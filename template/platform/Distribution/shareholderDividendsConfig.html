@@ -1,0 +1,133 @@
+{extend name="platform/base" /}
+{block name="right_tab"}
+<li><a class="nscs-table-handle_green" href="PLATFORM_MAIN/Distribution/addPartnerLevel"><i class="fa fa-plus-circle"></i>&nbsp;添加</a></li> 
+{/block}
+{block name="main"}
+<section class="panel panel-default">
+<header class="panel-heading font-bold"> 基本设置 </header>
+              <div class="row text-sm wrapper">
+                <div class="col-sm-12 m-b-xs">
+                  <a href="PLATFORM_MAIN/Distribution/addPartnerLevel" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加 </a> 
+                </div>
+              </div>
+<form class="form-horizontal" id="level_form" name="form">
+	<div class="form-group" style="margin-top:20px;">
+                                            <label class="col-sm-2 control-label">是否开启股东分红</label>
+                                            <div class="col-sm-4">
+                                                <label class="switch">
+                                                    <input id="is_partner_enable" type="checkbox" {eq name="shop_config_info.is_partner_enable" value="1"}checked{/eq}>
+                                                    <span></span> </label>
+                                            </div>
+                                        </div>
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+						<th class="center">等级名称</th>
+						<th width="20%">申请最低消费</th>
+						<th width="20%">股东分红佣金比率（%）</th>
+						<th class="center">创建时间</th>
+						<th class="center">操作</th>						
+			</tr>
+		</thead>
+		<tbody id="list">
+			{foreach name="partner_level_list" item="partner_level_info" }
+				    <tr align="center" data-level_id={$partner_level_info.level_id}>
+						<td>{$partner_level_info.level_name}</td>
+						<td><input  class="form-control" type="text" value="{$partner_level_info.level_money}" /></td>
+						<td><input  class="form-control"  type="text" value="{$partner_level_info.commission_rate}" /></td>
+						<td>{$partner_level_info.create_time}</td>
+						<td><a href="javascript:void(0);" onclick="deleteBox({$partner_level_info.level_id});">删除</a></td>
+					</tr>					
+				{/foreach}
+		</tbody>
+	</table>
+	<div class="form-group" style="margin-top:15px;">
+				<div class="col-sm-12 col-sm-offset-5">
+					<button type="submit" class="btn btn-primary" onclick="updatePartnerLevelAll();">保存</button>
+				</div>
+	</div>
+	</form>
+</section>
+{/block}
+{block name="script"}
+<script>
+/**
+ * 修改股东等级
+ */
+function updatePartnerLevelAll(){
+	if($("#is_partner_enable").prop("checked")){
+		var is_open = 1;
+	}else{
+		var is_open = 0;
+	}
+	var count_rate = 0;
+	var trObj = $("#partner_global");
+	var partner_level_string = "";
+	$("#list tr").each(function() {
+		var level_id = $(this).data("level_id");
+		var level_money = $(this).children().eq(1).children("input").val();
+		var commission_rate = $(this).children().eq(2).children("input").val();
+		partner_level_string = partner_level_string + ";" + level_id + "," + level_money + "," + commission_rate;
+		count_rate =parseFloat(count_rate) +parseFloat(commission_rate);
+	});
+	if(parseFloat(count_rate)>100 ){
+		showMessage('error', "佣金比率不可超过100%！");	
+		return false;
+	}
+	partner_level_string = partner_level_string.substring(1, partner_level_string.length );
+
+	$.ajax({
+		type:"post",
+		url:"PLATFORM_MAIN/Distribution/updatePartnerLevelAll",
+		data:{
+			'partner_level_string':partner_level_string,
+			'is_open':is_open
+		},
+		async:true,
+		success:function (data) {
+			if (data["code"] > 0) {
+				showMessage('success', data["message"],"PLATFORM_MAIN/Distribution/shareholderDividendsConfig");
+			}else{
+				showMessage('error', data["message"]);
+			}	
+		}
+	});
+}
+/**
+ *删除框
+ */
+function deleteBox(level_id){
+	$( "#dialog" ).dialog({
+        buttons: {
+            "确定,#51A351": function() {
+                $(this).dialog('close');
+                deletePartnerLevel(level_id);
+            },
+            "取消,#e57373": function() {
+                $(this).dialog('close');
+            }
+        },
+        contentText:"确定删除吗",
+        title:"提醒"
+    });
+}
+//删除等级
+function deletePartnerLevel(level_id){
+	$.ajax({
+		type:"post",
+		url:"PLATFORM_MAIN/Distribution/deletePartnerLevel",
+		data:{
+			'level_id':level_id
+		},
+		async:true,
+		success:function (data) {
+			if (data["code"] > 0) {
+				showMessage('success', data["message"],"PLATFORM_MAIN/Distribution/shareholderDividendsConfig");
+			}else{
+				showMessage('error', data["message"]);
+			}	
+		}
+	});
+}
+</script>
+{/block}

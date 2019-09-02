@@ -1,0 +1,43 @@
+<!--
+	创建人：李志伟
+	创建时间：2017年2月7日 12:22:28
+	功能描述：首页、店铺街
+-->
+<div class="w1210 store-wall2">
+	<h2>
+		<a class="store-wall-title" href="SHOP_MAIN/shop/shopstreet" title="店铺街" style="color: #000000">店铺街</a>
+	</h2>
+	<div class="store-con2">
+		<div class="store-wall2-ad">
+	</div>
+		<script type="text/javascript">
+			//店铺街小广告
+			var ap_id=[ap_id];
+			var data=platformAdvLoad(ap_id);
+			$('.store-wall2-ad').html('<a href="'+data[0]['adv_url']+'" target="_blank"><img class="lazy" src="__UPLOAD__/'+data[0]['adv_image']+'"></a>');
+		</script>
+		<ul class="store-wall2-list">
+			{for start="0" end="18"}
+				<li>
+				{if condition="$i lt $shop_list_count"}
+					{if condition="$shop_list[$i]['shop_logo'] eq ''"}
+						<img alt="{$shop_list[$i]['shop_name']}" src="__TEMP__/{$style}/public/images/default/default_shop_logo.png"/>
+					{else /}
+						<img alt="{$shop_list[$i]['shop_name']}" src="__UPLOAD__/{$shop_list[$i]['shop_logo']}"/>
+					{/if}
+					<div class="black-cover" style="display: none;"></div>
+					<div class="cover-content" style="display: none;">
+						<a href="SHOP_MAIN/shop/shopindex?shop_id={$shop_list[$i]['shop_id']}" class="enter"
+							target="_blank">点击进入</a></div>
+				{else /}
+					<img alt="虚位以待" src="__TEMP__/{$style}/public/images/default/default_shop_phantom.svg"/>
+					<div class="black-cover" style="display: none;"></div>
+					<div class="cover-content" style="display: none;">
+						<a href="SHOP_MAIN/shop/applyindex" class="enter"
+							target="_blank">点击进入</a></div>
+				{/if}
+				</li>
+			{/for}
+		</ul>
+	</div>
+</div>

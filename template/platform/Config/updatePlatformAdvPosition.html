@@ -1,0 +1,275 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style  type="text/css">
+.error{
+	font-size: 12px;
+    line-height: 16px;
+    color: red;
+    margin-top: 10px;
+	display:none;
+}
+
+</style>
+ {/block}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 编辑广告位 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label"><span style="color:red;margin-right:10px;">*</span>名称</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="ap_name" value="{$info['ap_name']}">
+				</div>
+					<p class="error">请输入广告位名称</p>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">简介</label>
+				<div class="col-md-4">
+					<div id="editor" class="form-control" style="overflow:scroll;height:150px;max-height:150px">{$info['ap_intro']}</div>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">类别</label>
+				<div class="col-md-4">
+					<select id="ap_class" name="account" class="form-control m-b">
+						<option value="0" {if condition="$info['ap_class'] eq 0"}selected{/if}>图片</option>
+<!-- 						<option value="1" {if condition="$info['ap_class'] eq 1"}selected{/if}>文字</option> -->
+<!-- 						<option value="2" {if condition="$info['ap_class'] eq 2"}selected{/if}>falsh</option> -->
+					</select>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+                                            <label class="col-sm-2 control-label">是否启用</label>
+                                            <div class="col-sm-4">
+                                                <label class="switch">
+                                                    <input id="is_use" type="checkbox" {if condition="$info['is_use'] eq 1"}checked{/if}>
+                                                    <span></span> </label>
+                                            </div>
+                                        </div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+                                            <label class="col-sm-2 control-label">所在位置类型</label>
+                                            <div class="col-sm-10">
+                                                <div class="radio col-sm-2">
+                                                    <label>
+                                                        <input type="radio" name="type" id="type1" value="1" {if condition="$info['type'] eq 1"}checked{/if}> pc端 </label>
+                                                </div>
+                                                <div class="radio col-sm-2">
+                                                    <label>
+                                                        <input type="radio" name="type" id="type2" value="2" {if condition="$info['type'] eq 2"}checked{/if}> 手机端 </label>
+                                                </div>
+                                            </div>
+                                        </div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+                                            <label class="col-sm-2 control-label"><span style="color:red;margin-right:10px;">*</span>展示方式</label>
+                                            <div class="col-sm-10">
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" name="ap_display" id="ap_display0" value="0" {if condition="$info['ap_display'] eq 0"}checked{/if}> 可以发布多条并幻灯展示 </label>
+                                                </div>
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" name="ap_display" id="ap_display1" value="1" {if condition="$info['ap_display'] eq 1"}checked{/if}> 可以发布多条广告并随机展示 </label>
+                                                </div>
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" name="ap_display" id="ap_display2" value="2" {if condition="$info['ap_display'] eq 2"}checked{/if}> 只允许发布并展示一条广告 </label>
+                                                   <p class="error">请选择展示方式</p>
+                                                </div>
+                                            </div>
+                                        </div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label"><span style="color:red;margin-right:10px;">*</span>宽度</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="ap_width" value="{$info['ap_width']}">
+				</div>
+				<p class="error">请输入广告位宽度只能是数字</p>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label"><span style="color:red;margin-right:10px;">*</span>高度</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="ap_height" value="{$info['ap_height']}">
+				</div>
+				<p class="error">请输入广告位高度只能是数字</p>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label"><span style="color:red;margin-right:10px;">*</span>默认图片</label>
+				<div class="col-md-4">
+					<p><img id="imgLogo" src="__UPLOAD__/{$info['default_content']}" class="imglogo"/></p>
+                                            	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                                            		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+                                            		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+														id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+														onchange="imgUpload(this);"> 
+														<input type="hidden" id="Logo" value="{$info['default_content']}" />
+													</span>
+													<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+												</a>
+												<p class="error">请上传一张图片作为默认图片</p>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">默认图片背景色</label>
+				<div class="col-md-2">
+<!-- 					<input id="colorpicker" value="{$info['ap_background_color']}"/> -->
+					<input type="color" class="form-control" id="colorpicker" value="{$info['ap_background_color']}" style="width:85px;">
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<input type="hidden" id="ap_id" value="{$info['ap_id']}">
+					<a href="javascript:void(0);" onclick="updatePlatformAdvPositionAjax()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+$(function (){
+	$("#colorpicker").spectrum({
+	    color: "{$info['ap_background_color']}",
+	    showInput: true,
+	    preferredFormat: true,
+	    showPalette: true,
+	});	
+});
+	/**
+	*模块输入信息验证
+	*/
+/* 	function verify( ad_image,link_url){
+		if(ad_image == ''){
+			$("#ad_image").parent().next().show();
+			return flase;
+		}else{
+			$(".error").hide();
+		}
+		if(link_url == ''){
+			$("#link_url").parent().next().show();
+			return flase;
+		}else{
+			$(".error").hide();
+		}
+	} */
+	/**
+	*添加模块
+	*/
+	function updatePlatformAdvPositionAjax() {
+		var ap_id = $("#ap_id").val();
+		var ap_name = $("#ap_name").val();
+		var ap_intro = $("#editor").html();
+		var ap_class = $("#ap_class").val();
+		if($("#is_use").prop("checked")){
+			var is_use = 1;
+		}else{
+			var is_use = 0;
+		}
+		var ap_display = $("input[type='radio'][name='ap_display']:checked").val();
+		var ap_width = $("#ap_width").val();
+		var ap_height = $("#ap_height").val();
+		var default_content = $("#Logo").val();
+		var ap_background_color = $("#colorpicker").val();
+		var type = $("input[type='radio'][name='type']:checked").val();
+		if(verify(ap_name,ap_display,ap_width,ap_height)){
+			$.ajax({
+				type : "post",
+				url : "PLATFORM_MAIN/config/updateplatformadvposition",
+				data : {
+					'ap_id' : ap_id,
+					'ap_name' : ap_name,
+					'ap_intro' : ap_intro,
+					'ap_class' : ap_class,
+					'is_use' : is_use,
+					'ap_display' : ap_display,
+					'ap_width' : ap_width,
+					'ap_height' : ap_height,
+					'default_content' : default_content,
+					'ap_background_color' : ap_background_color,
+					'type' : type,
+				},
+				async : true,
+				success : function(data) {
+					if (data["code"] > 0) {
+						showMessage('success', "编辑成功",'PLATFORM_MAIN/config/platformadvpositionlist');
+					}else{
+						showMessage('error', "编辑失败");
+					}
+				}
+			});
+		}	
+	}
+
+	/**
+	*模块输入信息验证
+	*/
+	function verify(ap_name,ap_display,ap_width,ap_height){
+		var reg = /^\d+$/;
+		if(ap_name.length == 0){
+			$("#ap_name").parent().next(".error").show();
+			$("#ap_name").focus();
+			return false;
+		}else{
+			$(".error").hide();
+		}
+		if(ap_display == undefined){
+			$("#ap_display2").parent().next(".error").show();
+			return false;
+		}else{
+			$(".error").hide();
+		}
+
+        if(!reg.test(ap_width)){
+			$("#ap_width").parent().next(".error").show();
+			$("#ap_width").focus();
+			return false;
+		}else{
+			$(".error").hide();
+		}
+		
+		if(!reg.test(ap_height)){
+			$("#ap_height").parent().next(".error").show();
+			$("#ap_height").focus();
+			return false;
+		}else{
+			$(".error").hide();
+		}
+
+		if($("#Logo").val().length ==0){
+			$(".pic .error").show();
+			return false;
+		}else{
+			$(".error").hide();
+		}
+		return true;;
+	}
+	/**
+	 *图片上传
+	 */
+	 /*	function imgUpload(event) {
+		var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+		fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+	}*/
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADADV };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

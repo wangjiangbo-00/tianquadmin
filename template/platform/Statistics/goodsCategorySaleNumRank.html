@@ -1,0 +1,68 @@
+{extend name="platform/base" /}
+{block name="resources"}
+<style>
+
+
+</style>
+{/block}
+{block name="main"} 
+<div class="row">
+<div id="container" style="min-width:400px;height:400px"></div>
+         
+</div>
+
+{/block}
+{block name="script"}
+<script src="__STATIC__/js/highcharts.js"></script>
+<script src="__STATIC__/js/exporting.js"></script>           
+<script>
+$(function () {
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/statistics/getcategorysalenumdata",
+		async : true,
+		success : function(data) {
+		    $('#container').highcharts({
+		        chart: {
+		            type: 'column'
+		        },
+		        title: {
+		            text: '商品分类销售'
+		        },
+		        subtitle: {
+		            text: ''
+		        },
+		        xAxis: {
+		            categories: data["category_list"],
+		            crosshair: true
+		        },
+		        yAxis: {
+		            min: 0,
+		            title: {
+		                text:' 销量(件)'
+		            }
+		        },
+		        tooltip: {
+		            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+		            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+		            '<td style="padding:0"><b>{point.y:.1f} 件</b></td></tr>',
+		            footerFormat: '</table>',
+		            shared: true,
+		            useHTML: true
+		        },
+		        plotOptions: {
+		            column: {
+		                pointPadding: 0.2,
+		                borderWidth: 0
+		            }
+		        },
+		        series: [{
+		            name: '销量',
+		            data:  data["sale_num_list"]
+		        }]
+		    });
+		}
+	});
+});
+</script>
+{/block}

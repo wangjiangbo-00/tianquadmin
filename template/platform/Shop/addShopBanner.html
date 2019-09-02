@@ -1,0 +1,379 @@
+{extend name="platform/base" /} {block name="main"}
+<script src="ADMIN_JS/My97DatePicker/WdatePicker.js" type="text/javascript"></script>
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加首页横幅 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="goods_category_form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">横幅名称</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="category_name" name="category_name" required value="">
+				</div>
+				<label class="col-md-8 error" for="category_name"></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">关联类型</label>
+				<div class="col-sm-2">
+					<select id="reftype" name="account" class="form-control m-b" >
+						<option value="0">选择一个关联的横幅类型</option>
+						<option value="1">商品链接</option>
+						<option value="2">店铺链接</option>
+						<option value="3">平台折扣</option>
+						<option value="4">平台抽奖</option>
+						<option value="5">平台团购</option>
+
+						<option value="999">展示</option>
+					</select>
+				</div>
+				<label class="col-md-8 error" for="reftype">请选择一个关联类型</label>
+			</div>
+
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label">关联属性</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="refid" name="category_name" required value="" >
+				</div>
+				<label class="col-md-8 error" for="category_name">请确认该关联类型下该属性值是正确的</label>
+			</div>
+
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label">属性详情</label>
+				<div class="col-md-2">
+					<div type="text"  id="refdetails" name="category_name" required value=""></div>
+				</div>
+				<label class="col-md-8 error" for="category_name"></label>
+			</div>
+
+
+			<div class="line line-dashed line-lg pull-in"></div>
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label">是否有效</label>
+				<div class="col-sm-2">
+					<label class="switch"><input id="is_open" type="checkbox"><span></span></label>
+				</div>
+			</div>
+			
+
+			<div class="line line-dashed line-lg pull-in"></div>
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label">是否展示</label>
+				<div class="col-sm-2">
+					<label class="switch"><input id="is_visible" type="checkbox"><span></span></label>
+				</div>
+			</div>
+
+
+
+
+
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">排序</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="sort" value=""
+						number="true" min="0">
+				</div>
+				<label class="col-md-9 error" for="sort"></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">活动图片</label>
+				<div class="col-md-10">
+					<p><img id="imgLogo" src="" class="imglogo"/></p>
+                             <a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                              		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+			                                   		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+								id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+								onchange="imgUpload(this);"> 
+								<input type="hidden" id="Logo" value="" />
+							 </span>
+							 <a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+					         </a>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">描述</label>
+				<div class="col-sm-4">
+					<div id="editor" class="form-control" style="overflow: scroll; height: 150px; max-height: 150px"></div>
+				</div>
+			</div>
+			<!-- 书签 -->
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+
+					<button type="submit" class="btn btn-primary">保存</button>
+<!-- 					<a href="javascript:void(0);" onclick="addGoodsCategoryAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+	var bannerType = 3;
+	$().ready(function() {
+
+        $(".error").hide();
+
+		$("#goods_category_form").validate({
+			submitHandler : function() {
+                addShopBanner();
+			}
+		});
+
+        $("#reftype").bind("change",function(){
+            //获取被选中的option的值
+            var id = $(this).val();
+            //获取自定义属性的值
+            var value = $(this).find("option:selected").val() ;
+
+            if(value!=undefined)
+            {
+                $("#refid").val("");
+
+                bannerType = value;
+            }
+
+
+        });
+
+
+
+
+        $("#refid").bind("change",function(){
+            //获取被选中的option的值
+            var id = $(this).val();
+            //获取自定义属性的值
+
+                if(id )
+				{
+                    value = parseInt(id);
+                    if(bannerType == 0)
+                    {
+
+
+                    }
+                    else if(bannerType == 1)
+                    {
+
+                        //get goods
+
+                        LoadGoods(value);
+                    }
+                    else if(bannerType == 2)
+                    {
+
+                        //get goods
+
+                        LoadShop(value);
+                    }
+
+                    else if(bannerType == 3)
+                    {
+
+                        //get goods
+
+                        LoadDiscount(value);
+                    }
+
+                    else if(bannerType == 4)
+                    {
+
+                        //get goods
+
+                        LoadGift(value);
+                    }
+
+                    else if(bannerType == 5)
+                    {
+
+                        //get goods
+
+                        LoadGroup(value);
+                    }
+				}
+
+
+
+
+        });
+	});
+	/**
+	 *添加模块
+	 */
+	function addShopBanner() {
+		var category_name = $("#category_name").val();
+
+
+
+		var sort = $("#sort").val();
+        var type = $("#reftype").val();
+        var refid = $("#refid").val();
+		var description = $("#editor").html();
+        var refdetails= $("#refdetails").html();
+		if ($("#is_visible").prop("checked")) {
+			var is_visible = 1;
+		} else {
+			var is_visible = 0;
+		}
+
+
+        if ($("#is_open").prop("checked")) {
+            var is_valid = 1;
+        } else {
+            var is_valid = 0;
+        }
+
+
+		var category_pic = $("#Logo").val();
+
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/shop/addshopbanner",
+			data : {
+				'name' : category_name,
+				'sort' : sort,
+				'description' : description,
+				'is_visible' : is_visible,
+                'is_valid' : is_valid,
+				'pic' : category_pic,
+                'type' : type,
+                'refid' : refid,
+                'refdetails' : refdetails,
+
+
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+
+					showMessage('success', data["message"],'PLATFORM_MAIN/shop/getshopbannerlist');
+
+
+
+				} else {
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+    function LoadGoods(id) {
+        var $goodsArr = new Array();
+
+        $.ajax({
+            type : "post",
+            url : "ADMIN_MAIN/goods/goodsDetails",
+            data : {
+
+                "id" : id,
+
+            },
+            success : function(data) {
+                var details ="商品:" + data.goods_name + " 团购价:" + data.group_price + " 简介:" + data.introduction;
+
+                $("#refdetails").html(details);
+
+            }
+        });
+    }
+
+    function LoadShop(id) {
+        var $goodsArr = new Array();
+
+        $.ajax({
+            type : "post",
+            url : "ADMIN_MAIN/shop/ShopDetails",
+            data : {
+
+                "id" : id,
+
+            },
+            success : function(data) {
+                var details ="店铺:" + data.shop_name ;
+
+                $("#refdetails").html(details);
+
+            }
+        });
+    }
+
+    function LoadDiscount(id) {
+        var $goodsArr = new Array();
+
+        $.ajax({
+            type : "post",
+            url : "ADMIN_MAIN/promotion/getDiscountDetail",
+            data : {
+
+                "id" : id,
+
+            },
+            success : function(data) {
+                var details ="折扣详情:" + data.discount_name ;
+
+                $("#refdetails").html(details);
+
+            }
+        });
+    }
+
+    function LoadGroup(id) {
+        var $goodsArr = new Array();
+
+        $.ajax({
+            type : "post",
+            url : "ADMIN_MAIN/promotion/getDiscountDetail",
+            data : {
+
+                "id" : id,
+
+            },
+            success : function(data) {
+                var details ="团购信息:" + data.name ;
+
+                $("#refdetails").html(details);
+
+            }
+        });
+    }
+
+    function LoadGift(id) {
+        var $goodsArr = new Array();
+
+        $.ajax({
+            type : "post",
+            url : "ADMIN_MAIN/promotion/getGiftDetail",
+            data : {
+
+                "id" : id,
+
+            },
+            success : function(data) {
+                var details ="抽奖信息:" + data.gift_name ;
+
+                $("#refdetails").html(details);
+
+            }
+        });
+    }
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src",res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

@@ -1,0 +1,115 @@
+{extend name="platform/base" /}
+{block name="resources"}
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script>
+<style>
+.col-sm-9 {
+    width: 50%;
+}
+</style>
+{/block}
+
+ {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9" style="width:50%;">
+		店铺总营业额：<span id="shop_sale">0</span>&nbsp;&nbsp;&nbsp;&nbsp;平台余额：<span id="platform_money">0</span>&nbsp;&nbsp;&nbsp;&nbsp;店铺余额：<span id="shop_money">0</span>
+	</div>
+	<div class="col-sm-2">
+		<input type="text" id="search_text" class="input-sm form-control" placeholder="请输入订单号">
+	</div>
+	<input type="text" id='startDate' placeholder="请选择开始日期" class="input-medium" style="float:left;width:203px;margin-right:5px;padding:5px 10px;height:30px;border:1px solid #d9d9d9;" onclick="WdatePicker()"/>
+	<input type="text" id='endDate' placeholder="请选择结束日期" class="input-medium" style="float:left;width:203px;margin-right:5px;padding:5px 10px;height:30px;border:1px solid #d9d9d9;" onclick="WdatePicker()" />
+	
+	<div class="col-sm-1">
+		<button class="btn btn-sm btn-default" type="button"
+			onclick="LoadingInfo(1)">搜索</button>
+	</div>
+</div>
+<section class="panel panel-default">
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+		
+				<th>订单编号</th>
+				<th>实付金额</th>
+				<th>平台获取金额</th>
+				<th>下单时间</th>
+				<th>是否结算</th>
+			
+			</tr>
+		</thead>
+		<tbody id="list">
+			<tr></tr>
+		</tbody>
+	</table>
+	{include file="platform/page" /}
+</section>
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		var start_date = $("#startDate").val();
+		var end_date = $("#endDate").val();
+// 		var user_name = $("#userName").val();
+// 		var order_no = $("#orderNo").val();
+// 		var order_status = $("#order_status").val();	
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/statistics/orderStat",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex,
+				"order_no" : search_text,
+				"start_date":start_date,
+				"end_date":end_date
+			},
+			success : function(data) {
+// 				alert(JSON.stringify(data['list']));
+				//alert(JSON.stringify(data['count']));
+			    $("#shop_sale").text(data['count']['shop_sale']);
+			    $("#platform_money").text(data['count']['platform_money']);
+			    $("#shop_money").text(data['count']['shop_money']);
+				var html = '';
+				$("#total_count_num").text(data['list']["total_count"]);
+				$("#page_count_num").text(data['list']["page_count"]);
+				$("#page_count").val(data['list']["page_count"]);
+				$("#pageNumber a").remove();
+				if (data.list["data"].length > 0) {
+					for (var i = 0; i < data.list["data"].length; i++) {
+						html += '<tr>';
+				
+						html += '<td>' + data.list["data"][i]["order_no"] + '</td>';
+						html += '<td>' + data.list["data"][i]["order_pay_money"] + '</td>';
+						html += '<td>' + data.list["data"][i]["platform_money"] + '</td>';
+						html += '<td>' + data.list["data"][i]["create_time"] + '</td>';
+						if(data.list["data"][i]["is_issue"]){
+							html += '<td><i class="fa fa-check text-success"></i></td>';
+						}else{
+							html += '<td><i class="fa  fa-times"></i></td>';
+						}																												
+						
+						html += '</tr>';
+					}
+			
+				} else {
+					html += '<tr align="center"><th colspan="8">暂无符合条件的订单</th></tr>';
+				}
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+</script>
+{/block}

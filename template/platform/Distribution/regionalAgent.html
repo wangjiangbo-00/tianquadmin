@@ -1,0 +1,122 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.form-control{
+	width: 50px;
+float: left;
+padding: 0px;
+text-align: center;
+}
+.percent{
+	padding: 0px 85px;
+}
+</style>
+
+{/block}
+
+
+{block name="main"}
+<section class="panel panel-default">
+<form class="form-horizontal" id="level_form" name="form">
+	<div class="form-group" style="margin-top:20px;">
+                                            <label class="col-sm-2 control-label">是否开启三级分销</label>
+                                            <div class="col-sm-4">
+                                                <label class="switch">
+                                                    <input id="is_regional_agent" type="checkbox" {eq name="shop_config_info.is_regional_agent" value="1"}checked{/eq}>
+                                                    <span></span> </label>
+                                            </div>
+                                        </div>
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+						<th width="5%"></th>						
+						<th width="15%" class="center">代理级别</th>
+						<th width="15%"></th>						
+						<th width="15%" class="center">各级奖励比例（%）</th>
+						<th width="15%"></th>						
+						<th width="15%" class="center">升级条件</th>
+						<th width="15%"></th>						
+			</tr>
+		</thead>
+		<tbody>
+			<tr align="center" >
+						<td></td>
+						<td>省级代理</td>
+						<td></td>
+						<td class="percent" style="padding: 0px 85px;"><input  class="form-control" type="text" id="province_rate"value="{$region_agent_info.province_rate}"/>%</td>
+						<td></td>
+						<td class="percent" style="padding: 0px 85px;"><input  class="form-control"  type="text" id="application_require_province"value="{$region_agent_info.application_require_province}" />元</td>						
+						<td></td>
+					</tr>	
+					<tr align="center" >
+						<td></td>
+						<td>市级代理</td>
+						<td></td>
+						<td class="percent" style="padding: 0px 85px;"><input  class="form-control" type="text" id="city_rate"value="{$region_agent_info.city_rate}" />%</td>
+						<td></td>
+						<td class="percent" style="padding: 0px 85px;"><input  class="form-control"  type="text" id="application_require_city"value="{$region_agent_info.application_require_city}" />元</td>						
+						<td></td>
+					</tr>
+					<tr align="center" >
+						<td></td>
+						<td>区级代理</td>
+						<td></td>
+						<td class="percent" style="padding: 0px 85px;"><input  class="form-control" type="text" id="district_rate"value="{$region_agent_info.district_rate}" />%</td>
+						<td></td>
+						<td class="percent" style="padding: 0px 85px;"><input  class="form-control"  type="text" id="application_require_district"value="{$region_agent_info.application_require_district}" />元</td>						
+						<td></td>
+					</tr>
+
+		</tbody>
+	</table>
+	<div class="form-group" style="margin-top:15px;">
+				<div class="col-sm-12 col-sm-offset-5">
+					<button type="submit" class="btn btn-primary" onclick="modifyShopConfigIsRegionalAgent();">保存</button>
+				</div>
+	</div>
+	</form>
+</section>
+<script src="__STATIC__/js/limit_input_digit.js"></script>
+<script>		
+	function modifyShopConfigIsRegionalAgent(){
+		if($("#is_regional_agent").prop("checked")){
+			var is_open = 1;
+		}else{
+			var is_open = 0;
+		}
+		var province_rate=$("#province_rate").val();
+		var application_require_province=$("#application_require_province").val();
+		var city_rate=$("#city_rate").val();
+		var application_require_city=$("#application_require_city").val();
+		var district_rate=$("#district_rate").val();
+		var application_require_district=$("#application_require_district").val();
+		
+		if((parseFloat(province_rate) +parseFloat(city_rate)+ parseFloat(district_rate))>100 ){
+			showMessage('error', "佣金比率不可超过100%！");	
+			return false;
+		}
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Distribution/UpdateShopRegionAgentConfig",
+			data:{
+				'is_open':is_open,
+				'province_rate':province_rate,
+				'application_require_province':application_require_province,
+				'city_rate':city_rate,
+				'application_require_city':application_require_city,
+				'district_rate':district_rate,
+				'application_require_district':application_require_district
+			},
+			async:true,
+			success:function (data) {
+				//alert(data);
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/Distribution/regionalAgent");
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+</script>
+{/block}

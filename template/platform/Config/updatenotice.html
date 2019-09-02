@@ -1,0 +1,79 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.mlr15{
+	margin:0;
+}
+</style>
+{/block}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 首页公告 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">首页公告</label>
+                <div class="col-sm-4">
+                    <textarea id="notice_message" class="form-control" style="overflow:scroll;height:150px;max-height:150px">{$info.notice_message}</textarea>
+                </div><br/>
+                <p class="hint" style="display:none;color:red;">不可为空！</p>
+                <div class="col-sm-4" style="width: 100%;margin-top: 13px;">
+                <label class="col-sm-2 control-label"></label><span style="color: orange;">此公告在手机端首页显示。</span>
+                
+                </div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label" style="margin-right: 15px;">是否启用</label>
+		<!-- 		<div style="margin-top: 7px;">
+					<input id="is_enable" type="checkbox" class="checkbox"  {if condition="$info.is_enable==1"} checked="checked"{/if}/>
+				</div> -->
+				<label class="switch">
+                        <input id="is_enable" type="checkbox"  {if condition="$info.is_enable==1"} checked="checked"{/if}>
+                        <span></span> 
+                </label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="setConfigAjax()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+
+
+
+<script>
+function setConfigAjax(){
+	var notice_message = $("#notice_message").val();
+	var is_enable = 0;
+	if($("#is_enable").is(":checked")){
+		is_enable = 1;
+	}
+	if (notice_message == '') {
+		$(".hint").show();
+		$("#notice_message").focus();
+		return false;
+	} else {
+		$(".hint").hide();
+	}
+	$.ajax({
+		type:"post",
+		url:"PLATFORM_MAIN/config/updatenotice",
+		data:{
+			'notice_message' : notice_message,
+			'is_enable' : is_enable
+		},
+		success:function (data) {
+			//alert(JSON.stringify(data));
+			if (data["code"] > 0) {
+				showMessage('success', data["message"],'PLATFORM_MAIN/config/updatenotice');
+			}else{
+				showMessage('error', data["message"]);
+			}
+		}
+	});
+}
+</script>
+{/block}

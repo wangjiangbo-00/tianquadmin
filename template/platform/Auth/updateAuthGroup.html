@@ -1,0 +1,108 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 修改用户组 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">用户组名称</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="group_name" name="group_name" value="{$info['group_name']}" required>
+				</div>
+				<label class="col-md-8 error" for="group_name" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group level_0">
+				<label class="col-sm-2 control-label"><input type="checkbox" onclick="allSelectBox(this)" value="0"> 设置权限</label>
+				<div class="col-md-10">
+				{foreach name="list" item="v1"}
+					<div class="form-group level_1">
+						<div class="col-md-1">
+							<label class="checkbox-inline"> <input type="checkbox" dir="0" onclick="selectlevel('level_1', this)" name="module_id" value="{$v1['module_id']}" {in name="$v1['module_id']" value="$info['module_id_array']"}checked{/in}> <b style="color:#555;">{$v1['module_name']}</b></label>
+						</div>
+						<div class="col-md-11">
+							{foreach name="v1['child']" item="v2"}
+							<div class="form-group level_2">
+								<div class="col-md-2">
+									<label class="checkbox-inline"> <input type="checkbox" dir="{$v2['pid']}" onclick="selectlevel('level_2',this)" name="module_id" value="{$v2['module_id']}" {in name="$v2['module_id']" value="$info['module_id_array']"}checked{/in}> <b>{$v2['module_name']}</b></label>
+								</div>
+								<div class="col-md-10">
+									{foreach name="v2['child']" item="v3"}
+										<label class="checkbox-inline"> <input type="checkbox" parentdir="{$v2['pid']}" dir="{$v3['pid']}" onclick="selectlevel('level_3',this)" name="module_id" value="{$v3['module_id']}" {in name="$v3['module_id']" value="$info['module_id_array']"}checked{/in}> {$v3['module_name']}</label>
+									{/foreach}
+								</div>
+							</div>
+							{/foreach}
+						</div>
+					</div>
+					<div class="line line-dashed line-lg pull-in"></div>
+				{/foreach}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<input type="hidden" id="group_id" value="{$info['group_id']}">
+					<button type="submit" class="btn btn-primary">保存</button>
+<!-- 					<a href="javascript:void(0);" onclick="updateAuthGroupAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+$().ready(function() {
+	$("#form").validate({
+		submitHandler:function(){
+			updateAuthGroupAjax();
+		}
+	});
+});
+//全选
+function allSelectBox(event){
+	$(".level_0 input[name='module_id']").prop("checked", $(event).is(":checked") == true ? "checked" : false);
+}
+function selectlevel(level, event){
+	var dir = $(event).attr("dir");
+	if($(event).is(":checked") == true){
+		$("input[name='module_id'][value='"+dir+"']").prop("checked", "checked");
+	}
+	if(level === 'level_3'){
+		var pardir = $(event).attr("parentdir");
+		if($(event).is(":checked") == true){
+			$("input[name='module_id'][value='"+pardir+"']").prop("checked", "checked");
+		}
+	}
+	$(event).parents("."+level).find("input[name='module_id']").prop("checked", $(event).is(":checked") == true ? "checked" : false);
+}
+	/**
+	 *添加用户组
+	 **/
+	function updateAuthGroupAjax() {
+		var group_id = $("#group_id").val();
+		var group_name = $("#group_name").val();
+		var select_box = '';
+		$("input[name='module_id']:checked").each(function(){
+			select_box = select_box+','+$(this).val();
+		});
+		select_box = select_box.substring(1);
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Auth/updateAuthGroup",
+			data : {
+				'group_id' : group_id,
+				'group_name' : group_name,
+				'select_box' : select_box,
+			},
+			async : true,
+			success : function(data) {
+				if (data['code'] > 0) {
+					showMessage('success', "修改成功",'PLATFORM_MAIN/Auth/authGroupList');
+				}else{
+					showMessage('error', "修改失败");
+				}
+			}
+		});
+	}
+</script>
+{/block}

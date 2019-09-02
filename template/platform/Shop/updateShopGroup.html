@@ -1,0 +1,58 @@
+{extend name="platform/base" /} {block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 修改分组 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">分组名称</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="group_name" value="{$shop_group_info.group_name}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">排序</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="group_sort" value="{$shop_group_info.group_sort}">
+				</div>
+			</div>
+			
+
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="updateShopGroupAjax()"
+						class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+		<input type="hidden" id="shop_group_id" name="shop_group_id" value="{$shop_group_info.shop_group_id}"/>
+	</div>
+</section>
+<script>
+	//添加分组
+	function updateShopGroupAjax() {
+		var shop_group_id = $("#shop_group_id").val();
+		var group_name = $("#group_name").val();
+		var group_sort = $("#group_sort").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Shop/updateShopGroup",
+			data : {
+				'shop_group_id':shop_group_id,
+				'group_name' : group_name,
+				'group_sort' : group_sort
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', "修改成功",'PLATFORM_MAIN/Shop/shopgrouplist');
+				}else{
+					showMessage('error', "修改失败");
+				}
+			}
+		});
+	}
+	
+</script>
+{/block}

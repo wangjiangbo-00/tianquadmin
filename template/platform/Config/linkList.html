@@ -1,0 +1,115 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9">
+		<a href="PLATFORM_MAIN/Config/addLink" class="btn btn-sm btn-primary"><i
+			class="fa fa-plus"></i> 添加友情链接 </a>
+	</div>
+	<div class="col-sm-2">
+		<input type="text" class="input-sm form-control" id="search_text"
+			placeholder="请输入友情链接名称">
+	</div>
+	<div class="col-sm-1">
+		<button class="btn btn-sm btn-default" type="button"
+			onclick="LoadingInfo(1)">搜索</button>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th>标题</th>
+					<th>链接地址</th>
+					<th class="center">排序</th>
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+})
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var ap_id = $("#ap_id").val();
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/config/linklist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text, "ap_id" : ap_id
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data['data'].length > 0) {
+					for (var i = 0; i < data['data'].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['link_id']+'"></td>';
+						html += '<td>'+ data['data'][i]['link_title']+'</td>';
+						html += '<td>' + data['data'][i]["link_url"] + '</td>';
+						html += '<td class="center">' + data['data'][i]["link_sort"] + '</td>';
+						html += '<td class="center"><a href="PLATFORM_MAIN/config/updatelink?link_id=' + data['data'][i]["link_id"] + '">编辑</a> ';
+						html += '<a href="javascript:;" onclick="delLink(' + data['data'][i]["link_id"] + ')">删除</a></td> ';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="6" style="text-align:center">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+			}
+		});
+	}	
+function delLink(link_id){
+	$( "#dialog" ).dialog({
+        buttons: {
+            "确定": function() {
+                $(this).dialog('close');
+                $.ajax({
+    				type:"post",
+    				url:"PLATFORM_MAIN/config/dellink",
+    				data:{'link_id':link_id},
+    				async:true,
+    				success:function (data) {
+    					if(data['code'] > 0){
+    						location.href = "PLATFORM_MAIN/config/linklist";
+    					}else{
+    						$("#dialog").dialog({
+    							 buttons: {
+    					                "确定,#e57373": function() {
+    					                    $(this).dialog('close');
+    					                }
+    					            },
+    					            contentText:data['message']
+    						})
+    					}
+    				}
+    			});
+            },
+            "取消,#e57373": function() {
+                $(this).dialog('close');
+            }
+        },
+        contentText:"确定删除？",
+    });
+}
+$("#search_text").keypress(function(e){
+	if(e.keyCode == 13){
+		LoadingInfo(1);
+	}
+});
+</script>
+{/block}

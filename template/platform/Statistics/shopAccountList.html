@@ -1,0 +1,117 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+              <header class="panel-heading"> 店铺账户统计</header>
+              <div class="table-responsive">
+                <table class="table table-striped b-t b-light text-sm">
+                  <thead>
+                    <tr>
+                      <th width="20"><input type="checkbox"></th>
+                      <th class="center">店铺名称 </th>
+                      <th class="center">营业额</th>
+                      <th class="center">入账总额</th>
+                      <th class="center">总收益</th>
+                      <th class="center">已提现总额</th>
+                      <th class="center">当前余额</th>
+                      <th class="center">平台提成比率</th>
+                      <th class="center">平台收益</th>
+                      <th class="center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="list">
+                    <tr></tr>
+                  </tbody>
+                </table>
+              </div>
+              {include file="platform/page" /}
+            </section>
+
+{/block}
+{block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/statistics/shopAccountList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				var html = '';
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['shop_id']+'"></td>';
+						html += '<td class="center">' + data["data"][i]["shop_name"] + '</td>';
+
+
+						html += '<td class="center">' + data["data"][i]["shop_profit"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_total_money"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_proceeds"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_withdraw"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_canwithdraw"] + '</td>';
+						html += '<td class="center"><span class="js-span-commission-rate'+data["data"][i]["shop_id"]+'">' + data["data"][i]["shop_platform_commission_rate"] + '%</span><input type="text" style="display:none;width:50px;text-align:center;" value="'+data["data"][i]["shop_platform_commission_rate"]+'" id="shop_platform_commission_rate'+data["data"][i]['shop_id']+'" /></td>';
+						html += '<td class="center">' + data["data"][i]["shop_platform_commission"] + '</td>';
+				
+						html += '<td class="center"><a href="PLATFORM_MAIN/account/shopaccountrecordslist?shop_id='+data['data'][i]['shop_id']+'">详情</a>&nbsp;<a href="javascript:updateData('+data["data"][i]["shop_id"]+');">修改</a></td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="11">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}
+	var flag = true;
+	function updateData(shop_id){
+		if(flag){
+// 			$("#list td span").hide();
+// 			$("#list td input").show();
+			$(".js-span-commission-rate"+shop_id).hide();
+			$("#shop_platform_commission_rate"+shop_id).show();
+			flag = false;
+		}else{
+			if(isNaN($("#shop_platform_commission_rate"+shop_id).val())){
+				showMessage('error', "请输入数字");
+				return;
+			}
+			if($("#shop_platform_commission_rate"+shop_id).val().split(".")[1].length>2){
+				showMessage('error', "要求保留两位小数");
+				return;
+			}
+			$.ajax({
+				url : "PLATFORM_MAIN/statistics/updateshopplatformcommissionrate",
+				type : "post",
+				data : { "shop_id" :shop_id, "commission_rate" : $("#shop_platform_commission_rate"+shop_id).val()},
+				success : function(res){
+					$("#shop_platform_commission_rate"+shop_id).prev().text($("#shop_platform_commission_rate"+shop_id).val()+"%");
+				}
+			})
+// 			$("#list td span").show();
+// 			$("#list td input").hide();
+			$(".js-span-commission-rate"+shop_id).show();
+			$("#shop_platform_commission_rate"+shop_id).hide();
+			flag = true;
+		}
+	}
+</script>
+{/block}

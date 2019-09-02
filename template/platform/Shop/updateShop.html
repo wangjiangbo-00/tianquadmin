@@ -1,0 +1,897 @@
+{extend name="platform/base" /} {block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading text-right bg-light">
+		<ul class="nav nav-tabs pull-left">
+			<li class="active"><a href="#base" data-toggle="tab">店铺信息</a></li>
+			<li class=""><a href="#apply" data-toggle="tab">注册信息</a></li>
+		</ul>
+		<span class="hidden-sm">编辑店铺</span>
+	</header>
+	<div class="panel-body">
+		<div class="tab-content">
+			<div class="tab-pane fade active in" id="base">
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">店铺名称</label>
+								<div class="col-md-2">
+									<input type="text" class="form-control" id="shop_name"
+										value="{$info['shop_name']}">
+								</div>
+							</div>
+							<!-- 			<div class="line line-dashed line-lg pull-in"></div> -->
+							<!-- 			<div class="form-group"> -->
+							<!-- 				<label class="col-sm-2 control-label">开店时间</label> -->
+							<!-- 				<div class="col-md-4"> -->
+							<!-- 					<input type="text" class="form-control" id="group_sort" value=""> -->
+							<!-- 				</div> -->
+							<!-- 			</div> -->
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">所属分类</label>
+								<div class="col-md-4">
+									<select id="shop_group_id" name="account"
+										class="form-control m-b"> {foreach name="group_list"
+										item="vg"}
+										<option value="{$vg['shop_group_id']}" {if
+											condition="$info['shop_group_id'] eq $vg['shop_group_id']"}selected{/if}>{$vg['group_name']}</option>
+										{/foreach}
+									</select>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">所属等级</label>
+								<div class="col-md-4">
+									<select id="shop_type" name="account" class="form-control m-b">
+										{foreach name="type_list" item="vt"}
+										<option value="{$vt['instance_typeid']}" {if
+											condition="$info['shop_type'] eq $vt['instance_typeid']"}selected{/if}>{$vt['type_name']}</option>
+										{/foreach}
+									</select>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">店铺信用</label>
+								<div class="col-md-4">
+									<select id="shop_credit" name="account"
+										class="form-control m-b">
+										<option value="1" {if condition="$info['shop_credit'] eq 1"}selected{/if}>1星</option>
+										<option value="2" {if condition="$info['shop_credit'] eq 2"}selected{/if}>2星</option>
+										<option value="3" {if condition="$info['shop_credit'] eq 3"}selected{/if}>3星</option>
+										<option value="4" {if condition="$info['shop_credit'] eq 4"}selected{/if}>4星</option>
+										<option value="5" {if condition="$info['shop_credit'] eq 5"}selected{/if}>5星</option>
+									</select>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">描述相符度分数</label>
+								<div class="col-md-4">
+									<select id="shop_desccredit" name="account"
+										class="form-control m-b">
+										<option value="1" {if
+											condition="$info['shop_desccredit'] eq 1"}selected{/if}>1星</option>
+										<option value="2" {if
+											condition="$info['shop_desccredit'] eq 2"}selected{/if}>2星</option>
+										<option value="3" {if
+											condition="$info['shop_desccredit'] eq 3"}selected{/if}>3星</option>
+										<option value="4" {if
+											condition="$info['shop_desccredit'] eq 4"}selected{/if}>4星</option>
+										<option value="5" {if
+											condition="$info['shop_desccredit'] eq 5"}selected{/if}>5星</option>
+									</select>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">服务态度分数</label>
+								<div class="col-md-4">
+									<select id="shop_servicecredit" name="account"
+										class="form-control m-b">
+										<option value="1" {if
+											condition="$info['shop_servicecredit'] eq 1"}selected{/if}>1星</option>
+										<option value="2" {if
+											condition="$info['shop_servicecredit'] eq 2"}selected{/if}>2星</option>
+										<option value="3" {if
+											condition="$info['shop_servicecredit'] eq 3"}selected{/if}>3星</option>
+										<option value="4" {if
+											condition="$info['shop_servicecredit'] eq 4"}selected{/if}>4星</option>
+										<option value="5" {if
+											condition="$info['shop_servicecredit'] eq 5"}selected{/if}>5星</option>
+									</select>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">发货速度分数</label>
+								<div class="col-md-4">
+									<select id="shop_deliverycredit" name="account"
+										class="form-control m-b">
+										<option value="1" {if
+											condition="$info['shop_deliverycredit'] eq 1"}selected{/if}>1星</option>
+										<option value="2" {if
+											condition="$info['shop_deliverycredit'] eq 2"}selected{/if}>2星</option>
+										<option value="3" {if
+											condition="$info['shop_deliverycredit'] eq 3"}selected{/if}>3星</option>
+										<option value="4" {if
+											condition="$info['shop_deliverycredit'] eq 4"}selected{/if}>4星</option>
+										<option value="5" {if
+											condition="$info['shop_deliverycredit'] eq 5"}selected{/if}>5星</option>
+									</select>
+								</div>
+							</div>
+							<!-- 			<div class="line line-dashed line-lg pull-in"></div> -->
+							<!-- 			<div class="form-group"> -->
+							<!-- 				<label class="col-sm-2 control-label">有效期至</label> -->
+							<!-- 				<div class="col-md-10"> -->
+							<!-- 					<input class="input-sm input-s datepicker-input form-control" -->
+							<!-- 						size="16" type="text" value="12-02-2013" -->
+							<!-- 						data-date-format="dd-mm-yyyy"> -->
+							<!-- 				</div> -->
+							<!-- 			</div> -->
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">店铺保障开关</label>
+								<div class="col-md-10">
+									<div class="col-md-3">
+										<p>7天退换</p>
+										<label class="switch"><input id="store_qtian"
+											type="checkbox" {if condition="$info['store_qtian'] eq 1"}checked{/if}><span></span></label>
+									</div>
+									<div class="col-md-3">
+										<p>正品保障</p>
+										<label class="switch"><input id="shop_zhping"
+											type="checkbox" {if condition="$info['shop_zhping'] eq 1"}checked{/if}><span></span></label>
+									</div>
+									<div class="col-md-3">
+										<p>两小时发货</p>
+										<label class="switch"><input id="shop_erxiaoshi"
+											type="checkbox" {if condition="$info['shop_erxiaoshi'] eq 1"}checked{/if}><span></span></label>
+									</div>
+									<div class="col-md-3">
+										<p>退货承诺</p>
+										<label class="switch"><input id="shop_tuihuo"
+											type="checkbox" {if condition="$info['shop_tuihuo'] eq 1"}checked{/if}><span></span></label>
+									</div>
+									<div class="col-md-3">
+										<p>试用中心</p>
+										<label class="switch"><input id="shop_shiyong"
+											type="checkbox" {if condition="$info['shop_shiyong'] eq 1"}checked{/if}><span></span></label>
+									</div>
+									<div class="col-md-3">
+										<p>实体验证</p>
+										<label class="switch"><input id="shop_shiti"
+											type="checkbox" {if condition="$info['shop_shiti'] eq 1"}checked{/if}><span></span></label>
+									</div>
+									<div class="col-md-3">
+										<p>消协保证</p>
+										<label class="switch"><input id="shop_xiaoxie"
+											type="checkbox" {if condition="$info['shop_xiaoxie'] eq 1"}checked{/if}><span></span></label>
+									</div>
+									<div class="col-md-3">
+										<p>货到付款</p>
+										<label class="switch"><input id="shop_huodaofk"
+											type="checkbox" {if condition="$info['shop_huodaofk'] eq 1"}checked{/if}><span></span></label>
+									</div>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">店铺状态（开启 / 关闭）</label>
+								<div class="col-md-10">
+									<label class="switch"><input id="shop_state"
+										type="checkbox" {if condition="$info['shop_state'] eq 1"}checked{/if}><span></span></label>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="shop_close_info" style="display: none;">
+								<div class="form-group">
+									<label class="col-sm-2 control-label">关闭原因</label>
+									<div class="col-md-4">
+										<div id="editor" class="form-control"
+											style="overflow: scroll; height: 150px; max-height: 150px"></div>
+									</div>
+								</div>
+								<div class="line line-dashed line-lg pull-in"></div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-4 col-sm-offset-2">
+									<a href="javascript:void(0);" onclick="updateShopAjax()"
+										class="btn btn-primary">保存</a>
+								</div>
+							</div>
+						</form>
+					</div>
+			</div>
+			<div class="tab-pane fade" id="apply">
+				<section class="panel panel-default">
+					<header class="panel-heading font-bold"> 公司及联系人信息 </header>
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">公司名称</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="company_name"
+										value="{$apply_info['company_name']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">公司所在地</label>
+								<div class="col-md-2">
+								<select class="form-control m-b" name="province" id="seleAreaNext" onchange="getProvince(this,'#seleAreaThird')">
+			                       <option value="">请选择省</option>
+			                     </select>
+			                     </div>
+			                     <div class="col-md-2">
+			                    <select class="form-control m-b" name="city" id="seleAreaThird" onchange="getSelCity(this, '#seleAreaFouth')">
+			                      <option value="">请选择市</option>
+			                                          </select>
+			                     </div>
+			                     <div class="col-md-2">
+			                    <select class="form-control m-b" name="district" id="seleAreaFouth">
+			                      <option value="-1">请选择区</option>
+			                    </select>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">公司详细地址</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control"
+										id="company_address_detail" value="{$apply_info['company_address_detail']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">公司电话</label>
+								<div class="col-md-2">
+									<input type="text" class="form-control" id="company_phone"
+										value="{$apply_info['company_phone']}">
+								</div>
+								<label class="col-sm-2 control-label">员工总数</label>
+								<div class="col-md-2">
+									<input type="text" class="form-control"
+										id="company_employee_count" value="{$apply_info['company_employee_count']}">
+								</div>
+								<label class="col-sm-2 control-label">注册资金（万元）</label>
+								<div class="col-md-2">
+									<input type="text" class="form-control"
+										id="company_registered_capital" value="{$apply_info['company_registered_capital']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">联系人姓名</label>
+								<div class="col-md-2">
+									<input type="text" class="form-control" id="contacts_name"
+										value="{$apply_info['contacts_name']}">
+								</div>
+								<label class="col-sm-2 control-label">联系人电话</label>
+								<div class="col-md-2">
+									<input type="text" class="form-control" id="contacts_phone"
+										value="{$apply_info['contacts_phone']}">
+								</div>
+								<label class="col-sm-2 control-label">电子邮箱</label>
+								<div class="col-md-2">
+									<input type="text" class="form-control" id="contacts_email"
+										value="{$apply_info['contacts_email']}">
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+				<section class="panel panel-default">
+					<header class="panel-heading font-bold"> 营业执照信息（副本） </header>
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">营业执照号</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="business_licence_number"
+										value="{$apply_info['business_licence_number']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">法定经营范围</label>
+								<div class="col-md-6">
+									<input type="text" class="form-control" id="business_sphere"
+										value="{$apply_info['business_sphere']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">营业执照电子版</label>
+								<div class="col-md-3">
+									<p>
+									{if condition="$apply_info['business_licence_number_electronic'] eq ''"}
+									<img id="imgLogo1" src="" class="imglogo"/>
+									{else/}
+									<img id="imgLogo1" src="__UPLOAD__/{$apply_info['business_licence_number_electronic']}" class="imglogo"/>
+									{/if}
+									</p>
+									<a href="javascript:void(0);"
+										style="display: block; position: relative; z-index: 1;"> <span
+										style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+											<input hidefocus="true" size="1" class="input-file"
+											name="file_upload" id="uploadImg1"
+											nc_type="change_store_label" type="file"
+											style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;"
+											onchange="imgUpload1(this);"> <input type="hidden"
+											id="Logo1" value="{$apply_info['business_licence_number_electronic']}" />
+									</span> <a class="btn btn-default"><i
+											class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+									</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+				<section class="panel panel-default">
+					<header class="panel-heading font-bold"> 组织机构代码证 </header>
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">组织机构代码</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="organization_code"
+										value="{$apply_info['organization_code']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">组织机构代码证电子版</label>
+								<div class="col-md-3">
+									<p>
+									{if condition="$apply_info['organization_code_electronic'] eq ''"}
+									<img id="imgLogo2" src="" class="imglogo"/>
+									{else/}
+									<img id="imgLogo2" src="__UPLOAD__/{$apply_info['organization_code_electronic']}" class="imglogo"/>
+									{/if}
+									</p>
+									<a href="javascript:void(0);"
+										style="display: block; position: relative; z-index: 1;"> <span
+										style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+											<input hidefocus="true" size="1" class="input-file"
+											name="file_upload" id="uploadImg2"
+											nc_type="change_store_label" type="file"
+											style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;"
+											onchange="imgUpload2(this);"> <input type="hidden"
+											id="Logo2" value="{$apply_info['organization_code_electronic']}" />
+									</span> <a class="btn btn-default"><i
+											class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+									</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+				<section class="panel panel-default">
+					<header class="panel-heading font-bold"> 一般纳税人证明 </header>
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">一般纳税人证明</label>
+								<div class="col-md-3">
+									<p>
+									{if condition="$apply_info['general_taxpayer'] eq ''"}
+									    <img id="imgLogo3" src="" class="imglogo"/>
+									{else/}
+										<img id="imgLogo3" src="__UPLOAD__/{$apply_info['general_taxpayer']}" class="imglogo"/>
+									{/if}
+									</p>
+									<a href="javascript:void(0);"
+										style="display: block; position: relative; z-index: 1;"> <span
+										style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+											<input hidefocus="true" size="1" class="input-file"
+											name="file_upload" id="uploadImg3"
+											nc_type="change_store_label" type="file"
+											style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;"
+											onchange="imgUpload3(this);"> <input type="hidden"
+											id="Logo3" value="{$apply_info['general_taxpayer']}" />
+									</span> <a class="btn btn-default"><i
+											class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+									</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+				<section class="panel panel-default">
+					<header class="panel-heading font-bold"> 开户银行信息 </header>
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">银行开户名</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="bank_account_name"
+										value="{$apply_info['bank_account_name']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">公司银行账号</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="bank_account_number"
+										value="{$apply_info['bank_account_number']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">开户银行支行名称</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="bank_name"
+										value="{$apply_info['bank_name']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">支行联行号</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="bank_code"
+										value="{$apply_info['bank_code']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">开户银行所在地</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="bank_address"
+										value="{$apply_info['bank_address']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">开户银行许可证电子版</label>
+								<div class="col-md-3">
+									<p>
+									{if condition="$apply_info['bank_licence_electronic'] eq ''"}
+									<img id="imgLogo4" src="" class="imglogo"/>
+									{else/}
+									<img id="imgLogo4" src="__UPLOAD__/{$apply_info['bank_licence_electronic']}" class="imglogo"/>
+									{/if}
+									</p>
+									<a href="javascript:void(0);"
+										style="display: block; position: relative; z-index: 1;"> <span
+										style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+											<input hidefocus="true" size="1" class="input-file"
+											name="file_upload" id="uploadImg4"
+											nc_type="change_store_label" type="file"
+											style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;"
+											onchange="imgUpload4(this);"> <input type="hidden"
+											id="Logo4" value="{$apply_info['bank_licence_electronic']}" />
+									</span> <a class="btn btn-default"><i
+											class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+									</a>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">是否是结算账号</label>
+								<div class="col-sm-4">
+									<label class="switch"> <input id="is_settlement_account"
+										type="checkbox" {if condition="$apply_info['is_settlement_account'] eq 1"}checked{/if}> <span></span>
+									</label>
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+				<section class="panel panel-default" id="settlement_info" style='{if condition="$apply_info['is_settlement_account'] eq 1"}display:none;{/if}'>
+					<header class="panel-heading font-bold"> 结算账号信息 </header>
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">银行开户名</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="settlement_bank_account_name"
+										value="{$apply_info['settlement_bank_account_name']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">公司银行账号</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="settlement_bank_account_number"
+										value="{$apply_info['settlement_bank_account_number']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">开户银行支行名称</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="settlement_bank_name"
+										value="{$apply_info['settlement_bank_name']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">支行联行号</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="settlement_bank_code"
+										value="{$apply_info['settlement_bank_code']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">开户银行所在地</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="settlement_bank_address"
+										value="{$apply_info['settlement_bank_address']}">
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+				<section class="panel panel-default">
+					<header class="panel-heading font-bold"> 税务登记证 </header>
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">税务登记证号</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="tax_registration_certificate"
+										value="{$apply_info['tax_registration_certificate']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">纳税人识别号</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="taxpayer_id"
+										value="{$apply_info['taxpayer_id']}">
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">税务登记证号电子版</label>
+								<div class="col-md-3">
+									<p>
+									{if condition="$apply_info['tax_registration_certificate_electronic'] eq ''"}
+									<img id="imgLogo5" src="" class="imglogo"/>
+									{else/}
+									<img id="imgLogo5" src="__UPLOAD__/{$apply_info['tax_registration_certificate_electronic']}" class="imglogo"/>
+									{/if}
+									</p>
+									<a href="javascript:void(0);"
+										style="display: block; position: relative; z-index: 1;"> <span
+										style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+											<input hidefocus="true" size="1" class="input-file"
+											name="file_upload" id="uploadImg5"
+											nc_type="change_store_label" type="file"
+											style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;"
+											onchange="imgUpload5(this);"> <input type="hidden"
+											id="Logo5" value="{$apply_info['tax_registration_certificate_electronic']}" />
+									</span> <a class="btn btn-default"><i
+											class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+									</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+								<div class="col-sm-4 col-sm-offset-2">
+									<input type="hidden" id="apply_id" value="{$apply_info['apply_id']}">
+									<a href="javascript:void(0);" onclick="updateShopApplyAjax()"
+										class="btn btn-primary">保存</a>
+								</div>
+			</div>
+		</div>
+	</div>
+	<input type="hidden" id="shop_id" value="{$info['shop_id']}">
+	<input type="hidden" id="company_province_id" value="{$apply_info['company_province_id']}">
+	<input type="hidden" id="company_city_id" value="{$apply_info['company_city_id']}">
+	<input type="hidden" id="company_district_id" value="{$apply_info['company_district_id']}">
+	
+</section>
+<script src="PLATFORM_JS/init_address.js" type="text/javascript"></script>
+<script src="PLATFORM_JS/ajaxFileUpload.js" type="text/javascript"></script>
+<script src="__STATIC__/js/file_upload.js" type="text/javascript"></script>
+<script>
+if($("#company_province_id").val() == null){
+	provice_id = 0;
+}else{
+	provice_id = $("#company_province_id").val();
+}
+if($("#company_city_id").val() == null){
+	city_id = -1;
+}else{
+	city_id = $("#company_city_id").val();
+}
+if($("#company_district_id").val() == null){
+	district_id = -1;
+}else{
+	district_id = $("#company_district_id").val();
+}
+if(provice_id == 0){
+	initProvince('#seleAreaNext');
+}else{
+	load('province',provice_id, 'city', city_id, 'district', district_id);
+}
+function updateShopApplyAjax(){
+	var shop_id = $("#shop_id").val();
+	var apply_id = $("#apply_id").val();
+	//公司及联系人信息
+	var company_name = $("#company_name").val();
+	var company_province_id = $("#seleAreaNext").val();
+	var company_city_id = $("#seleAreaThird").val();
+	var company_district_id = $("#seleAreaFouth").val();
+	var company_address_detail = $("#company_address_detail").val();
+	var company_phone = $("#company_phone").val();
+	var company_employee_count = $("#company_employee_count").val();
+	var company_registered_capital = $("#company_registered_capital").val();
+	var contacts_name = $("#contacts_name").val();
+	var contacts_phone = $("#contacts_phone").val();
+	var contacts_email = $("#contacts_email").val();
+	//营业执照信息（副本）
+	var business_licence_number = $("#business_licence_number").val();
+	var business_sphere = $("#business_sphere").val();
+	var business_licence_number_electronic = $("#Logo1").val();
+	//组织机构代码证
+	var organization_code = $("#organization_code").val();
+	var organization_code_electronic = $("#Logo2").val();
+	//一般纳税人证明
+	var general_taxpayer = $("#Logo3").val();
+	//开户银行信息
+	var bank_account_name = $("#bank_account_name").val();
+	var bank_account_number = $("#bank_account_number").val();
+	var bank_name = $("#bank_name").val();
+	var bank_code = $("#bank_code").val();
+	var bank_address = $("#bank_address").val();
+	var bank_licence_electronic = $("#Logo4").val();
+	if($("#is_settlement_account").prop("checked")){
+		var is_settlement_account = 1;
+	}else{
+		var is_settlement_account = 2;
+	}
+	//结算账号信息
+	if($("#is_settlement_account").prop("checked")){
+		var settlement_bank_account_name = $("#bank_account_name").val();
+		var settlement_bank_account_number = $("#bank_account_number").val();
+		var settlement_bank_name = $("#bank_name").val();
+		var settlement_bank_code = $("#bank_code").val();
+		var settlement_bank_address = $("#bank_address").val();
+	}else{
+		var settlement_bank_account_name = $("#settlement_bank_account_name").val();
+		var settlement_bank_account_number = $("#settlement_bank_account_number").val();
+		var settlement_bank_name = $("#settlement_bank_name").val();
+		var settlement_bank_code = $("#settlement_bank_code").val();
+		var settlement_bank_address = $("#settlement_bank_address").val();
+	}
+	var tax_registration_certificate = $("#tax_registration_certificate").val();				//税务登记证号
+	var taxpayer_id = $("#taxpayer_id").val();			//纳税人识别号
+	var tax_registration_certificate_electronic = $("#Logo5").val();	//税务登记证号电子版
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Shop/updateShopApply",
+		data : {
+			'apply_id' : apply_id,
+			'company_name' : company_name,
+			'company_province_id' : company_province_id,
+			'company_city_id' : company_city_id,
+			'company_district_id' : company_district_id,
+			'company_address_detail' : company_address_detail,
+			'company_phone' : company_phone,
+			'company_employee_count' : company_employee_count,
+			'company_registered_capital' : company_registered_capital,
+			'contacts_name' : contacts_name,
+			'contacts_phone' : contacts_phone,
+			'contacts_email' : contacts_email,
+			'business_licence_number' : business_licence_number,
+			'business_sphere' : business_sphere,
+			'business_licence_number_electronic' : business_licence_number_electronic,
+			'organization_code' : organization_code,
+			'organization_code_electronic' : organization_code_electronic,
+			'general_taxpayer' : general_taxpayer,
+			'bank_account_name' : bank_account_name,
+			'bank_account_number' : bank_account_number,
+			'bank_name' : bank_name,
+			'bank_code' : bank_code,
+			'bank_address' : bank_address,
+			'bank_licence_electronic' : bank_licence_electronic,
+			'is_settlement_account' : is_settlement_account,
+			'settlement_bank_account_name' : settlement_bank_account_name,
+			'settlement_bank_account_number' : settlement_bank_account_number,
+			'settlement_bank_name' : settlement_bank_name,
+			'settlement_bank_code' : settlement_bank_code,
+			'settlement_bank_address' : settlement_bank_address,
+			'tax_registration_certificate' : tax_registration_certificate,
+			'taxpayer_id' : taxpayer_id,
+			'tax_registration_certificate_electronic' : tax_registration_certificate_electronic,
+		},
+		async : true,
+		success : function(data) {
+			if (data["code"] > 0) {
+				showMessage('success', "编辑成功",
+						'PLATFORM_MAIN/Shop/updateShop?shop_id='
+								+ shop_id);
+			} else {
+				showMessage('error', "编辑失败");
+			}
+		}
+	});
+}
+	$("#shop_state").change(function() {
+		if ($("#shop_state").prop("checked")) {
+			$(".shop_close_info").hide();
+		} else {
+			$(".shop_close_info").show();
+			$("#editor").html('');
+		}
+	});
+	$("#is_settlement_account").change(function(){
+		if ($("#is_settlement_account").prop("checked")) {
+			$("#settlement_info").hide();
+		} else {
+			$("#settlement_info").show();
+		}
+	});
+	//添加分组
+	function updateShopAjax() {
+		var shop_id = $("#shop_id").val();
+		var shop_name = $("#shop_name").val();
+		var shop_group_id = $("#shop_group_id").val();
+		var shop_type = $("#shop_type").val();
+		var shop_credit = $("#shop_credit").val();
+		var shop_desccredit = $("#shop_desccredit").val();
+		var shop_servicecredit = $("#shop_servicecredit").val();
+		var shop_deliverycredit = $("#shop_deliverycredit").val();
+		if ($("#store_qtian").prop("checked")) {
+			var store_qtian = 1;
+		} else {
+			var store_qtian = 0;
+		}
+		if ($("#shop_zhping").prop("checked")) {
+			var shop_zhping = 1;
+		} else {
+			var shop_zhping = 0;
+		}
+		if ($("#shop_erxiaoshi").prop("checked")) {
+			var shop_erxiaoshi = 1;
+		} else {
+			var shop_erxiaoshi = 0;
+		}
+		if ($("#shop_tuihuo").prop("checked")) {
+			var shop_tuihuo = 1;
+		} else {
+			var shop_tuihuo = 0;
+		}
+		if ($("#shop_shiyong").prop("checked")) {
+			var shop_shiyong = 1;
+		} else {
+			var shop_shiyong = 0;
+		}
+		if ($("#shop_shiti").prop("checked")) {
+			var shop_shiti = 1;
+		} else {
+			var shop_shiti = 0;
+		}
+		if ($("#shop_xiaoxie").prop("checked")) {
+			var shop_xiaoxie = 1;
+		} else {
+			var shop_xiaoxie = 0;
+		}
+		if ($("#shop_huodaofk").prop("checked")) {
+			var shop_huodaofk = 1;
+		} else {
+			var shop_huodaofk = 0;
+		}
+		if ($("#shop_state").prop("checked")) {
+			var shop_state = 1;
+		} else {
+			var shop_state = 0;
+		}
+		var shop_close_info = $("#editor").html();
+		$
+				.ajax({
+					type : "post",
+					url : "PLATFORM_MAIN/Shop/updateShop",
+					data : {
+						'shop_id' : shop_id,
+						'shop_name' : shop_name,
+						'shop_group_id' : shop_group_id,
+						'shop_type' : shop_type,
+						'shop_credit' : shop_credit,
+						'shop_desccredit' : shop_desccredit,
+						'shop_servicecredit' : shop_servicecredit,
+						'shop_deliverycredit' : shop_deliverycredit,
+						'store_qtian' : store_qtian,
+						'shop_zhping' : shop_zhping,
+						'shop_erxiaoshi' : shop_erxiaoshi,
+						'shop_tuihuo' : shop_tuihuo,
+						'shop_shiyong' : shop_shiyong,
+						'shop_shiti' : shop_shiti,
+						'shop_xiaoxie' : shop_xiaoxie,
+						'shop_huodaofk' : shop_huodaofk,
+						'shop_state' : shop_state,
+						'shop_close_info' : shop_close_info,
+					},
+					async : true,
+					success : function(data) {
+						if (data["code"] > 0) {
+							showMessage('success', "编辑成功",
+									'PLATFORM_MAIN/Shop/updateShop?shop_id='
+											+ shop_id);
+						} else {
+							showMessage('error', "编辑失败");
+						}
+					}
+				});
+	}
+	/**
+	 *图片上传
+	 */
+/* 	function imgUpload(event) {
+		var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+		fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+	} */
+	function imgUpload1(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo1").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo1").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+	function imgUpload2(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo2").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo2").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+	function imgUpload3(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo3").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo3").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+	function imgUpload4(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo4").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo4").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+	function imgUpload5(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo5").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo5").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

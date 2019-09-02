@@ -1,0 +1,85 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold" style="height:40px;line-height:40px;"> 
+		 <ul class="nav nav-tabs pull-left">
+		 	<li class="active"><a href="PLATFORM_MAIN/config/pointconfig" data-toggle="tab">积分管理</a></li>
+         	<li class=""><a href="PLATFORM_MAIN/config/integral">积分奖励</a></li>
+       	</ul>
+	</header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">所得积分等同于余额,1积分=</label>
+				<div class="col-md-1">
+					<input type="number" min="0.01" step="0.01" class="form-control" id="convert_rate" value="{$pointconfiginfo.convert_rate}"">
+				</div>
+				<div class="col-md-1">
+					<p class="form-control-static">元</p>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">是否启用积分兑换余额</label>
+				<div class="col-md-4">
+					<div class="controls">
+						<label class="radio inline"><input type="radio" name="fare" value="1" {if condition="$pointconfiginfo.is_open eq 1"}checked="checked"{/if} id="manebaoyouResultYes">启用</label> 
+						<label class="radio inline"><input type="radio" name="fare" value="0" {if condition="$pointconfiginfo.is_open eq 0"}checked="checked"{/if} id="manebaoyouResultNo">禁用</label>
+						<input type="hidden" id="is_open" value='{$pointconfiginfo.is_open}'>
+					</div>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+                 <label class="col-lg-2 control-label">积分说明</label>
+                 <div class="col-sm-4">
+                     <div id="editor" class="form-control" style="overflow:scroll;height:150px;max-height:150px">{$pointconfiginfo.desc}</div>
+                 </div>
+             </div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="SavepointConfig()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+{/block}
+{block name="script"}
+<script type="text/javascript">
+var validation = true;//验证余额输入
+$("#integrat_money").live("keyup",function(){
+	var reg = /^\d+(.{0,1})(\d{0,2})$/;
+	if(!reg.test($(this).val())){
+		showTip("请输入大于0的数字，并且保留两位小数","warning");
+		validation = false;
+	}else{
+		validation = true;
+	}
+})
+  function SavepointConfig(){
+	  var convert_rate= $("#convert_rate").val();
+	  var is_open = $("input[type='radio'][name='fare']:checked").val();
+	  var desc = $("#editor").html();
+		$.ajax({
+			type:"post",
+			url : "PLATFORM_MAIN/config/pointconfig",
+			async : true,
+			data : {
+				"convert_rate" : convert_rate,
+				"is_open" : is_open,
+				"desc" : desc
+			},
+			success : function(data){
+				if(data['code'] > 0)
+					{
+						showMessage('success', data["message"], "PLATFORM_MAIN/config/pointconfig");
+					}else{
+						showMessage('error', data["message"]);
+					}
+			}
+		})
+	}
+</script>
+{/block}

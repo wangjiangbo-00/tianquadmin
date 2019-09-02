@@ -1,0 +1,83 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+              <header class="panel-heading"> 店铺提现列表</header>
+              <div class="table-responsive">
+                <table class="table table-striped b-t b-light text-sm">
+                  <thead>
+                    <tr>
+                      <th width="20"><input type="checkbox"></th>
+                      <th class="center">店铺名称 </th>
+                      <th class="center">可提现余额</th>
+                      <th class="center">总余额</th>
+                      <th class="center">已提现金额</th>
+                      <th class="center">提现审核中</th>
+                      <th class="center">店铺营业额</th>
+                      <th class="center">提成比率</th>
+                      <th class="center">店铺总佣金</th>
+                      <th class="center">店铺已发放总佣金</th>
+                      <th class="center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="list">
+                    <tr></tr>
+                  </tbody>
+                </table>
+              </div>
+              {include file="platform/page"/}
+            </section>
+
+{/block}
+{block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/account/shopAccountList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				var html = '';
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['shop_id']+'"></td>';
+						html += '<td class="center">' + data["data"][i]["shop_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_account"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_account_total_money"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_account_withdraw"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_account_withdraw_audit"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_profit"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_platform_commission_rate"] + '%</td>';
+						html += '<td class="center">' + data["data"][i]["nfx_shop_commission"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["nfx_shop_commission_cash"] + '</td>';
+						html += '<td class="center"><a href="PLATFORM_MAIN/statistics/ShopAccountRecordsList?shop_id='+data['data'][i]['shop_id']+'">详情</a></td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="11">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}	
+	
+</script>
+{/block}

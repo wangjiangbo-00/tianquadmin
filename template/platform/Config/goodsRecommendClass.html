@@ -1,0 +1,339 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.col-sm-3 {
+    width: 80%;
+}
+</style>
+{/block}
+{block name="main"}
+<div class="row padder-v">
+                <div class="col-sm-9">
+                  <a href="javascript:void(0);" onclick="addBlock()" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加促销版块 </a> 
+                </div>
+              </div>
+<section class="panel panel-default">
+	<div class="panel-body">
+		<form class="form-horizontal" id="block_list">
+			{foreach name="goods_recommend_class" item="v"}
+				<div class="form-group">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8">
+	                <section class="panel panel-default">
+	                  <header class="panel-heading"> 
+	                  	<a href="javascript:void(0);" onclick="delGoodsRecommendClass({$v['class_id']},this)" class="label bg-danger pull-right"> 删除 </a> 
+	                  	<a href="javascript:void(0);" data-toggle="data" onclick="updateGoodsRecommendClass({$v['class_id']})" class="label bg-primary pull-right"> 编辑 </a>
+	                  	{$v['class_name']} 
+	                  </header>
+	                  <table class="table table-striped m-b-none text-sm">
+	                    <tbody align="center">
+	                      <tr>
+	                      {foreach name="v['goods_list']" item="vg"}
+	                        <td><img class="imglogo" src="__UPLOAD__/{$vg['picture_info']['pic_cover_small']}" alt="{$vg['goods_info']['goods_name']}" title="{$vg['goods_info']['goods_name']}"></td>
+	                      {/foreach}
+	                      </tr>
+	                    </tbody>
+	                  </table>
+	                </section>
+	              </div>
+	              <div class="col-sm-2"></div>
+	              </div>
+              {/foreach}
+		</form>
+	</div>
+</section>
+
+<div class="modal fade" id="data">
+  <div class="modal-dialog">
+    <div class="modal-content" style="width:800px;">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">促销商品推荐</h4>
+      </div>
+      <div class="modal-body" style="height:700px;overflow:auto;">
+      <form class="form-horizontal">
+      	<div class="form-group">
+      	<div class="col-sm-12">
+           <label>商品推荐模块标题名称</label>
+           <input type="hidden" class="form-control" id="class_id" value="" >
+           <input type="text" class="form-control" id="class_name" value="" placeholder="请输入促销模块标题名称">
+           </div>
+        </div>
+      	<div class="form-group">
+      	<div class="col-sm-12">
+           <label>排序</label>
+           <input type="text" class="form-control" id="sort" value="" placeholder="排序">
+           </div>
+      	</div>
+        <div class="line line-dashed line-lg pull-in"></div>
+        <div class="alert alert-warning alert-block">
+                  <button type="button" class="close" data-dismiss="alert">×</button>
+                  <p>单击查询出的商品选中，双击已选择的可以删除，最多5个，保存后生效。</p>
+                </div>
+        <div class="form-group" id="goods_list">
+<!--            <div class="col-sm-2"> -->
+<!--            		<img class="imglogo" src="__UPLOAD__/upload/admin/album/14875633083.jpg"> -->
+<!--            		<label>1231</label> -->
+<!--            </div> -->
+        </div>
+        <div class="line line-dashed line-lg pull-in"></div>
+        <p>选择要促销的推荐商品</p>
+        <div class="form-group">
+      	<div class="col-sm-12">
+           <label class="col-sm-2 control-label">选择分类</label>
+           <div class="col-sm-3">
+           		<select name="account" class="form-control m-b category_first" id="category_first_id" onchange="changeCategory(this, 1)" style="width:145px;height:34px;display: inline-block;">
+					<option value="0">商品分类一级</option>
+					{volist name="category_list_1" id="vc1"}
+						<option value="{$vc1['category_id']}">{$vc1['category_name']}</option>
+					{/volist}
+				</select>
+           		<select name="account" class="form-control m-b hides category_second" id="category_second_id" onchange="changeCategory(this, 2)" style="width:145px;height:34px;">
+					<option value="0">商品分类二级</option>
+				</select>
+				<select name="account" class="form-control m-b hides category_three" id="category_three_id" onchange="changeCategory(this, 3)" style="width:145px;height:34px;">
+					<option value="0">商品分类三级</option>
+				</select>
+           </div>
+           </div>
+        </div>
+        <div class="form-group">
+      	<div class="col-sm-12">
+           <label class="col-sm-2 control-label">商品名称</label>
+           <div class="col-sm-4"><input type="text" class="form-control" id="goods_name" value="" ></div>
+           <div class="col-sm-2"><button type="button" class="btn btn-default btn-success" onclick="search_goods()">搜索</button></div>
+           </div>
+           </div>
+           <div class="line line-dashed line-lg pull-in"></div>
+      <div class="form-group" id="search_goods_list">
+<!--            <div class="col-sm-2"> -->
+<!--            		<img class="imglogo" src="__UPLOAD__/upload/admin/album/14875633083.jpg"> -->
+<!--            		<label>1231</label> -->
+<!--            </div> -->
+        </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-info" onclick="save()">保存</button>
+      </div>
+    </div>
+    <!-- /.modal-content --> </div>
+  <!-- /.modal-dialog --> </div>
+{/block} 
+{block name="script"}
+<script>
+//改变商品分类触发事件
+function changeCategory(event, level){
+	var category_id = $(event).val();
+	if(category_id == 0){
+		$(event).parent().find(".category_second option:gt(0)").remove();
+		$(event).parent().find(".category_three option:gt(0)").remove();
+		return false;
+	}
+	if(level == 1){
+		$(event).parent().find(".category_second").show(300);
+		$(event).parent().find(".category_second option:gt(0)").remove();
+		$(event).parent().find(".category_three option:gt(0)").remove();
+		loadCategoryData(category_id, $(event).parent().find(".category_second"));
+	}else if(level == 2){
+		$(event).parent().find(".category_three").show(300);
+		$(event).parent().find(".category_three option:gt(0)").remove();
+		loadCategoryData(category_id, $(event).parent().find(".category_three"));
+	}
+}
+// 加载数据
+function loadCategoryData(category_id, obj){
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/config/getgoodscategorylistajax",
+		data : {
+			'category_id' : category_id,
+		},
+		async : true,
+		success : function(data) {
+			//alert(JSON.stringify(data));
+			var html = '';
+			if(data.length > 0){
+				for(var i = 0; i < data.length; i++){
+					html += '<option value="'+data[i]['category_id']+'">'+data[i]['category_name']+'</option>';
+				}
+			}
+			$(obj).append(html);
+		}
+	});
+}
+function addBlock(){
+	$("class_id").val(null);
+	var html = '';
+	html += '<div class="form-group"><div class="col-sm-2"></div>';
+	html += '<div class="col-sm-8">';
+	html += '<section class="panel panel-default">';
+	html += '<header class="panel-heading"> <a href="javascript:void(0);" onclick="delGoodsRecommendClass(0,this)" class="label bg-danger pull-right"> 删除 </a>';
+	html += '<a href="javascript:void(0);" data-toggle="data" onclick="updateGoodsRecommendClass(0)" class="label bg-primary pull-right"> 编辑 </a> 商品推荐 </header>';
+	html += '<table class="table table-striped m-b-none text-sm"><tbody align="center">';
+	html += '<tr>';
+	html += '</tr></tbody></table></section></div><div class="col-sm-2"></div></div>';
+	$("#block_list").prepend(html);
+}
+function updateGoodsRecommendClass(class_id){
+	$("#data").modal("show");
+	$("#class_name").val();
+	$("#goods_list").html();
+	$("#class_id").val(class_id);
+	if(class_id > 0){
+		$.ajax({
+			type: 'post',
+			url: 'PLATFORM_MAIN/Config/getGoodsRecommendClass',
+			data: {'class_id':class_id},
+			async: true,
+			success:function(data){
+//	 			alert(JSON.stringify(data));
+				$("#class_name").val(data['class_name']);
+				$("#sort").val(data['sort']);
+				$("#class_id").val(class_id);
+				var goods_list_html = '';
+				for(var i=0;i<data['goods_list'].length;i++){
+					goods_list_html += '<div class="alert alert-info col-sm-2">';
+					goods_list_html += '<button type="button" class="close" data-dismiss="alert">×</button>';
+					goods_list_html += '<input type="checkbox" name="selected_goods" value="'+data['goods_list'][i]['goods_id']+'" style="display:none;">';
+					goods_list_html += '<img class="imglogo" src="__UPLOAD__/'+data['goods_list'][i]['picture_info']['pic_cover_small']+'">';
+					goods_list_html += '<label style="display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">'+data['goods_list'][i]['goods_info']['goods_name']+'</label>';
+					goods_list_html += '</div>';
+				}
+				$("#goods_list").html(goods_list_html);
+			}
+		});
+	}else{
+		$("#class_name").val('');
+		$("#sort").val('');
+		$("#class_id").val('');	
+		$('#goods_list .alert-info').remove();
+	}
+}
+function search_goods(){
+	var goods_name = $("#goods_name").val();
+	if($("#category_three_id").val() > 0){
+		var category_id = $("#category_three_id").val();
+		var category_level = 3;
+	}else if($("#category_second_id").val() > 0){
+		var category_id = $("#category_second_id").val();
+		var category_level = 2;
+	}else{
+		var category_id = $("#category_first_id").val();
+		var category_level = 1;
+	}
+	$.ajax({
+		type: 'post',
+		url: 'PLATFORM_MAIN/config/searchgoods',
+		data: {'goods_name':goods_name,'category_id':category_id, 'category_level':category_level},
+		async: true,
+		success:function(data){
+			var html = '';
+			if(data['data'].length > 0){
+				for(var i=0;i<data['data'].length;i++){
+					html += '<div class="col-sm-2" style="min-height:130px;">';
+					html += '<input type="checkbox" name="select_goods" value="'+data['data'][i]['goods_id']+'" style="display:none;">';
+					html += '<img class="imglogo" src="__UPLOAD__/'+data['data'][i]['pic_cover_micro']+'" onclick="addSelectGoods(this)">';
+					html += '<label style="display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">'+data['data'][i]['goods_name']+'</label>';
+					html += '</div>';
+				}
+			}else{
+				html += '<div class="col-sm-12"><p>暂无商品</p></div>';
+			}
+			$("#search_goods_list").html(html);
+		}
+	});
+}
+function addSelectGoods(event){
+	var goods_id_obj = $("#goods_list").find('input[name="selected_goods"]');
+	var goods_id_str = '';
+	for(var i=0; i<goods_id_obj.length; i++){ 
+		goods_id_str += ','+goods_id_obj[i].value; //如果选中，将value添加到变量s中 
+	} 
+	//判断添加商品的个数
+	var goods_list_obj = $("#goods_list").find('input[name="selected_goods"]');
+	if(goods_list_obj.length<5){
+		
+	}else{
+		return false;
+	}
+	var goods_id = $(event).parent('.col-sm-2').children('input[name="select_goods"]').val();
+	var goods_url = $(event).attr("src");
+	var goods_name = $(event).parent('.col-sm-2').children('label').html();
+	if(goods_id_str.indexOf(goods_id) > 0){
+		return false;
+	}else{
+		var html = '';
+		html += '<div class="alert alert-info col-sm-2">';
+		html += '<button type="button" class="close" data-dismiss="alert">×</button>';
+		html += '<input type="checkbox" name="selected_goods" value="'+goods_id+'" style="display:none;">';
+		html += '<img class="imglogo" src="'+goods_url+'" style="min-width:99.2px;">';
+		html += '<label style="display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">'+goods_name+'</label>';
+		html += '</div>';
+		$("#goods_list").append(html);
+	}
+}
+function save(){
+	var class_id = $("#class_id").val();
+	var class_name = $("#class_name").val();
+	var sort = $("#sort").val();
+	var goods_id_obj = $("#goods_list").find('input[name="selected_goods"]');
+	var goods_id_str = '';
+	for(var i=0; i<goods_id_obj.length; i++){ 
+		goods_id_str += ','+goods_id_obj[i].value; //如果选中，将value添加到变量s中 
+	} 
+	goods_id_str = goods_id_str.substr(1);
+	$.ajax({
+		type: 'post',
+		url: 'PLATFORM_MAIN/Config/updategoodsrecommendclass',
+		data: {'class_id':class_id,'class_name':class_name,'goods_id_str':goods_id_str,'sort':sort},
+		async: true,
+		success:function(data){
+			$("#data").modal("hide");
+			if(data['code'] > 0){
+				showMessage('success',data['message'],'PLATFORM_MAIN/config/goodsrecommendclass');
+			}else{
+				showMessage('error',data['message']);
+			}
+		}
+	});
+}
+/**
+ * 删除 促销版块
+ */
+function delGoodsRecommendClass(class_id,e){
+	if(class_id > 0){
+		$( "#dialog" ).dialog({
+	        buttons: {
+	            "确定": function() {
+	                $(this).dialog('close');
+	                $.ajax({
+	    				type:"post",
+	    				url:"PLATFORM_MAIN/config/delgoodsrecommendclass",
+	    				data:{'class_id':class_id},
+	    				async:true,
+	    				success:function (data) {
+	    					if(data['code'] > 0){
+	    						showMessage('success', data['message'], 'PLATFORM_MAIN/config/goodsrecommendclass');
+	    					}else{
+	    						showMessage('error', data['message']);
+	    					}
+	    				}
+	    			});
+	            },
+	            "取消,#e57373": function() {
+	                $(this).dialog('close');
+	            }
+	        },
+	        contentText:"确定删除？",
+	    });
+	}else{
+		$(e).parents('.form-group').remove()
+	}
+}
+</script>
+
+
+
+{/block}

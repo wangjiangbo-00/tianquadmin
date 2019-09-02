@@ -1,0 +1,159 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9">
+		<a href="PLATFORM_MAIN/Config/addShopNavigation"
+			class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加导航 </a>
+	</div>
+	<div class="col-sm-2">
+		<input type="text" class="input-sm form-control" id="search_text"
+			placeholder="请输入导航名称">
+	</div>
+	<div class="col-sm-1">
+		<button class="btn btn-sm btn-default" onclick="LoadingInfo(1)">搜索</button>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th>导航名称</th>
+					<th>链接地址</th>
+					<th class="center">所在位置</th>
+					<th class="center">是否新窗口打开</th>
+					<th class="center">创建时间</th>
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//分页数据
+ function LoadingInfo(pageIndex) {
+	var search_text = $("#search_text").val();
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/config/shopnavigationlist",
+		async : true,
+		data : {
+			"pageIndex" : pageIndex, "search_text" : search_text
+		},
+		success : function(data) {
+			var html = '';
+			$("#total_count_num").text(data["total_count"]);
+			$("#page_count_num").text(data["page_count"]);
+			$("#page_count").val(data["page_count"]);
+			$("#pageNumber a").remove();
+			if (data["data"].length > 0) {
+				for (var i = 0; i < data["data"].length; i++) {
+					html += '<tr>';
+					html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['nav_id']+'"></td>';
+					html += '<td>'+ data['data'][i]['nav_title']+'</td>';	
+					if(data["data"][i]["nav_type"] == 0){
+						html += '<td class="tal" style="word-break:break-word;">' + data["data"][i]["template_name"]+ '</td>';
+					}else if(data["data"][i]["nav_type"] == 1){
+						html += '<td class="tal" style="word-break:break-word;">' + data["data"][i]["nav_url"]+ '</td>';
+					}
+					if(data["data"][i]["type"] == 1){
+						html += '<td class="center">头部</td>';
+					}else if(data["data"][i]["type"] == 2){
+						html += '<td class="center">中部</td>';
+					}else if(data["data"][i]["type"] == 3){
+						html += '<td class="center">底部</td>';
+					}else{ 
+						html += '<td>&nbsp;</td>';
+					}
+					if(data['data'][i]['is_blank'] ==0 ){
+						html += '<td class="center">否</td>';	
+					}else if(data['data'][i]['is_blank'] ==1){
+						html += '<td class="center">是</td>';	
+					}
+					html += '<td class="center">' + data["data"][i]["create_time"]+ '</td>';
+			        html += '<td class="center"><a href="PLATFORM_MAIN/Config/updateShopNavigation?nav_id='+ data['data'][i]['nav_id']+'">修改</a> <a style="cursor: pointer;" onclick="deleteArticle('+data['data'][i]['nav_id']+')">删除</a></td> ';
+				    html += '</tr>';
+				}
+			} else {
+				html += '<tr align="center"><th colspan="7">暂无分类</th></tr>';
+			}
+			$("#list").html(html);
+			var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			load();
+		}
+	});
+}	
+ 
+//删除菜单
+function deleteArticle(nav_id){
+	$( "#dialog" ).dialog({				
+        buttons: {
+            "确定": function() {
+                $(this).dialog('close');
+                $.ajax({
+    				type : "post",
+    				url : "PLATFORM_MAIN/config/delshopnavigation",
+    				async : true,
+    				data : {
+    					"nav_id" : nav_id
+    				},
+    				success : function(data) {
+    					//alert(JSON.stringify(data));
+    					if (data["code"] > 0) {
+    						showMessage('success', data["message"]);
+    						LoadingInfo(1);
+    					}else{
+    						showMessage('error', data["message"]);
+    					}
+    				}
+    				})
+            },
+            "取消,#e57373": function() {
+                $(this).dialog('close');
+            }
+        },
+        contentText:"是否删除菜单？",
+    });
+}
+/*修改排序*/
+function load(){
+	$('.num').change(function(){
+		var nav_id = $(this).attr('nav_id');
+		var sort = $(this).val();
+		//alert(sort);
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/config/modifyshopnavigationsort",
+			data:{'nav_id':nav_id,'sort':sort},
+			async:true,
+			success: function (data) {
+				if(data['code'] > 0){
+					/* showMessage('success', data["message"]); */
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		}); 
+	});
+}
+$("#search_text").keypress(function(e){
+	if(e.keyCode == 13){
+		LoadingInfo(1);
+	}
+});
+</script>
+{/block}

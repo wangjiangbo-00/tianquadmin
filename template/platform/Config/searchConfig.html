@@ -1,0 +1,103 @@
+{extend name="platform/base" /} {block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading text-right bg-light">
+		<ul class="nav nav-tabs pull-left">
+			<li class="active"><a href="#hot" data-toggle="tab">热门搜索</a></li>
+			<li class=""><a href="#default" data-toggle="tab">默认搜索</a></li>
+		</ul>
+		<span class="hidden-sm">搜索设置</span>
+	</header>
+	<div class="panel-body">
+		<div class="tab-content">
+			<div class="tab-pane fade active in" id="hot">
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">热门搜索</label>
+								<div class="col-md-4">
+									<div id="editor" class="form-control" style="overflow: scroll; height: 150px; max-height: 150px">{$hot_keywords}</div><br/>
+									
+								</div>
+								<div class="col-md-6" style="width:100%;">
+								<label class="col-sm-2 control-label"></label>
+									<span style="color: orange;">*&nbsp;&nbsp;热门搜索，将显示在前台搜索框下面，前台点击时直接作为关键词进行搜索，多个关键词间请用半角逗号 ","
+										隔开</span>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<div class="col-sm-4 col-sm-offset-2">
+									<a href="javascript:void(0);" onclick="setHotSearchAjax()"
+										class="btn btn-primary">保存</a>
+								</div>
+							</div>
+						</form>
+					</div>
+			</div>
+			<div class="tab-pane fade" id="default">
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">默认搜索</label>
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="default_keywords"
+										value="{$default_keywords}">
+								</div>
+								<div class="col-md-6">
+									<span>默认搜索，将显示在前台搜索框，前台点击时直接作为关键词进行搜索</span>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<div class="col-sm-4 col-sm-offset-2">
+									<a href="javascript:void(0);" onclick="defaultHotSearchAjax()"
+										class="btn btn-primary">保存</a>
+								</div>
+							</div>
+						</form>
+					</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+</section>
+<script>
+	function setHotSearchAjax(){
+		var keywords = $("#editor").html();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/config/hotsearchconfig",
+			data:{
+				'keywords':keywords
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/config/searchconfig");
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+	function defaultHotSearchAjax(){
+		var default_keywords = $("#default_keywords").val();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/config/defaultsearchconfig",
+			data:{
+				'default_keywords':default_keywords
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/config/searchconfig");
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+</script>
+{/block}

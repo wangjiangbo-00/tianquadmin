@@ -1,0 +1,278 @@
+{extend name="platform/base" /} {block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading text-right bg-light">
+		<ul class="nav nav-tabs pull-left">
+			<li class="active"><a href="#wpay" data-toggle="tab">微信支付</a></li>
+<!-- 			<li class=""><a href="#alipay" data-toggle="tab">支付宝支付</a></li> -->
+<!-- 			<li class=""><a href="#otherpay" data-toggle="tab">其他支付方式</a></li> -->
+		</ul>
+		<span class="hidden-sm">支付设置</span>
+	</header>
+	<div class="panel-body">
+		<div class="tab-content">
+			<div class="tab-pane fade active in" id="wpay">
+					<div class="panel-body">
+						<form class="form-horizontal" id="wpay_form"  method="post">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">是否启用</label>
+								<div class="col-md-4">
+									<label class="switch">
+										<input type="checkbox" id="wpay_is_use" {if condition="$config.is_use==1"} checked="checked"{/if}>
+										<span></span>
+									</label>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">应用ID[AppID]</label>
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="APP_KEY" name="APP_KEY" required
+										value="{$config['value']['appid']}">
+								</div>
+								<label class="col-md-6  error"  for="APP_KEY"></label>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">应用密钥[AppSecrect]</label>
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="APP_SECRET" name="APP_SECRET"  required
+										value="{$config['value']['appkey']}">
+								</div>
+								<label class="col-md-6 error" for="APP_SECRET"></label>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-lg-2 control-label">支付专用签名串[paySignKey]</label>
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="paySignKey" name="paySignKey" required
+										value="{$config['value']['mch_key']}">
+								</div>
+								<label class="col-md-6 error" for="paySignKey"></label>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<label class="col-lg-2 control-label">微信支付商户号[MCHID]</label>
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="MCHID" name="MCHID" required
+										value="{$config['value']['mch_id']}">
+								</div>
+								<label class="col-md-6 error" for="MCHID" class="error"></label>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<div class="col-sm-4 col-sm-offset-2">
+									<button type="submit" class="btn btn-primary">保存</button>
+<!-- 									<a href="javascript:void(0);" onclick="setWpayConfigAjax()" -->
+<!-- 										class="btn btn-primary">保存</a> -->
+								</div>
+							</div>
+						</form>
+					</div>
+			</div>
+<!-- 			<div class="tab-pane fade" id="alipay"> -->
+<!-- 					<div class="panel-body"> -->
+<!-- 						<form class="form-horizontal" id="alipay_form"> -->
+<!-- 							<div class="form-group"> -->
+<!-- 								<label class="col-sm-2 control-label">是否启用</label> -->
+<!-- 								<div class="col-md-4"> -->
+<!-- 									<label class="switch"> -->
+<!-- 										<input type="checkbox" id="alipay_is_use" {if condition="$ali_config.is_use eq 1"}checked{/if}> -->
+<!-- 										<span></span> -->
+<!-- 									</label> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 							<div class="line line-dashed line-lg pull-in"></div> -->
+<!-- 							<div class="form-group"> -->
+<!-- 								<label class="col-sm-2 control-label">账号</label> -->
+<!-- 								<div class="col-md-4"> -->
+<!-- 									<input type="text" class="form-control" id="ali_partnerid" required -->
+<!-- 										value="{$ali_config.oauth_value.ali_partnerid}"> -->
+<!-- 								</div> -->
+<!-- 								<label class="col-md-6 error" for="ali_partnerid" class="error"></label> -->
+<!-- 							</div> -->
+<!-- 							<div class="line line-dashed line-lg pull-in"></div> -->
+<!-- 							<div class="form-group"> -->
+<!-- 								<label class="col-sm-2 control-label">合作者身份ID</label> -->
+<!-- 								<div class="col-md-4"> -->
+<!-- 									<input type="text" class="form-control" id="ali_seller" required -->
+<!-- 										value="{$ali_config.oauth_value.ali_seller}"> -->
+<!-- 								</div> -->
+<!-- 								<label class="col-md-6 error" for="ali_seller" class="error"></label> -->
+<!-- 							</div> -->
+<!-- 							<div class="line line-dashed line-lg pull-in"></div> -->
+<!-- 							<div class="form-group"> -->
+<!-- 								<label class="col-lg-2 control-label">安全校验网</label> -->
+<!-- 								<div class="col-md-4"> -->
+<!-- 									<input type="text" class="form-control" id="ali_key" required -->
+<!-- 										value="{$ali_config.oauth_value.ali_key}"> -->
+<!-- 								</div> -->
+<!-- 								<label class="col-md-6 error" for="ali_key" class="error"></label> -->
+<!-- 							</div> -->
+<!-- 							<div class="line line-dashed line-lg pull-in"></div> -->
+<!-- 							<div class="form-group"> -->
+<!-- 								<div class="col-sm-4 col-sm-offset-2"> -->
+<!-- 									<button type="submit" class="btn btn-primary">保存</button> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 						</form> -->
+<!-- 					</div> -->
+<!-- 			</div> -->
+			
+<!-- 			<div class="tab-pane fade" id="otherpay"> -->
+<!-- 				<div class="panel-body"> -->
+<!-- 						<form class="form-horizontal" id="opay_form"  method="post"> -->
+<!-- 							<div class="form-group"> -->
+<!-- 								<label class="col-sm-2 control-label">是否启用余额支付</label> -->
+<!-- 								<div class="col-md-4"> -->
+<!-- 									<label class="switch"> -->
+<!-- 										<input type="checkbox" id="ypay_is_use" {if condition="$other_config.oauth_value.is_balance_pay eq 1"}checked{/if}> -->
+<!-- 										<span></span> -->
+<!-- 									</label> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 							<div class="line line-dashed line-lg pull-in"></div> -->
+<!-- 							<div class="form-group"> -->
+<!-- 								<label class="col-sm-2 control-label">是否启用购物币支付</label> -->
+<!-- 								<div class="col-md-4"> -->
+<!-- 									<label class="switch"> -->
+<!-- 										<input type="checkbox" id="gpay_is_use" {if condition="$other_config.oauth_value.is_coin_pay eq 1"}checked{/if}> -->
+<!-- 										<span></span> -->
+<!-- 									</label> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 							<div class="line line-dashed line-lg pull-in"></div> -->
+<!-- 							<div class="form-group"> -->
+<!-- 								<div class="col-sm-4 col-sm-offset-2"> -->
+<!-- 									<button type="submit" class="btn btn-primary">保存</button> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 						</form> -->
+<!-- 					</div> -->
+<!-- 			</div> -->
+		</div>
+	</div>
+</section>
+<script>
+$().ready(function() {
+	 $("#wpay_form").validate({
+	        submitHandler:function(){
+	            setWpayConfigAjax();
+	        }    
+	 });
+});
+$().ready(function() {
+	 $("#alipay_form").validate({
+	        submitHandler:function(){
+	        	setAliPayConfigAjax();
+	        }    
+	 });
+});
+$().ready(function() {
+	 $("#opay_form").validate({
+	        submitHandler:function(){
+	            setopayConfigAjax();
+	        }    
+	 });
+});
+
+/**
+ * 微信支付 设置
+ */
+	function setWpayConfigAjax() {
+		if($("#wpay_is_use").prop("checked")){
+			var is_use = 1;
+		}else{
+			var is_use = 0;
+		}
+		var appkey = $("#APP_KEY").val();
+		var appsecret = $("#APP_SECRET").val();
+		var paySignKey = $("#paySignKey").val();
+		var MCHID = $("#MCHID").val();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/config/payconfig",
+			data:{
+				'appkey':appkey,
+				'appsecret':appsecret,
+				'paySignKey':paySignKey,
+				'MCHID':MCHID,
+				'type':'wchat',
+				'is_use' : is_use
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"]);
+					 location.href="PLATFORM_MAIN/config/payconfig";
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+/**
+ * 支付宝 支付设置
+ */
+	function setAliPayConfigAjax(){
+		var ali_partnerid = $("#ali_partnerid").val();
+		var ali_seller = $("#ali_seller").val();
+		var ali_key = $("#ali_key").val();
+		if($("#alipay_is_use").prop("checked")){
+			var is_use = 1;
+		}else{
+			var is_use = 0;
+		}
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Config/setAliPayConfig",
+			data:{
+				'partnerid':ali_partnerid,
+				'seller':ali_seller,
+				'ali_key':ali_key,
+				'is_use':is_use
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],'PLATFORM_MAIN/Config/payConfig.html');
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+	/**
+	 * 其他支付方式 设置
+	 */
+		function setopayConfigAjax() {
+			if($("#ypay_is_use").prop("checked")){
+				var yis_use = 1;
+			}else{
+				var yis_use = 0;
+			}
+			if($("#gpay_is_use").prop("checked")){
+				var gis_use = 1;
+			}else{
+				var gis_use = 0;
+			}
+			
+			$.ajax({
+				type : "post",
+				url : "PLATFORM_MAIN/Config/setOpayConfig",
+				data : {
+					
+					'yis_use' : yis_use,
+					'gis_use' : gis_use
+				},
+				async : true,
+				success : function(data) {
+					if (data["code"] > 0) {
+						showMessage('success', data["message"], 'PLATFORM_MAIN/Config/payConfig.html');
+					} else {
+						showMessage('error', data["message"]);
+					}
+				}
+			});
+		}
+</script>
+{/block}

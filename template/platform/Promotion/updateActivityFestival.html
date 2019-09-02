@@ -1,0 +1,189 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加平台活动 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="goods_category_form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">活动名称</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="category_name" name="category_name" required value="{$info.discount_name}" readonly>
+				</div>
+				<label class="col-md-8 error" for="category_name"></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">活动类型</label>
+				<div class="col-sm-2">
+					<select id="pid" name="account" class="form-control m-b"  readonly disabled="disabled">
+						<option value="0" {if condition="$info.type eq 3"}selected{/if}>限时活动</option>
+						<option value="1" {if condition="$info.type eq 2"}selected{/if}>永久活动</option>
+
+					</select>
+				</div>
+			</div>
+
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div id="date_with_picker">
+					<label class="col-sm-2 control-label">活动期限</label>
+					<div class="col-md-2">
+						<input class="input-medium" type="text"  id="start_time" style="width:250px;" readonly value="{$info.start_time}">
+						<span class="mlr5">-</span>
+						<input class="input-medium " size="15" id="end_time" type="text"  style="width:250px;" readonly value="{$info.end_time}">
+
+					</div>
+				</div>
+
+			</div>
+
+			<div class="line line-dashed line-lg pull-in"></div>
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label">是否开放</label>
+				<div class="col-sm-2">
+					<label class="switch"><input id="is_open" type="checkbox" {if condition="$info.is_open eq 1"}checked{/if}><span></span></label>
+				</div>
+			</div>
+
+
+			<div class="line line-dashed line-lg pull-in"></div>
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label">是否可见</label>
+				<div class="col-sm-2">
+					<label class="switch"><input id="is_visible" type="checkbox" {if condition="$info.is_visible eq 1"}checked{/if}><span></span></label>
+				</div>
+			</div>
+
+
+
+
+
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">排序</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="sort" value="{$info.sort}"
+						   number="true" min="0">
+				</div>
+				<label class="col-md-9 error" for="sort"></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">活动图片</label>
+				<div class="col-md-10">
+					<p><img id="imgLogo"  src ="{$info.img}"  class="imglogo" /></p>
+					<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                              		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;">
+			                                   		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+														   id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+														   onchange="imgUpload(this);">
+								<input type="hidden" id="Logo" value="{$info.img}" />
+							 </span>
+						<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+					</a>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">描述</label>
+				<div class="col-sm-4">
+					<div id="editor" class="form-control" style="overflow: scroll; height: 150px; max-height: 150px">{$info.desp}</div>
+				</div>
+			</div>
+			<!-- 书签 -->
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<input id="activity_id" type="hidden" value="{$info.id}">
+					<button type="submit" class="btn btn-primary">保存</button>
+					<!-- 					<a href="javascript:void(0);" onclick="addGoodsCategoryAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+$().ready(function() {
+
+	 $("#goods_category_form").validate({
+	        submitHandler:function(){
+	        	updateGoodsCategoryAjax();
+	        }    
+	 });
+});
+	/**
+	*修改模块
+	*/
+	function updateGoodsCategoryAjax() {
+		var id = $("#activity_id").val();
+        var category_name = $("#category_name").val();
+
+
+
+        var sort = $("#sort").val();
+        var description = $("#editor").html();
+        if ($("#is_visible").prop("checked")) {
+            var is_visible = 1;
+        } else {
+            var is_visible = 0;
+        }
+
+
+        if ($("#is_open").prop("checked")) {
+            var is_open = 1;
+        } else {
+            var is_open = 0;
+        }
+
+
+        var category_pic = $("#Logo").val();
+
+        $.ajax({
+            type : "post",
+            url : "PLATFORM_MAIN/promotion/updateactivityfestival",
+            data : {
+                "id":id,
+                'discount_name' : category_name,
+                'sort' : sort,
+                'description' : description,
+                'is_visible' : is_visible,
+                'is_open' : is_open,
+                'pic' : category_pic,
+            },
+            async : true,
+            success : function(data) {
+                if (data["code"] > 0) {
+
+
+					showMessage('success', data["message"],'PLATFORM_MAIN/promotion/getfestivalactivitylist');
+
+                } else {
+                    showMessage('error', data["message"]);
+                }
+            }
+        });
+	}
+	/**
+	 *图片上传
+	 */
+/* 	function imgUpload(event) {
+		var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+		fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+	} */
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src",res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

@@ -1,0 +1,166 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+     <header class="panel-heading text-right bg-light">
+       <ul class="nav nav-tabs pull-left">
+         <li class="active"><a href="#email" data-toggle="tab">邮箱设置</a></li>
+       </ul>
+       <span class="hidden-sm">邮箱短信</span>
+     </header>
+                  <div class="panel-body">
+                    <div class="tab-content">
+                  
+                      <div class="tab-pane fade active in" id="email">
+							<div class="panel-body">
+								<form class="form-horizontal" method="get">
+									<div class="form-group">
+										<label class="col-sm-2 control-label">是否启用</label>
+										<div class="col-md-4">
+											<label class="switch">
+												<input type="checkbox" id="email_is_use" {if condition="$email_message.is_use=='1'"}checked="checked"{/if}>
+												<span></span>
+											</label>
+										</div>
+									</div>
+									<div class="line line-dashed line-lg pull-in"></div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">SMTP 服务器</label>
+										<div class="col-md-4">
+											<input type="text" class="form-control" id="email_host" value="{$email_message['value']['email_host']}">
+										</div>
+									</div>
+									<div class="line line-dashed line-lg pull-in"></div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">SMTP 端口</label>
+										<div class="col-md-4">
+											<input type="text" class="form-control" id="email_port" value="{$email_message['value']['email_port']}">
+										</div>
+									</div>
+									<div class="line line-dashed line-lg pull-in"></div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">发信人邮件地址</label>
+										<div class="col-md-4">
+											<input type="text" class="form-control" id="email_addr" value="{$email_message['value']['email_addr']}">
+										</div>
+									</div>
+									<div class="line line-dashed line-lg pull-in"></div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">SMTP 身份验证用户名</label>
+										<div class="col-md-4">
+											<input type="text" class="form-control" id="email_id" value="{$email_message['value']['email_id']}">
+										</div>
+									</div>
+									<div class="line line-dashed line-lg pull-in"></div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">SMTP 身份验证码</label>
+										<div class="col-md-4">
+											<input type="password" class="form-control" id="email_pass" value="{$email_message['value']['email_pass']}" >
+										</div>
+									</div>
+						            <div class="line line-dashed line-lg pull-in"></div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">测试接受邮件地址</label>
+										<div class="col-md-4">
+											<input type="text" class="form-control" id="email_test" value="">
+										</div>
+										<div class="col-md-1">
+											<a class="btn btn-primary"  onclick="testSend()">测试发送</a>
+										</div>
+									</div>
+						            <div class="line line-dashed line-lg pull-in"></div>
+									<div class="form-group">
+										<div class="col-sm-4 col-sm-offset-2">
+											<a href="javascript:void(0);" onclick="setEmailMassage()" class="btn btn-primary">保存</a>
+										</div>
+									</div>
+								</form>
+							</div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+
+<script>
+//设置邮件通知
+	function setEmailMassage(){
+		if($("#email_is_use").prop('checked')){
+			var is_use = 1;
+		}else{
+			var is_use = 0;
+		}
+		var email_host = $("#email_host").val();
+		var email_port = $("#email_port").val();
+		var email_addr = $("#email_addr").val();
+		var email_id = $("#email_id").val();
+		var email_pass = $("#email_pass").val();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Config/setEmailMessage",
+			data:{
+				'is_use':is_use,
+				'email_host':email_host,
+				'email_port':email_port,
+				'email_addr':email_addr,
+				'email_id':email_id,
+				'email_pass':email_pass,
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],'PLATFORM_MAIN/Config/messageemailconfig');
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+//设置微信
+	function setMobileMessage(){
+		if($("#mobile_is_use").prop('checked')){
+			var is_use = 1;
+		}else{
+			var is_use = 0;
+		}
+		var app_key = $("#APP_KEY").val();
+		var secret_key = $("#SECRET_KEY").val();
+		var free_sign_name = $("#FREE_SIGN_NAME").val();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Config/setMobileMessage",
+			data:{
+				'is_use':is_use,
+				'app_key':app_key,
+				'secret_key':secret_key,
+				'free_sign_name':free_sign_name,
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],'PLATFORM_MAIN/Config/messageConfig');
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+	function testSend(){
+		var email_test = $("#email_test").val();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Config/testSend",
+			data:{
+				'email_test':email_test,
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"]);
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+</script>
+{/block}

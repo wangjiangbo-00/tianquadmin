@@ -1,0 +1,92 @@
+{extend name="admin/base" /}
+{block name="resources"/}
+<link rel="stylesheet" type="text/css" href="ADMIN_CSS/dashboard.css">
+<link rel="stylesheet" type="text/css" href="ADMIN_CSS/index.css">
+<script src="ADMIN_JS/highcharts.js"></script>
+<script src="ADMIN_JS/exporting.js"></script>
+<script>
+var admin_main = "ADMIN_MAIN";
+</script>
+<script src="ADMIN_JS/index.js"></script>
+<script src="ADMIN_JS/jquery.timers.js"></script>
+<!-- ********************【脚本统一写在index.js中】******************** -->
+{/block}
+{block name="main"}
+<header class="home">
+
+</header>
+<div class="goods-prompt">
+	<h3>店铺及商品提示<span>您需要关注的店铺信息以及待处理事项</span></h3>
+	<div class="subtitle">
+		<img src="__STATIC__/images/green_giftbag.png" /> <label>店铺商品发布情况：<span class="goods_all_count">0/不限</span></label>
+		<img src="__STATIC__/images/orange_picture.png" /><label>图片空间使用情况：<span>不限</span></label>
+	</div>
+	<div class="goods-state">
+		<ul>
+			<a href="ADMIN_MAIN/goods/goodslist"><li><h4 class="goods_sale_count">0</h4>出售中</li></a>
+			<a href="ADMIN_MAIN/goods/goodslist"><li><h4 class="goods_audit_count">0</h4>仓库中</li></a>
+		    <a href="ADMIN_MAIN/goods/goodslist"><li><h4 class="goods_shelf_count">0</h4>违规下架</li></a> 
+			<a href="ADMIN_MAIN/saleservice/consultlist?type=to_reply"><li><h4 class="goods_consult_count">0</h4>待回复咨询</li></a>
+		</ul>
+	</div>
+</div>
+
+
+
+<div class="goods-prompt">
+	<h3>
+		交易提示<span>您需要立即处理的交易订单</span>
+	</h3>
+	<div class="subtitle">
+		<img src="__STATIC__/images/green_list.png" /><label>近期售出：<span>交易中的订单</span></label>
+
+	</div>
+	<div class="goods-state">
+		<ul>
+			<a href='ADMIN_MAIN/order/orderlist?status=0'><li><h4 class="daifukuan">0</h4>待付款</li></a>
+			<a href='ADMIN_MAIN/order/orderlist?status=1'><li><h4 class="daifahuo">0</h4>待发货</li></a>
+			<a href='ADMIN_MAIN/order/orderlist?status=2'><li><h4 class="yifahuo">0</h4>已发货</li></a>
+			<a href='ADMIN_MAIN/order/orderlist?status=3'><li><h4 class="yishouhuo">0</h4>已收货</li></a>
+			<a href='ADMIN_MAIN/order/orderlist?status=4'><li><h4 class="yiwancheng">0</h4>已完成</li></a>
+			<a href='ADMIN_MAIN/order/orderlist?status=5'><li><h4 class="yiguanbi">0</h4>已关闭</li></a>
+			<a href='ADMIN_MAIN/order/orderlist?status=-1'><li><h4 class="tuikuanzhong">0</h4>退款中</li></a>
+			<a href='ADMIN_MAIN/order/orderlist?status=-2' style="display: none;"><li><h4 class="yituikuan">0</h4>已退款</li></a>
+		</ul>
+	</div>
+</div>
+
+<div class="sales">
+	<h3>
+		销售情况统计<span>按周期统计商家店铺的订单量和订单金额</span>
+	</h3>
+	<table>
+		<tr>
+			<td>项目</td>
+			<td>订单量（件）</td>
+			<td>订单金额（元）</td>
+		</tr>
+		<tr>
+			<td>昨日销量</td>
+			<td><span class="yesterday_goods">0</span></td>
+			<td><span class="month_goods">0</span></td>
+		</tr>
+		<tr>
+			<td>本月销量</td>
+			<td><span class="yesterday_money">0</span></td>
+			<td><span class="month_money">0</span></td>
+		</tr>
+	</table>
+</div>
+
+
+
+
+
+<div class="charts">
+	<h3>
+		订单总数统计<span><i></i>订单数量</span>
+	</h3>
+	<div id="orderCharts"></div>
+</div>
+
+{/block}

@@ -1,0 +1,200 @@
+<input type="hidden" id='shop_id' name="shop_id" value="{$shop_id}"/>
+
+
+<div class="header">
+	<div class="w1210 clearfix">
+		<div class="logo-info">
+			{if condition="$web_info['logo'] neq ''"}
+				<a href="SHOP_MAIN" class="logo"><img src="__UPLOAD__/{$web_info['logo']}" /></a>
+			{/if}
+		</div>
+		<div class="shop-info">
+			<div class="shop">
+				<div class="shop-name ">
+					<a href="SHOP_MAIN/shop/shopindex?shop_id={$shop_id}" title="{$shop_info['shop_name']}">{$shop_info['shop_name']}</a>
+				</div>
+			
+				
+
+			</div>
+			<div class="shop-main">
+				
+				<div class="shop-score-box">
+					<div class="shop-score-item">
+						<div class="shop-score-title">描 述</div>
+						<div class="score color">
+							<span>{$shop_info['shop_desccredit']}</span>
+						</div>
+					</div>
+					<div class="shop-score-item">
+						<div class="shop-score-title">服 务</div>
+						<div class="score color">
+							<span>{$shop_info['shop_servicecredit']}</span>
+						</div>
+					</div>
+					<div class="shop-score-item">
+						<div class="shop-score-title">发 货</div>
+						<div class="score color">
+							<span>{$shop_info['shop_deliverycredit']}</span>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+			<a class="slogo-triangle">
+				<i class="icon-triangle"></i>
+			</a>
+			<div class="extra-info">
+				<div class="hd">
+					<p class="shop-collect">
+						<a href="SHOP_MAIN/shop/shopindex?shop_id={$shop_id}" title="{$shop_info['shop_name']}" class="shop-logo">
+							{if condition="$shop_info['shop_logo'] eq '' or $shop_info['shop_logo'] eq null "}
+							<img src="__TEMP__/{$style}/public/images/default/default_shop_logo.png">
+							{else /}
+								<img src="__UPLOAD__/{$shop_info['shop_logo']}">
+							{/if}
+							
+						</a>
+						{if condition="$is_favorites eq 0"}
+							<a href="javascript:" onclick="collectionShopOperation({$shop_id},'shop','',this);"  class="collect-btn bg-color">加入收藏</a>
+						{elseif condition="$is_favorites eq -1"}
+							<a href="SHOP_MAIN/Login/index" class="collect-btn bg-color">加入收藏</a>
+						{else/}
+							<a href="javascript:;" onclick="collectionShopOperation({$shop_id},'shop','',this)"  class="collect-btn bg-color">取消收藏</a>
+						{/if}
+						
+					</p>
+					<p class="collect-count">
+						<em id="collect-count">{$shop_info['shop_collect']}</em>
+					</p>
+					<p class="collect-tip">已收藏</p>
+				</div>
+				<div class="bd">
+					
+					<div class="shop-rate">
+						<h4>店铺动态评分</h4>
+						<ul>
+							<li>
+								描述相符：
+								<a target="_blank" href="javascript:void(0);">
+									<em class="count color" title="">{$shop_info['shop_desccredit']}</em>
+								</a>
+							</li>
+							<li>
+								服务态度：
+								<a target="_blank" href="javascript:void(0);">
+									<em class="count color" title="">{$shop_info['shop_servicecredit']}</em>
+								</a>
+							</li>
+							<li>
+								发货速度：
+								<a target="_blank" href="javascript:void(0);">
+									<em class="count color" title="">{$shop_info['shop_deliverycredit']}</em>
+								</a>
+							</li>
+						</ul>
+					</div>
+					
+					<div class="extend ">
+						<h4 class="extend-title">店铺服务</h4>
+						<ul>
+							<li>
+								<label>店铺掌柜：</label>
+								<div class="extend-right">
+									<a href="/shop/1.html" class="color">{$shop_info['shop_name']}店长</a>
+								</div>
+							</li>
+							
+							<li>
+								<label>店铺客服：</label>
+								<div class="extend-right">
+									<span class="tool">
+										
+										<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin={$shop_info['shop_qq']}&site=qq&menu=yes" class="service-btn">
+											<img border="0" src="__TEMP__/{$style}/public/images/customer_qq.gif" alt="点这里给我发消息">
+										</a>
+										
+									</span>
+								</div>
+							</li>
+							<li class="locus">
+								<label>所在地：</label>
+								<div class="extend-right">
+									<span>{$shop_info['live_store_address']}</span>
+								</div>
+							</li>
+							
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="search">
+			<form class="search-form" method="get" name="" id="search-form" action="" onsubmit="">
+				<input type="hidden" name="type" id="searchtype" value="">
+				<div class="search-info">
+					<div class="search-box">
+						<div class="search-box-con">
+							<input class="search-box-input" name="keyword" id="keyword" tabindex="9" autocomplete="off" value="{$keyword}" onfocus="if( this.value=='请输入关键词'){ this.value=''; }else{ this.value=this.value; }" onblur="if(this.value=='')this.value='请输入关键词'" type="text">
+						</div>
+					</div>
+					<input type="button" onclick="search_all()" value="搜全站" class="button bg-color">
+				</div>
+				<input type="button" onclick="search_me()" value="搜本店" class="button button-spe">
+			</form>
+			<ul class="hot-query">
+				<!-- 默认搜索词 -->
+				
+				<li class="first">
+					<a href="" title=""></a>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+
+<script type="text/javascript">
+//全站搜索
+function search_all(){
+	var keyword=$('#keyword').val();
+	location.href="SHOP_MAIN/goods/goodslist?keyword="+keyword;
+}
+//本店搜索
+function search_me(){
+	var keyword=$('#keyword').val();
+	location.href="SHOP_MAIN/shop/shopgoodlist?shop_id={$shop_id}&goods_group_id=0&keyword="+keyword;
+}
+//收藏店铺操作
+function collectionShopOperation(fav_id,fav_type,log_msg,even){
+	var evtext=$(even).text();
+	var ajaxUrl="SHOP_MAIN/components/collectiongoodsorshop";
+	var updateText="取消收藏";
+	if(evtext==updateText){
+		ajaxUrl="SHOP_MAIN/components/cancelcollgoodsorshop";
+		updateText="加入收藏";
+		$('#collect-count').text(Number($('#collect-count').text())-1);
+	}else{
+		$('#collect-count').text(Number($('#collect-count').text())+1);
+	}
+	$.ajax({
+		type:"post",
+		url:ajaxUrl,
+		async:true,
+		data:{'fav_id':fav_id,
+			  'fav_type':fav_type,
+			  'log_msg':log_msg
+		},
+		success:function(res){
+			if(res['code']>0){	
+				$.msg(evtext+'成功！');
+				$(even).text(updateText);
+			}else{
+				$.msg(evtext+'失败！');
+			}
+			
+		}
+	});
+}
+
+</script>
+</div>

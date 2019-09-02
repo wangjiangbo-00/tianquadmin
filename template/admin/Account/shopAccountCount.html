@@ -1,0 +1,181 @@
+{extend name="admin/base" /}
+{block name="resources"/}
+<style  type="text/css">
+.statistics{
+	width:33%;
+	height:70px;
+	float:left;
+}
+.statistics img{
+	padding-left:15px;
+	padding-top:10px;
+	float:left;
+}
+.statistics  ul{
+	float:left;
+	font-size:12px;
+}
+.income{
+	width:100%;
+	height:260px;
+	clear:both;
+}
+.income-left{
+	float:left;
+	width:25%;
+	text-align:center;
+}
+.income-left ul{
+	margin:0;
+}
+.income-left ul li{
+	line-height:35px;
+}
+.income-right{
+	min-width:70%;
+	height:260px;
+	float:left;"
+}
+.withdraw-left{
+	float:left;
+	width:25%;
+	text-align:center;
+}
+.withdraw-left ul{
+	margin:0;
+}
+.withdraw-left ul li{
+	line-height:35px;
+}
+.withdraw-right{
+	min-width:70%;
+	height:260px;
+	float:left;"
+}
+</style>
+ {/block}
+{block name="main"}
+<div class="total">
+	<div class="statistics">
+		<img src="__STATIC__/images/balance.png" />
+		<ul>
+		<li style="line-height:40px;"><span>可提现余额(元)</span></li>
+		<li><span style="font-size:15px;font-weight:bold;">{$count_data.shop_account}</span></li>
+		</ul>
+	</div>
+	<div class="statistics">
+		<img src="__STATIC__/images/balance1.png" />
+		<ul>
+		<li style="line-height:40px;"><span>待结算余额(元)</span></li>
+		<li><span style="font-size:15px;font-weight:bold;">{$count_data.shop_account_total_money-$count_data.shop_account}</span></li>
+		</ul>
+	</div>
+	<div class="statistics">
+		<img src="__STATIC__/images/balance2.png" />
+		<ul>
+		<li style="line-height:40px;"><span>已提现(元)</span></li>
+		<li><span style="font-size:15px;font-weight:bold;"><?php echo -$count_data["shop_account_withdraw"]; ?></span></li>
+		</ul>
+	</div>
+	<div class="statistics">
+		<img src="__STATIC__/images/balance3.png" />
+		<ul>
+		<li style="line-height:40px;"><span>提现审核中(元)</span></li>
+		<li><span style="font-size:15px;font-weight:bold;">{$count_data.shop_account_withdraw_audit}</span></li>
+		</ul>
+	</div>
+	<div class="statistics">
+		<img src="__STATIC__/images/balance3.png" />
+		<ul>
+		<li style="line-height:40px;"><span>已发放总佣金(元)</span></li>
+		<li><span style="font-size:15px;font-weight:bold;">{$count_data.nfx_shop_commission_cash}</span></li>
+		</ul>
+	</div>
+	<div class="statistics">
+		<img src="__STATIC__/images/balance3.png" />
+		<ul>
+		<li style="line-height:40px;"><span>店铺总佣金(元)</span></li>
+		<li><span style="font-size:15px;font-weight:bold;">{$count_data.nfx_shop_commission}</span></li>
+		</ul>
+	</div>
+	<div class="income">
+	<div class="income-left">
+		<ul>
+			<li style="padding-top: 60px;font-size:20px;"><span>{$month}月</span></li>
+			<li><span style="font-size:22px;color:#323232;">{$count_data.shop_profit}</span></li>
+			<li><span style="color:#323232;">店铺总收入</span></li>
+		</ul>
+	</div> 
+	<div id="container" class="income-right" ></div>
+	</div>
+	<!-- <div class="withdraw">
+	<div class="withdraw-left">
+		<ul>
+			<li style="padding-top: 60px;"><span>2017/03/27 16:16:59</span></li>
+			<li><span style="font-size:22px;color:#323232;">100.00</span></li>
+			<li><span style="color:#323232;">以提现</span></li>
+		</ul>
+	</div>
+	<div id="withdraw" class="withdraw-right" ></div>
+	</div> -->
+</div>
+<script src="__STATIC__/js/highcharts.js"></script>
+<script src="__STATIC__/js/exporting.js"></script>
+<script>
+$(function(){
+	$.ajax({
+		type : "post",
+		url : "ADMIN_MAIN/Account/shopAccountCountJson",
+		async : true,
+		success : function(data) {
+			var chart = new Highcharts.Chart('container', {
+				
+			    title: {
+			        text: '店铺{$month}月收入',
+			        x: -20
+			    },
+			   
+			    xAxis: {
+			        categories: data[0]
+			    },
+			    credits:{
+			        enabled:false // 禁用版权信息
+			    },
+			    yAxis: {
+			        title: {
+			            text: '收入金额(元)'
+			        },
+			        plotLines: [{
+			            value: 0,
+			            width: 1,
+			            color: '#808080'
+			        }]
+			    },
+			    tooltip: {
+			        valueSuffix: '元'
+			    },
+			    legend: {
+			        layout: 'vertical',
+			        align: 'right',
+			        verticalAlign: 'middle',
+			        borderWidth: 0
+			    },		    
+			    series: [{
+			        name: '已结算收入',			     
+//			         data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,200,0,0,0,0]
+			        data: data[1]
+			    },{
+			        name: '未结算收入',
+			        color:"#FF8400",
+			        data: data[2]
+			    }]
+			});	
+		}
+	});
+	
+	
+}) 
+
+
+</script>
+{/block}

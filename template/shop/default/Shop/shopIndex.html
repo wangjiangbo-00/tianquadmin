@@ -1,0 +1,28 @@
+{extend name="shop/default/Shop/base" /}
+{block name="resources"}
+<!-- 添加css、字体文件文件 -->
+
+
+{/block}
+{block name="LeftMenu"}
+
+{/block}
+{block name="main"}
+<input type="hidden" id='shop_id' name="shop_id" value="{$shop_id}"/>
+
+<!--广告滚动 strat-->
+{include file='shop/default/Shop/controlBanner'/}
+<!--广告滚动 end-->
+
+<!--广告栏 strat-->
+{include file='shop/default/Shop/controlShopAdGroup'/}
+
+
+{/block}
+
+{block name="javascript"}
+
+<!-- 添加js文件 -->
+<script type="text/javascript" src="__TEMP__/{$style}/public/js/ns_index.js"></script>	
+
+{/block}

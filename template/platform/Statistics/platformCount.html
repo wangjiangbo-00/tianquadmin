@@ -1,0 +1,93 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+	.img{
+		float:left;
+		padding-left: 30px;
+    	padding-top: 7px;
+	}
+</style>
+{/block}
+{block name="main"} 
+            <div class="row">
+              <div class="col-md-12">
+                <section class="panel panel-default">
+                  <header class="panel-heading font-bold">平台收益</header>
+                  <div class="panel-body">
+                    <div id="container" style="height:210px"></div>
+                  </div>
+                  <footer class="panel-footer bg-white no-padder">
+                    <div class="row text-center no-gutter">
+                      <div class="col-xs-3 b-r b-light" onclick="load_url();"><img src="PLATFORM_IMG/platform1.png" class="img"> <span class="h4 font-bold m-t block">{$AccountCount.account_profit}</span> <small class="text-muted m-b block">平台的总营业额</small> </div>
+                      <div class="col-xs-3 b-r b-light"><img src="PLATFORM_IMG/platform2.png" class="img"> <span class="h4 font-bold m-t block">{$AccountCount.account_money}</span> <small class="text-muted m-b block">平台资金总余额</small> </div>
+                      <div class="col-xs-3 b-r b-light"><img src="PLATFORM_IMG/platform3.png" class="img"> <span class="h4 font-bold m-t block">{$AccountCount.account_return}</span> <small class="text-muted m-b block">平台利润总额</small> </div>
+                      <div class="col-xs-3"><img src="PLATFORM_IMG/platform4.png" class="img"> <span class="h4 font-bold m-t block">{$AccountCount.account_deposit}</span> <small class="text-muted m-b block">保证金总额</small> </div>
+                    </div>
+                  </footer>
+                   <footer class="panel-footer bg-white no-padder">
+                    <div class="row text-center no-gutter">
+                      <div class="col-xs-3 b-r b-light"><img src="PLATFORM_IMG/platform5.png" class="img"> <span class="h4 font-bold m-t block">{$AccountCount.account_order}</span> <small class="text-muted m-b block">商城订单总额</small> </div>
+                      <div class="col-xs-3 b-r b-light"><img src="PLATFORM_IMG/platform6.png" class="img"> <span class="h4 font-bold m-t block">{$AccountCount.account_withdraw}</span> <small class="text-muted m-b block">商城提现总额</small> </div>
+                      <div class="col-xs-3 b-r b-light"><img src="PLATFORM_IMG/platform7.png" class="img"> <span class="h4 font-bold m-t block">{$AccountCount.account_shop}</span> <small class="text-muted m-b block">店铺总余额</small> </div>
+                      <div class="col-xs-3"><img src="PLATFORM_IMG/platform8.png" class="img"> <span class="h4 font-bold m-t block">{$AccountCount.account_shop_withdraw}</span> <small class="text-muted m-b block">店铺总提现</small> </div>
+                    </div>
+                  </footer>
+                </section>
+              </div>
+            </div>
+{/block}
+{block name="script"}            
+<script src="__STATIC__/js/highcharts.js"></script>
+<script src="__STATIC__/js/exporting.js"></script>           
+<script>
+$(function(){
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Account/platformAccountMonthRecoredJson",
+		async : true,
+		success : function(data) {
+			var chart = new Highcharts.Chart('container', {
+				
+			    title: {
+			        text: '平台收益',
+			        x: -20
+			    },
+			   
+			    xAxis: {
+			        categories: data[0]
+			    },
+			    yAxis: {
+			        title: {
+			            text: '收益金额(元)'
+			        },
+			        plotLines: [{
+			            value: 0,
+			            width: 1,
+			            color: '#808080'
+			        }]
+			    },
+			    credits:{
+			        enabled:false // 禁用版权信息
+			    },	
+			    tooltip: {
+			        valueSuffix: '元'
+			    },
+			    legend: {
+			        layout: 'vertical',
+			        align: 'right',
+			        verticalAlign: 'middle',
+			        borderWidth: 0
+			    },
+			    series: [{
+			        name: '已结算收益',
+			        data: data[1]
+			    }]
+			});	
+		}
+	});
+	
+	
+}) 
+</script>
+{/block}
+

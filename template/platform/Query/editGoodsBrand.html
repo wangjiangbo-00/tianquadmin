@@ -1,0 +1,234 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 修改品牌 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="goods_brand_form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">品牌名称</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="brand_name" name="brand_name" value="{$brand_info['brand_name']}" required>
+				</div>
+				<label class="col-md-8 error" for="brand_name" ></label>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">品牌首字母</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="brand_initial" name="brand_initial" value="{$brand_info['brand_initial']}" required maxlength="1">
+				</div>
+				<label class="col-md-9 error" for="brand_initial" ></label>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">是否推荐</label>
+				<div class="col-md-4">
+					<label class="switch">
+                                                    <input id="brand_recommend" type="checkbox" {if condition="$brand_info['brand_recommend'] eq 1"}checked{/if}>
+                                                    <span></span> </label>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">商品分类</label>
+				<div class="col-sm-2 category_name">
+					<span>{$brand_info['category_name']}</span>
+					<a href="javascript:void(0);" onclick="show_select()" class="btn btn-default">编辑</a>
+				</div>
+				<div class="col-sm-2 category_id_1" style="display:none;">
+					<select id="category_id_1" name="account" class="form-control m-b" onchange="changeCategory(1)">
+						<option value="0">请选择...</option>
+						{foreach name="goods_category_list" item="v1"}
+							<option value="{$v1['category_id']}">{$v1['category_name']}</option>
+						{/foreach}
+					</select>
+				</div>
+				<div class="col-sm-2 category_id_2" style="display:none;">
+					<select id="category_id_2" name="account" class="form-control m-b" onchange="changeCategory(2)">
+						<option value="0">请选择...</option>
+					</select>
+				</div>
+				<div class="col-sm-2 category_id_3" style="display:none;">
+					<select id="category_id_3" name="account" class="form-control m-b">
+						<option value="0">请选择...</option>
+					</select>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">品牌图片</label>
+				<div class="col-md-4">
+					<p>
+						{if condition="$brand_info['brand_pic'] eq ''"}
+						<img id="imgLogo" class="imglogo" src=""/>
+						{else/}
+						<img id="imgLogo" class="imglogo" src="__UPLOAD__/{$brand_info['brand_pic']}"/>
+						{/if}
+					</p>
+                                            	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                                            		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+                                            		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+														id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+														onchange="imgUpload(this);"> 
+														<input type="hidden" id="Logo" value="{$brand_info['brand_pic']}" />
+													</span>
+													<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+												</a>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">品牌推荐广告图</label>
+				<div class="col-md-4">
+					<p>
+						{if condition="$brand_info['brand_ads'] eq ''"}
+						<img id="imgLogo1" class="imglogo" src=""/>
+						{else/}
+						<img id="imgLogo1" class="imglogo" src="__UPLOAD__/{$brand_info['brand_ads']}"/>
+						{/if}
+					</p>
+                                            	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                                            		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+                                            		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+														id="uploadImg1" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+														onchange="imgUpload1(this);"> 
+														<input type="hidden" id="Logo1" value="{$brand_info['brand_ads']}" />
+													</span>
+													<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+												</a>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<input type="hidden" id="brand_id" value="{$brand_info['brand_id']}">
+					<button type="submit" class="btn btn-primary">保存</button>
+<!-- 					<a href="javascript:void(0);" onclick="updateGoodsBrandAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+$().ready(function() {
+	$("#goods_brand_form").validate({
+		submitHandler:function(){
+			updateGoodsBrandAjax();
+		}
+	});
+});
+function show_select(){
+	$(".category_name").hide();
+	$(".category_id_1").show();
+}
+function changeCategory(type){
+	var pid = $("#category_id_"+type).val();
+	$.ajax({
+		type:"post",
+		url:"PLATFORM_MAIN/goods/changecategory",
+		data:{
+			'pid':pid
+		},
+		async:true,
+		success:function (data) {
+			if(type == 1){
+				$("#category_id_2 option:gt(0)").remove();
+				$("#category_id_3 option:gt(0)").remove();
+			}else if(type == 2){
+				$("#category_id_3 option:gt(0)").remove();
+			}
+			var html = '';
+			for(var i=0; i<data.length; i++){
+				html += '<option value="'+data[i]['category_id']+'">'+data[i]['category_name']+'</option>';
+			}
+			if(data.length > 0){
+				$("#category_id_"+(type+1)).append(html);
+				$(".category_id_"+(type+1)).show();
+			}
+		}
+	});
+}
+	function updateGoodsBrandAjax(){
+		var brand_id = $("#brand_id").val();
+		var brand_name = $("#brand_name").val();
+		var brand_initial = $("#brand_initial").val();
+		if($("#brand_recommend").prop("checked")){
+			var brand_recommend = 1;
+		}else{
+			var brand_recommend = 0;
+		}
+		var category_id_1 = $("#category_id_1").val();
+		var category_id_2 = $("#category_id_2").val();
+		var category_id_3 = $("#category_id_3").val();
+		var category_name = '';
+		if(category_id_3 > 0){
+			category_name = $("#category_id_3 option:selected").text();
+		}else if(category_id_2 > 0 && category_id_3 <= 0){
+			category_name = $("#category_id_2 option:selected").text();
+		}else if(category_id_1 > 0){
+			category_name = $("#category_id_1 option:selected").text();
+		}else{
+			category_name = '';
+		}
+		var brand_pic = $("#Logo").val();
+		var brand_ads = $("#Logo1").val();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/goods/updategoodsbrand",
+			data:{
+				'brand_id':brand_id,
+				'brand_name':brand_name,
+				'brand_initial':brand_initial,
+				'brand_recommend':brand_recommend,
+				'brand_pic':brand_pic,
+				'brand_ads':brand_ads,
+				'category_id_1':category_id_1,
+				'category_id_2':category_id_2,
+				'category_id_3':category_id_3,
+				'category_name':category_name
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', "商品品牌修改成功",'PLATFORM_MAIN/goods/goodsbrandlist');
+				}else{
+					showMessage('error', "商品品牌修改失败");
+				}	
+			}
+		});
+	}
+	/**
+	 *图片上传
+	 */
+/* 	function imgUpload(event) {
+		var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+		fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+	} */
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+	function imgUpload1(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo1").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo1").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

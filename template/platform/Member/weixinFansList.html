@@ -1,0 +1,139 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9"></div>
+	<div class="col-sm-2">
+		<div class="input-group">
+			<input type="text" class="input-sm form-control" id="search_text" placeholder="请输入粉丝名称">
+		</div>
+	</div>
+	<div class="col-sm-1">
+		<div class="input-group">
+			<span class="input-group-btn">
+				<button class="btn btn-sm btn-default" type="button"
+					onclick="LoadingInfo(1)">搜索</button>
+			</span>
+		</div>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th>粉丝头像</th>
+					<th>粉丝名称</th>
+					<th class="center">地址</th>
+					<th class="center">关注状态</th>
+					<th class="center">关注时间</th>
+					<th class="center">备注</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} {block name="script"}
+<script type="text/javascript">
+
+$(function(){
+	LoadingInfo(1);
+})
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Member/weixinfanslist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+// 				alert(JSON.stringify(data));
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						var is_subscribe = "";
+						var sex = "";
+						if(data["data"][i]["is_subscribe"] == 1){
+							is_subscribe = "已关注";
+						}else{
+							is_subscribe = "取消关注";
+						}
+						if(data["data"][i]["sex"] == 1){
+							sex = '男';
+						}else{
+							sex = '女';
+						}
+						var country = "";
+						var province = "";
+						var city = "";
+						var district = "";
+						if(data["data"][i]["country"] != "无"){
+							country = data["data"][i]["country"];
+						}
+						if(data["data"][i]["province"] != "无"){
+							province = data["data"][i]["province"];
+						}
+						if(data["data"][i]["city"] != "无"){
+							city = data["data"][i]["city"];
+						}
+						if(data["data"][i]["district"] != "无"){
+							district = data["data"][i]["district"];
+						}
+						
+						html += '<tr>';
+						html += '<td><div class="cell"><label ><input name="sub" type="checkbox" value="'+ data["data"][i]["fans_id"]+'" ></label></div></td>';
+						//html += '<td>' + data["data"][i]["uid"]+ '</td>';
+// 						html +='<td><img src="__STATIC__/images/default_user_portrait.gif" style="height:50px;"/></td>';
+						html += '<td>';
+						if(data["data"][i]["headimgurl"] ==""){
+							html += '<img src="__STATIC__/images/default_user_portrait.gif" class="head-portrait" />';							
+						}else{
+							html += '<img src="'+data["data"][i]["headimgurl"]+'" class="head-portrait" />';
+						}
+						html += '</td>';
+						if (data["data"][i]["nickname_decode"] == null || "" == data["data"][i]["nickname_decode"]) {
+							html += '<td class="center">--</td>';
+						} else {
+							html += '<td class="center">' + data["data"][i]["nickname_decode"] + '</td>';
+						}
+						html += '<td class="center">' + country +province +city+district +'</td>';	
+						html += '<td class="center">' + is_subscribe + '</td>';
+						html += '<td class="center">' + data["data"][i]["memo"] + '</td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="9">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+ 					var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+				
+			}
+		});
+	}
+	//全选
+	function CheckAll(event){
+		var checked = event.checked;
+		$(".style0list tbody input[type = 'checkbox']").prop("checked",checked);
+	}
+	
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+</script>
+{/block}

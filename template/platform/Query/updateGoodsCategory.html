@@ -1,0 +1,105 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 修改商品分类 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="goods_category_form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">商品分类名称</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="category_name" value="{$data.catname}" required>
+				</div>
+				<label class="col-md-8 error" for="category_name" ></label>
+			</div>
+
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">分类图片</label>
+				<div class="col-md-10">
+					<p>
+						{if condition="$data.logo eq ''"}
+						<img id="imgLogo" src="">
+						{else/}
+						<img id="imgLogo" src="{$data.logo}" class="imglogo"/>
+						{/if}
+					</p>
+					<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+	                                   		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;">
+							                                   		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+																		   id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+																		   onchange="imgUpload(this);">
+												<input type="hidden" id="Logo" value="{$data.logo}" />
+											 </span>
+						<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+					</a>
+				</div>
+			</div>
+
+			<!-- 书签 -->
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<input id="category_id" type="hidden" value="{$data.id}">
+					<button type="submit" class="btn btn-primary">保存</button>
+<!-- 					<a href="javascript:void(0);" onclick="updateGoodsCategoryAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+$().ready(function() {
+	 $("#goods_category_form").validate({
+	        submitHandler:function(){
+	        	updateQueryCategoryAjax();
+	        }    
+	 });
+});
+	/**
+	*修改模块
+	*/
+	function updateQueryCategoryAjax() {
+
+		var category_name = $("#category_name").val();
+        var category_id = $("#category_id").val();
+        var logo = $("#Logo").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/query/updatequerycategory",
+			data : {
+				'category_id' : category_id,
+                'category_name' : category_name,
+                'logo':logo,
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],'PLATFORM_MAIN/query/querycategorylist');
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+	/**
+	 *图片上传
+	 */
+/* 	function imgUpload(event) {
+		var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+		fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+	} */
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src",res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

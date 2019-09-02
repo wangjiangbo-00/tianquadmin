@@ -1,0 +1,136 @@
+{extend name="platform/base" /} {block name="main"}
+<style>
+.check{
+	position: absolute;
+	bottom:0px;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.8);
+	display:none;
+}
+.check div{
+	width:60%;
+	height:30px;
+	margin-left:20%;
+	border:1px solid #fff;
+	margin-top:10%;
+	text-align:center;
+	/* background:#00C1FF; */
+}
+.check div:hover{
+	background: #00C1FF;
+	border:1px solid #00C1FF;
+}
+.check div a{
+	font-size:15px;
+	color:#fff;
+	line-height:30px;
+}
+</style>
+<header class="header clearfix">
+	<div class="row m-t-sm">
+		<a href="PLATFORM_MAIN/Wchat/qrcode" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加自定义模板</a>
+	</div>
+</header>
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 推广二维码管理 </header>
+	<div class="panel-body">
+		<div class="row">
+		{foreach name="template_list" item="info"}
+			<div class="col-lg-2"  style="opacity: 1;height:auto;position:relative;"  onmouseover="checkShowThis(this);"  onmouseout="checkHideThis(this);" >			
+			<div style="position:relative;">
+			<!-- <img src="__UPLOAD__/{$info.template_url}" onclick="checkShowThis(this);"/> --> 
+			{if condition="$info.is_check == 1 "} 
+				<img src="__UPLOAD__/{$info.template_url}" style="border:1px solid #00C0FF;width:100%;"/>
+				{else /} 
+					<img src="__UPLOAD__/{$info.template_url}" style="border:1px solid #eee;width:100%"/>
+				{/if}
+			<div class="check" >
+			{if condition="$info.is_check == 1 "} 
+				<div style="margin-top:60%;" onclick="deleteWeixinQrcodeTemplateValid({$info.id})">
+					<a href="javascript:;">删除</a>
+				</div>
+				<div onclick="modifyWeixinQrcode({$info.id})">
+					<a href="javascript:;">编辑</a>
+				</div>
+				{else /} 
+				<div style="margin-top:50%;" onclick="modifyWeixinQrcodeTemplateValid({$info.id})">
+					<a href="javascript:;">设为默认</a>
+				</div>
+				<div onclick="deleteWeixinQrcodeTemplateValid({$info.id})">
+					<a href="javascript:;">删除</a>
+				</div>
+				<div onclick="modifyWeixinQrcode({$info.id})">
+					<a href="javascript:;">编辑</a>
+				</div>
+				{/if}	
+			</div>
+			<div>
+				{if condition="$info.is_check == 1 "} 
+					<img src="PLATFORM_IMG/qrcode/check_qrcode1.png"class="qrcode_img" style="position:absolute;top:0px;right:0px;"/>
+				{else /} 
+					<img src="PLATFORM_IMG/qrcode/check_qrcode1.png" class="qrcode_img"style="position:absolute;top:0px;right:0px;display:none;"/>
+				{/if}
+			</div>
+		    </div>
+		    </div>
+		{/foreach}
+		</div>
+	</div>
+</section>
+
+<script type="text/javascript">
+/**
+ * 设置店铺的模板为默认
+ */
+function modifyWeixinQrcodeTemplateValid(id){
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Wchat/modifyWeixinQrcodeTemplateValid",
+		data : {
+			'id' : id
+		},
+		async : true,
+		success : function(data) {
+			location.reload();
+			if(data['code'] > 0){
+				 showMessage('success', data['message'], 'PLATFORM_MAIN/Wchat/weixinQrcodeTemplate');				 
+			 }else{
+				 showMessage('error', data['message']);
+			 } 
+		}
+	})
+}
+
+function deleteWeixinQrcodeTemplateValid(id){
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Wchat/deleteWeixinQrcodeTemplateValid",
+		data : {
+			'id' : id
+		},
+		async : true,
+		success : function(data){
+			if(data['code'] > 0){
+				 showMessage('success', data['message'], 'PLATFORM_MAIN/Wchat/weixinQrcodeTemplate');				 
+			 }else{
+				 showMessage('error', data['message']);
+			 }
+		}
+	})
+}
+function modifyWeixinQrcode(id){
+	window.location.href="PLATFORM_MAIN/Wchat/qrcode?id="+id;
+}
+function checkShowThis(event){
+	$(".qrcode_button").hide();
+	$(".check").hide();
+	$(event).find(".qrcode_button").show();
+	$(event).find(".check").show();
+}
+function checkHideThis(event){
+	$(event).find(".qrcode_button").hide();
+	$(event).find(".check").hide();
+}
+</script>
+{/block}

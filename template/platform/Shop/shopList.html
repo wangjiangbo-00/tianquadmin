@@ -1,0 +1,196 @@
+{extend name="platform/base" /}
+{block name="resources"}
+<style>
+.col-sm-7 {
+    width: 41.333333%;
+}
+</style>
+{/block}
+
+
+{block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-7"></div>
+	<div class="col-sm-2">
+		<select class="input-sm form-control" id="status">
+			<option value="">请选择店铺状态</option>
+			<option value="0">已关闭</option>
+			<option value="1">已开启</option>
+			<option value="2">审核中</option>
+		</select>
+	</div>
+	<div class="col-sm-2">
+		<select class="input-sm form-control" id="shop_type">
+			<option value="0">请选择所属等级...</option> {foreach name="shop_type_list"
+			item="vs"}
+			<option value="{$vs['instance_typeid']}">{$vs['type_name']}</option>
+			{/foreach}
+		</select>
+	</div>
+	<div class="col-sm-2">
+		<input type="text" id="search_text" class="input-sm form-control"
+			placeholder="请输入店铺名称">
+	</div>
+	<div class="col-sm-1">
+		<button class="btn btn-sm btn-default" type="button"
+			onclick="LoadingInfo(1)">搜索</button>
+	</div>
+</div>
+
+
+<li><a class="nscs-table-handle_green" href="PLATFORM_MAIN/shop/addshop"><i class="fa fa-plus-circle"></i>&nbsp;新增商店</a></li>
+
+<section class="panel panel-default">
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+				<th width="20"><input type="checkbox"></th>
+				<th>店铺名称</th>
+				<th>账户名</th>
+
+				<th>排序</th>
+				<th>平台抽取比率</th>
+				<th>是否推荐</th>
+				<th class="center">所属城市</th>
+				<th class="center">状态</th>
+				<th class="center">操作</th>
+			</tr>
+		</thead>
+		<tbody id="list">
+			<tr></tr>
+		</tbody>
+	</table>
+	{include file="platform/page" /}
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var shop_type = $("#shop_type").val();
+		var search_text = $("#search_text").val();
+		var status = $("#status").val();
+		//alert(status);
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/shop/shoplist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text, "shop_type" : shop_type, "status" : status
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['shop_id']+'"></td>';
+						html += '<td>' + data["data"][i]["shop_name"] + '</td>';
+						if(data[i]["username"]==null){
+							html += '<td>--</td>';
+						}else{
+							html += '<td>' + data[i]["username"] + '</td>';
+						}
+						
+						if(data["data"][i]["shop_recommend"]==1){
+							html += '<td><a href="javascript:;" id="recommend_'+data["data"][i]["shop_id"]+'" is_recommend="1" onclick="setRecomment('+data["data"][i]["shop_id"]+')">是</a></td>'
+						}else{
+							html += '<td><a href="javascript:;" id="recommend_'+data["data"][i]["shop_id"]+'" is_recommend="0" onclick="setRecomment('+data["data"][i]["shop_id"]+')">否</a></td>';
+						}
+						
+						html += '<td><input style="color:#717171;" type="number" value="' + data["data"][i]["shop_sort"] + '" id="shop_sort'+i+'" onchange="load('+data["data"][i]["shop_id"]+','+i+')"></td>';
+						html += '<td>'+data["data"][i]["shop_platform_commission_rate"]+'%</td>';
+						html += '<td class="center">' + data["data"][i]["shop_type_name"] + '</td>';
+						if(data["data"][i]['shop_state'] == 1){
+							html += '<td class="center" style="color:green;">已开启</td>';
+						}else if(data["data"][i]['shop_state'] == 2){
+							html += '<td class="center" style="color:#ffc333;">审核中</td>';
+						}else if(data["data"][i]['shop_state'] == 0){
+							html += '<td class="center" style="color:red;">已关闭</td>';
+						}
+						html += '<td class="center"><a href="PLATFORM_MAIN/Shop/updateShop?shop_id='+ data['data'][i]['shop_id']+'">修改</a>&nbsp;&nbsp;';
+						if(data["data"][i]['shop_state'] == 1){
+							html += '<a href="javascript:;" onclick="closeStatus(0,'+data["data"][i]["shop_id"]+');">关闭</a>';
+						}else{
+							html += '<a href="javascript:;" onclick="closeStatus(1,'+data["data"][i]["shop_id"]+');">开启</a>';
+						}
+						
+						html += '</td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="8">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+	
+	/*
+	*修改input值
+	*/
+	function load(shop_id,index){
+		
+	    var shop_sort = $("#shop_sort"+index).val();
+		//alert(shop_sort);
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/shop/updateshoplist",
+			data:{'shop_id':shop_id,'shop_sort':shop_sort},
+			async:true,
+			success: function (data) {
+				
+				if(data['code'] <= 0){
+					showMessage('error', $data['message']);
+				}else{
+					LoadingInfo(1);
+				}
+			}
+		});
+	}
+	
+	/**设置推荐
+	*/
+	function closeStatus(type,shop_id){
+					
+	                $.ajax({
+	        			type:"post",
+	        			url:"PLATFORM_MAIN/shop/setstatus",
+	        			data:{'shop_id':shop_id,'type':type},
+	        			async:false,
+	        			success : function(data) {
+	        				//alert(JSON.stringify(data));
+	        				if(data["code"] > 0 || data["code"] == 0){
+	        					showMessage('success','操作成功');
+	        					window.location.reload();
+	        					
+	        				}else{
+	        					showMessage('error', data["message"]);
+	        					window.location.reload();
+	        				}
+	        				
+	        			}
+	        		});
+	           
+	}
+	
+</script>
+{/block}

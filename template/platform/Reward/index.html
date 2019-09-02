@@ -1,0 +1,128 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 积分奖励设置 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="user_form" name="form" action="javascript:;">
+			<div class="form-group">
+				<label class="col-sm-1 control-label">签到</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="sign_point" name="admin_name" value="{$res.sign_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">分享</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="share_point" name="admin_name" value="{$res.share_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-1 control-label">会员注册</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_member_self_point" name="admin_name" value="{$res.reg_member_self_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">会员上级</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_member_one_point" name="admin_name" value="{$res.reg_member_one_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">会员上上级</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_member_two_point" name="admin_name" value="{$res.reg_member_two_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">会员上上上级</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_member_three_point" name="admin_name" value="{$res.reg_member_three_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-1 control-label">成为推广员</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_promoter_self_point" name="admin_name" value="{$res.reg_promoter_self_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">推广员上级</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_promoter_one_point" name="admin_name" value="{$res.reg_promoter_one_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">推广员上上级</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_promoter_two_point" name="admin_name" value="{$res.reg_promoter_two_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">推广员上上上级</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_promoter_three_point" name="admin_name" value="{$res.reg_promoter_three_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-1 control-label">成为股东</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_partner_self_point" name="admin_name" value="{$res.reg_partner_self_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">股东上级</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_partner_one_point" name="admin_name" value="{$res.reg_partner_one_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">股东上上级</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_partner_two_point" name="admin_name" value="{$res.reg_partner_two_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+				<label class="col-sm-1 control-label">股东上上上级</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="reg_partner_three_point" name="admin_name" value="{$res.reg_partner_three_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button type="submit" class="btn btn-primary" onclick="setRewardRuleAjax();">保存</button>	
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+	function setRewardRuleAjax(){
+		var sign_point = $("#sign_point").val();
+		var share_point = $("#share_point").val();
+		var reg_member_self_point = $("#reg_member_self_point").val();
+		var reg_member_one_point = $("#reg_member_one_point").val();
+		var reg_member_two_point = $("#reg_member_two_point").val();
+		var reg_member_three_point = $("#reg_member_three_point").val();
+		var reg_promoter_self_point = $("#reg_promoter_self_point").val();
+		var reg_promoter_one_point = $("#reg_promoter_one_point").val();
+		var reg_promoter_two_point = $("#reg_promoter_two_point").val();
+		var reg_promoter_three_point = $("#reg_promoter_three_point").val();
+		var reg_partner_self_point = $("#reg_partner_self_point").val();
+		var reg_partner_one_point = $("#reg_partner_one_point").val();
+		var reg_partner_two_point = $("#reg_partner_two_point").val();
+		var reg_partner_three_point = $("#reg_partner_three_point").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Reward/indexFx2",
+			data : {
+				"sign_point" : sign_point,
+				"share_point" : share_point,
+				"reg_member_self_point" : reg_member_self_point,
+				"reg_member_one_point" : reg_member_one_point,
+				"reg_member_two_point" : reg_member_two_point,
+				"reg_member_three_point" : reg_member_three_point,
+				"reg_promoter_self_point" : reg_promoter_self_point,
+				"reg_promoter_one_point" : reg_promoter_one_point,
+				"reg_promoter_two_point" : reg_promoter_two_point,
+				"reg_promoter_three_point" : reg_promoter_three_point,
+				"reg_partner_self_point" : reg_partner_self_point,
+				"reg_partner_one_point" : reg_partner_one_point,
+				"reg_partner_two_point" : reg_partner_two_point,
+				"reg_partner_three_point" : reg_partner_three_point
+			},
+			success : function(data){
+				if(data['code']>0){
+					showMessage("success", "设置成功！", "PLATFORM_MAIN/Reward/index");
+				}else{
+					showMessage("error", "设置失败！");
+				}
+			}
+		})
+	}
+</script>
+{/block}

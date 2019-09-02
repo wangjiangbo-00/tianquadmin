@@ -1,0 +1,280 @@
+{extend name="admin/base" /}
+{block name="resources"/}
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script>
+<style  type="text/css">
+.modal-div{
+	width:90%;
+	margin:auto;
+}
+.modal-dl{
+	overflow:hidden;
+}
+.modal-dl dt{
+	line-height:33px;
+	float:left;
+	font-weight:normal;
+}
+.modal-dl dd{
+	float:left;
+}
+.modal-dl dd span{
+	display:block;
+	color:#de533c;
+}
+.btn.off{
+	background-color:#e26f6f;
+	color:#FFF;
+}
+.btn.sure{
+	color:#FFF;
+	background-color:#62c462;
+}
+
+
+/*独立*/
+.status-error{
+	display:inline-block;
+	padding-left:5px;
+	padding-right:5px;	
+	padding-bottom:3px;
+	padding-top:3px;
+	color:#FFF;
+	background-color:#de533c;
+}
+/*独立*/
+.status-success{
+	display:inline-block;
+	color:#FFF;
+	padding-left:5px;
+	padding-right:5px;	
+	padding-bottom:3px;
+	padding-top:3px;
+	background-color:#5be15b;
+}
+
+</style>
+
+ {/block}
+{block name="right_tab"}
+<li><a class="nscs-table-handle_green" href="ADMIN_MAIN/account/applyshopaccountwithdraw"><i class="fa fa-plus-circle"></i>&nbsp;提现</a></li> 
+{/block}
+{block name="main"}
+
+	
+<div class="mod-table">
+	<div class="mod-table-head">
+		<div class="con style0list">
+			<table>
+				<colgroup>
+					<col style="width: 1%;">
+					<col style="width: 5%;">
+					<col style="width: 10%;">
+					<col style="width: 10%;">
+					<col style="width: 7%;">
+					<col style="width: 11%;">
+					<col style="width: 6%;">
+					<col style="width: 10%;">
+					<col style="width: 10%;">
+					<col style="width: 6%;">
+				<!-- 	<col style="width: 10%;"> -->
+				</colgroup>
+				<thead>
+					<tr>
+						<th><label style="margin-left: 5px;"> <input type="checkbox"  onclick="CheckAll(this)"></label></th>
+						<th>提现流水号</th>
+						<th>提现银行</th>
+						<th>提现账户</th>
+						<th>账户姓名</th>
+						<th>手机</th>
+						<th>金额</th>
+						<th>提现日期</th>
+						<th>到账日期</th>
+						<th>状态</th>
+					<!-- 	<th>操作</th> -->
+					</tr>
+				</thead>
+				<colgroup>
+					<col style="width: 3%;">
+					<col style="width: 10%;">
+					<col style="width: 9%;">
+					<col style="width: 8%;">
+					<col style="width: 9%;">
+					<col style="width: 8%;">
+					<col style="width: 6%;">
+					<col style="width: 15%;">
+					<col style="width: 15%;">
+					<col style="width: 5%;">
+				<!-- 	<col style="width: 10%;"> -->
+				</colgroup>
+				<tbody></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- 修改用户上级（Modal）开始 -->
+<div class="modal hide" id="editParent" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">推广员上级修改</h4>
+            </div>
+            <div class="modal-body">
+            	<div class="modal-div">
+            		<input type="hidden"  id="promoter_id"  value=''/>
+            		<dl class="modal-dl">
+            			<dt>上级推广员账号:</dt>
+            			<dd>
+            				<input  type="text" id="parent_promoter"value=""/>
+            				<span id="ever_parent_promoter"></span>
+            			</dd>
+            		</dl>           		            		
+            	</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn off" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn sure" onclick="modifyPromoterParent();">修改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<!-- 修改用户上级（Modal）结束 -->
+{/block}
+{block name="script"}
+{include file="admin/pageCommon" /}
+{include file="admin/openDialog" /}
+<script type="text/javascript">
+//查询
+function searchData(){
+	LoadingInfo(1);
+}
+	//加载数据
+	function LoadingInfo(pageIndex) {
+		$.ajax({
+			type : "post",
+			url : "ADMIN_MAIN/account/shopaccountwithdrawlist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex
+			},
+			success : function(data) {
+			//	alert(JSON.stringify(data));
+				$("#page_count").val(data['list']["page_count"]);
+				$("#pageNumber a").remove();
+				var html = '';
+				if (data['list']["data"].length > 0) {
+					for (var i = 0; i < data['list']["data"].length; i++) {
+						var status = "";
+						if(data['list']["data"][i]["status"] == 1){
+							status = "已通过";
+							
+						}else if(data['list']["data"][i]["status"] == 1){
+							status = "已拒绝";
+						}else{
+							status = "审核中";
+							
+						}
+						var parent_realname ="";
+						if(data['list']["data"][i]["parent_realname"] != null){
+							parent_realname = data['list']["data"][i]["parent_realname"];
+						}
+						html += '<tr align="center">';
+						html += '<td><div class="cell"><label ><input name="sub" type="checkbox" value="'+ data['list']["data"][i]["id"] +'" ></label></div></td>';
+						html += '<td>' + data['list']["data"][i]["withdraw_no"] + '</td>';
+						html += '<td>' + data['list']["data"][i]["bank_name"] + '</td>';
+						html += '<td>' + data['list']["data"][i]["account_number"] + '</td>';
+						html += '<td>' + data['list']["data"][i]["realname"] + '</td>';
+						html += '<td>' + data['list']["data"][i]["mobile"] + '</td>';
+						html += '<td>' + data['list']["data"][i]["cash"] + '</td>';
+						html += '<td>' + data['list']["data"][i]["ask_for_date"] + '</td>';
+						if(data['list']["data"][i]["payment_date"] == null){
+							html += '<td> </td>';
+						}else{
+							html += '<td>' + data['list']["data"][i]["payment_date"] + '</td>';
+						}
+						
+						html += '<td>' + status + '</td>';						
+						html += '<td></td> ';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="11">暂无符合条件的数据记录</th></tr>';
+				}
+				
+				$(".style0list tbody").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}	
+	//全选
+	function CheckAll(event){
+		var checked = event.checked;
+		$(".style0list tbody input[type = 'checkbox']").prop("checked",checked);
+	}
+	
+	
+	//
+	function modifyPromoterLock(promoter_id, is_lock){
+		$.ajax({
+			type : "post",
+			url : "ADMIN_MAIN/distribution/modifypromoterlock",
+			async : true,
+			data : {
+				"promoter_id" : promoter_id,
+				"is_lock":is_lock
+			},
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"ADMIN_MAIN/distribution/promoterlist");
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+	//修改上级弹出框
+	function showEditParent(promoter_id,parent_promoter){
+		$("#promoter_id").val(promoter_id);
+		if(parent_promoter == "" ){
+			var parent_text = "此推广员无上级";
+		}else{
+			var parent_text = "原上级推广员账号为:"+parent_promoter;
+		}
+		$("#ever_parent_promoter").html(parent_text);
+		$("#editParent").modal('show');
+	}
+	function modifyPromoterParent(){
+		var promoter_id = $("#promoter_id").val();
+		var parent_promoter = $("#parent_promoter").val();
+		if(parent_promoter == ''){
+			$("#parent_promoter").parent().next().show();
+			return false;
+		}
+		$.ajax({
+			type:"post",
+			url:"ADMIN_MAIN/distribution/modifypromoterparent",
+			data:{
+				'promoter_id':promoter_id,
+				'parent_promoter':parent_promoter
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"ADMIN_MAIN/distribution/promoterlist");
+					$("#editParent").modal('hide');
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+</script>
+{/block}

@@ -1,0 +1,254 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.fa {
+    display: grid;
+   
+}
+</style>
+{/block}
+ {block name="main"}
+<div class="row padder-v">
+		<div class="col-sm-7">
+			<!-- 			<a href="PLATFORM_MAIN/Auth/addUser" class="btn btn-sm btn-primary"><i -->
+			<!-- 				class="fa fa-plus"></i> 添加用户 </a> -->
+		</div>
+		
+		<div class="col-sm-2">
+			<input type="text" id="search_text" class="input-sm form-control" placeholder="请输入商品名称"> 
+		</div>
+		<div class="col-sm-2">
+			<div style="width:25%;float:left;line-height: 30px;">上下架</div>
+			<select class="input-sm form-control" id="shop_type" style="width:75%;float:left;">
+                <option value="">全部</option>
+				<option value="1">上架</option>
+				<option value="0">下架</option>
+            </select>			
+		</div>
+		<div class="col-sm-1">
+			<button class="btn btn-sm btn-default" type="button" onclick="LoadingInfo(1)">搜索</button>
+		</div>
+	</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th>图片</th>
+					<th>编号</th>
+					<th style="width: 23%;">商品名称</th>
+					<th>店铺</th>
+					<th class="center">新品</th>
+					<th class="center">精品</th>
+					<th class="center">热卖</th>
+					<th>分类&品牌</th>
+					<th>价格</th>
+					<th>库存</th>
+					<th>商品状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} 
+{block name="script"}
+<script type="text/javascript">
+function modifyGoodsRecommend(goods_id, type, is_recommend){
+// 	 alert(goods_id);
+//      alert(type);
+//      alert(is_recommend);
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Goods/modifyGoodsRecommend",
+		async : true,
+		data : {
+			"goods_id" : goods_id,
+			"type" : type,
+			"is_recommend" : is_recommend
+		},
+		success : function(data) {
+			return true;
+		}
+	});
+}
+$(function(){
+	LoadingInfo(1);
+});
+	//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var goods_name =$("#search_text").val();
+		var state = $("#shop_type").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Goods/goodsList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "goods_name" : goods_name, "state" : state
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['goods_id']+'"></td>';
+						html += '<td><img src="'+data["data"][i]["pic_cover_micro"]+'"></td>';
+						html += '<td>'+data['data'][i]['code']+'</td>';
+						html += '<td>'+data["data"][i]["goods_name"]+'</td>';
+						html += '<td>'+data["data"][i]["shop_name"]+'</td>';
+						if(data["data"][i]["is_platform_new"] > 0){
+							html += '<td class="center"><a href="#" class="active" onclick="modifyGoodsRecommend('+data["data"][i]["goods_id"]+',1,0)" data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}else{
+							html += '<td class="center"><a href="#" class="" onclick="modifyGoodsRecommend('+data["data"][i]["goods_id"]+',1,1)" data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}
+						if(data["data"][i]["is_platform_best"] > 0){
+							html += '<td class="center"><a href="#" class="active" onclick="modifyGoodsRecommend('+data["data"][i]["goods_id"]+',2,0)" data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}else{
+							html += '<td class="center"><a href="#" class="" onclick="modifyGoodsRecommend('+data["data"][i]["goods_id"]+',2,1)" data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}
+						if(data["data"][i]["is_platform_hot"] > 0){
+							html += '<td class="center"><a href="#" class="active" onclick="modifyGoodsRecommend('+data["data"][i]["goods_id"]+',3,0)" data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}else{
+							html += '<td class="center"><a href="#" class="" onclick="modifyGoodsRecommend('+data["data"][i]["goods_id"]+',3,1)" data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}
+						if(data["data"][i]["brand_name"] != null){
+							html += '<td><div class="media-body"><div>'+data["data"][i]["category_name"]+'</div><small class="text-muted">'+data["data"][i]["brand_name"]+'</small></div></td>';
+						}else{
+							html += '<td><div class="media-body"><div>'+data["data"][i]["category_name"]+'</div></div></td>';
+						}
+						html += '<td>' + data["data"][i]["price"] + '</td>';
+						html += '<td>' + data["data"][i]["stock"] + '</td>';
+						if(data["data"][i]["state"] == 1){
+							html += '<td>已上架</td>';
+						}else{
+							html += '<td>已下架</td>';
+						}
+						html += '<td><a target="_BLANK" href="__ROOT__/goods/goodsinfo?goodsid=' + data["data"][i]["goods_id"] + '">查看</a>  &nbsp;&nbsp;&nbsp;';
+						if(data["data"][i]["state"] == 1){
+							html += ' <a href="javascript:void(0);" onclick="modifyGoodsOnline('+data["data"][i]["goods_id"]+')">违规下架</a>';
+						}else{
+							html += ' <a href="javascript:void(0);" onclick="deleteGoods('+data["data"][i]["goods_id"]+')">删除</a>';
+						}
+						
+						html += '</td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="9">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}
+	
+	
+
+	//商品上架id合计
+	//商品上架id合计
+	function goodsIdCount(){
+		var goods_ids= "";
+		$("#list input[type='checkbox']:checked").each(function() {
+			if (!isNaN($(this).val())) {
+				var state = $(this).data("state");
+				if(state == 0){
+					$( "#dialog" ).dialog({
+			            buttons: {
+			                "确定,#e57373": function() {
+			                    $(this).dialog('close');
+			                }
+			            },
+			            contentText:"记录中包含已下架记录",
+			            title:"消息提醒",
+			        });
+					return false;
+				}
+				goods_ids = $(this).val() + "," + goods_ids;
+			}
+		});
+		goods_ids = goods_ids.substring(0, goods_ids.length - 1);
+		if(goods_ids == ""){
+			$( "#dialog" ).dialog({				
+	            buttons: {
+	                "确定,#e57373": function() {
+	                    $(this).dialog('close');
+	                }
+	            },
+	            contentText:"请选择需要操作的记录",
+	            title:"消息提醒",
+	        });
+			return false;
+		}
+		modifyGoodsOnline(goods_ids);
+	}
+	
+	//商品上下架
+	function modifyGoodsOnline(goods_ids){
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Goods/ModifyGoodsOffline",
+			async : true,
+			data : {
+				"goods_ids" : goods_ids
+			},
+			success : function(data) {
+				if(data["code"] > 0 ){
+					showMessage('success', "下架成功",'PLATFORM_MAIN/Goods/goodsList');
+				}else{
+					showMessage('error', "下架失败");
+				}
+			}
+		})
+	}
+	
+	function deleteGoods(goods_ids){
+		$( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+            			type : "post",
+            			url : "PLATFORM_MAIN/Goods/deleteGoods",
+            			async : true,
+            			data : {
+            				"goods_ids" : goods_ids
+            			},
+            			success : function(data) {
+            				if(data["code"] > 0 ){
+            					showMessage('success', "删除成功",'PLATFORM_MAIN/Goods/goodsList');
+            				}else{
+            					showMessage('error', "删除失败");
+            				}
+            			}
+            		})
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+                
+            },
+            contentText:"你确定删除吗？",
+            title:"消息提醒"
+        });
+	}
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+</script>
+{/block}

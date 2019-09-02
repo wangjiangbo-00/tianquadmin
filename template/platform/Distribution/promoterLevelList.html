@@ -1,0 +1,118 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9">
+		<a href="PLATFORM_MAIN/Distribution/addPromoterLevel"
+			class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加推广员等级
+		</a>
+	</div>
+</div>
+<section class="panel panel-default">
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+				<th width="20"><input type="checkbox"></th>
+				<th>等级名称</th>
+				<th class="center">升级条件</th>
+				<th class="center">店内销售佣金比率</th>
+				<th class="center">给上级的佣金比率</th>
+				<th class="center">给上上级的佣金比率</th>
+				<th class="center">创建时间</th>
+				<th class="center">操作</th>
+			</tr>
+		</thead>
+		<tbody id="list">
+			<tr></tr>
+		</tbody>
+	</table>
+	{include file="platform/page" /}
+</section>
+{/block} {block name="script"}
+<script type="text/javascript">	
+$(function(){
+	LoadingInfo(1);
+});
+	//加载数据
+	function LoadingInfo(pageIndex) {
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Distribution/promoterLevelList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input name="sub" type="checkbox" value="'+ data["data"][i]["level_id"] +'" ></td>';
+						html += '<td>' + data["data"][i]["level_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["level_money"] + '元</td>';
+						html += '<td class="center">' + data["data"][i]["level_0"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["level_1"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["level_2"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["create_time"] + '</td>';
+						html += '<td class="center"><a href="PLATFORM_MAIN/Distribution/updatePromoterLevel?level_id='+ data["data"][i]["level_id"] +'">修改</a>&nbsp;&nbsp;<a href="javascript:void(0);" onclick="deleteBox('+ data["data"][i]["level_id"] +');">删除</a></td> ';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="8">暂无符合条件的数据记录</th></tr>';
+				}
+				
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}	
+	//全选
+	function CheckAll(event){
+		var checked = event.checked;
+		$(".style0list tbody input[type = 'checkbox']").prop("checked",checked);
+	}
+	/**
+	 *删除框
+	 */
+	function deleteBox(level_id){
+		$( "#dialog" ).dialog({
+	        buttons: {
+	            "确定,#51A351": function() {
+	                $(this).dialog('close');
+	                deletePartnerLevel(level_id);
+	            },
+	            "取消,#e57373": function() {
+	                $(this).dialog('close');
+	            }
+	        },
+	        contentText:"确定删除吗",
+	        title:"提醒"
+	    });
+	}
+	//删除等级
+	function deletePartnerLevel(level_id){
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Distribution/deletePromoterDelete",
+			data:{
+				'level_id':level_id
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/Distribution/promoterLevelList");
+				}else{
+					showMessage('error', "存在推广员的等级不可删除！");
+				}	
+			}
+		});
+	}
+</script>
+{/block}

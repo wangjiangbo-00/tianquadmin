@@ -1,0 +1,824 @@
+{extend name="shop/blue/base" /} {block name="resources"}
+<link href="__TEMP__/{$style}/public/css/apply/style.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="__TEMP__/{$style}/public/css/ns_shop_common.css">
+<link rel="stylesheet" type="text/css" href="__TEMP__/{$style}/public/css/store_joinin.css">
+<script type="text/javascript" src="__TEMP__/{$style}/public/js/region.js"></script>
+<style>
+.btn:hover{color:white;}
+</style>
+{/block}
+{block name="head"}{/block}
+{block name="headGoodType"}{/block}
+{block name="main"}
+<div class="margin-w1210 clearfix" id="applySecond">
+	<div class="headerLayout">
+		<div class="headerCon">
+			<h1 id="mallLogo"><a href="SHOP_MAIN/index/index" class="header-logo"><img src="__UPLOAD__/{$web_info['logo']}"></a></h1>
+			<div class="header-extra">
+				<div class="panel-heading">
+					<div class="more">
+						<div class="progress">
+							<div class="progress-wrap">
+								<div class="progress-item passed">
+									<div class="number">1</div>
+									<div class="progress-desc">入驻须知</div>
+								</div>
+							</div>
+							<div class="progress-wrap">
+								{if condition="$apply_state neq 'apply'"}
+								<div class="progress-item passed">
+									{else /}
+									<div class="progress-item ongoing">
+								{/if}
+										<div class="number">2</div>
+										<div class="progress-desc">公司信息认证</div>
+									</div>
+								</div>
+								<div class="progress-wrap">
+									{if condition="$apply_state neq 'apply'"}
+									<div class="progress-item passed">
+										{else /}
+										<div class="progress-item tobe">
+									{/if}
+											<div class="number">3</div>
+											<div class="progress-desc">店铺信息认证</div>
+										</div>
+									</div>
+									<div class="progress-wrap">
+									{if condition="$apply_state neq 'apply'"}
+										<div class="progress-item ongoing">
+									{else /}
+											<div class="progress-item tobe">
+										{/if}
+												<div class="number">
+													<i class="tick"></i>
+												</div>
+												<div class="progress-desc">
+												{if condition="$apply_state eq 'refuse_apply' or $apply_state eq 'is_system'"}
+													审核结束
+												{else /}
+													等待审核
+												{/if}
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="store-joinin-apply">
+					{if condition="$apply_state eq 'is_apply' "}
+					<div class="main">
+						<div class="explain"><i></i>入驻申请已经提交，请等待管理员审核</div>
+						<div class="bottom"></div>
+					</div>
+					{elseif condition="$apply_state eq 'refuse_apply' and $is_read eq 0"}
+					<div class="main">
+						<div class="explain"><i></i>您的入驻申请被拒！您可以重新<a href="SHOP_MAIN/shop/applyfristagreement?is_read=1" class="point">申请入驻</a>!</div>
+						<div class="bottom"></div>
+					</div>
+					{elseif condition="$apply_state eq 'is_system' "}
+					<div class="main">
+						<div class="explain"><i></i>您的入驻申请已被批准！您可以进入<a href="ADMIN_MAIN" class="point">商家管理中心</a>进行查看!</div>
+						<div class="bottom"></div>
+					</div>
+					{else /}
+					<div class="main">
+						<div>
+							<table border="0" cellpadding="0" cellspacing="0" class="all">
+								<thead>
+									<tr><th colspan="2" align="left">请选择您的开店身份</th></tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><input type="radio" name="apply_type" value="1" checked="" onclick="radioShow()"> 个人 <input type="radio" name="apply_type" value="2" onclick="radioShow()"> 企业</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div id="apply_person_info" class="apply-company-info" style="display: block;">
+							<div class="note"><i></i>以下所需要上传的电子版资质文件仅支持JPG\GIF\PNG格式图片，大小请控制在4096K之内。</div>
+							<form id="form_person_info" name="form_person_info" action="" method="post" enctype="multipart/form-data" onsubmit="return supplier_person_Reg()">
+								<table border="0" cellpadding="0" cellspacing="0" class="all">
+									<thead>
+										<tr><th colspan="2" align="left">请按照提示填写本人真实的资料</th></tr>
+									</thead>
+									<tbody>
+										<tr>
+											<th><i>*</i>公司名称：</th>
+											<td><input name="company_name" type="text" value="" class="w200" id="company_name"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>联系地址：</th>
+											<td>
+												<select name="province" id="seleAreaNext" onchange="GetProvince('#seleAreaNext','#seleAreaThird');getSelCity('#seleAreaThird','#seleAreaFouth');">
+													<option value="0">请选择省</option>
+												</select>
+												<select name="city" id="seleAreaThird" onchange="getSelCity('#seleAreaThird','#seleAreaFouth');">
+													<option value="0">请选择市</option>
+												</select>
+												<select name="district" id="seleAreaFouth">
+													<option value="-1">请选择区</option>
+												</select><span></span>
+											</td>
+										</tr>
+										<tr>
+											<th><i>*</i>详细地址：</th>
+											<td><input name="address" class="w200" type="text" value="" id="company_address_detail"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>姓名：</th>
+											<td><input name="contacts_name" type="text" class="w200" value="" id="contacts_name"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>联系人电话：</th>
+											<td><input name="mobile" type="text" class="w200" value="" id="contacts_phone"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>电子邮箱：</th>
+											<td><input type="text" name="email" size="45" value="" class="w200" id="contacts_email"> <span></span></td>
+										</tr>
+									</tbody>
+									<tfoot><tr><td colspan="20">&nbsp;</td></tr></tfoot>
+								</table>
+								<table border="0" cellpadding="0" cellspacing="0" class="all">
+									<thead>
+										<tr><th colspan="20" align="left">身份证信息</th></tr>
+									</thead>
+									<tbody>
+										<tr>
+											<th><i>*</i>身份证号码：</th>
+											<td><input name="id_card_no" type="text" class="w200" value="" id="contacts_card_no"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>手持身份证照片：</th>
+											<td>
+												<div>
+													<p><img id="imglogo1" src="" style="width: 100px; height: 100px; border: medium none; display: block;" /></p>
+													<a href="javascript:void(0);" style="display: block; position: relative; z-index: 1;">
+														<span style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+															<input hidefocus="true" size="1" class="input-file" name="file_upload" id="contacts_card_electronic_1" nc_type="change_store_label" type="file" style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;" onchange="imgUpload1(this);">
+															<input type="hidden" id="logo1" value="" />
+														</span>
+														<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+													</a>
+												</div><span id="id-hand-s"></span>
+											</td>
+										</tr>
+										<tr>
+											<th><i>*</i>身份证正面：</th>
+											<td>
+												<div>
+													<p><img id="imglogo2" src="" style="width: 100px; height: 100px; border: medium none; display: block;" /></p>
+													<a href="javascript:void(0);" style="display: block; position: relative; z-index: 1;">
+														<span style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+															<input hidefocus="true" size="1" class="input-file" name="file_upload" id="contacts_card_electronic_2" nc_type="change_store_label" type="file" style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;" onchange="imgUpload2(this);">
+															<input type="hidden" id="logo2" value="" />
+														</span>
+														<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+													</a>
+												</div><span id="id-front-s"></span>
+											</td>
+										</tr>
+										<tr>
+											<th><i>*</i>身份证反面：</th>
+											<td>
+												<div>
+													<p><img id="imglogo3" src="" style="width: 100px; height: 100px; border: medium none; display: block;" /></p>
+													<a href="javascript:void(0);" style="display: block; position: relative; z-index: 1;">
+														<span style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+															<input hidefocus="true" size="1" class="input-file" name="file_upload" id="contacts_card_electronic_3" nc_type="change_store_label" type="file" style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;" onchange="imgUpload3(this);">
+															<input type="hidden" id="logo3" value="" />
+														</span>
+														<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+													</a>
+												</div><span id="id-back-s"></span>
+											</td>
+										</tr>
+									</tbody>
+									<tfoot><tr><td colspan="20">&nbsp;</td></tr></tfoot>
+								</table>
+								<table border="0" cellpadding="0" cellspacing="0" class="all">
+									<thead>
+										<tr>
+											<th colspan="20" align="left">开户银行信息</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<th class="w150"><i>*</i>银行开户名：</th>
+											<td><input name="bank_account_name" id="bank_account_name" type="text" class="w200" value=""> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>个人银行账号：</th>
+											<td><input name="bank_account_number" id="bank_account_number" type="text" class="w200" value=""><span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>开户银行支行名称：</th>
+											<td><input name="bank_name" type="text" id="bank_name" class="w200" value=""> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>支行联行号：</th>
+											<td><input name="bank_code" type="text" id="bank_code" class="w200" value=""> <span></span></td>
+										</tr>
+									</tbody>
+									<tfoot><tr><td colspan="20">&nbsp;</td></tr></tfoot>
+								</table>
+								<input type="hidden" name="shownum" value="1">
+								<input type="hidden" name="do" value="1">
+								<input type="hidden" name="person" value="1">
+								<div class="bottom">
+									<input type="button" value="上一步" class="btn" onclick="location.href='SHOP_MAIN/shop/applyfristagreement'">
+									<input type="button" value="下一步" class="btn" onclick="next_page()">
+								</div>
+							</form>
+						</div>
+						<div id="apply_company_info" class="apply-company-info" style="display: none">
+							<div class="note"><i></i>以下所需要上传的电子版资质文件仅支持JPG\GIF\PNG格式图片，大小请控制在4096K之内。</div>
+							<form id="form_company_info" name="form_company_info" action="" method="post" enctype="multipart/form-data" onsubmit="return supplier_Reg()">
+								<table border="0" cellpadding="0" cellspacing="0" class="all">
+									<thead>
+										<tr>
+											<th colspan="2" align="left">公司及联系人信息</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<th><i>*</i>公司名称：</th>
+											<td><input name="company_name" type="text" value="" class="w200" id="company_name_2"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>公司所在地：</th>
+											<td>
+												<select name="province" id="seleAreaCommpanyNext" onchange="GetProvince('#seleAreaCommpanyNext','#seleAreaCommpanyThird');getSelCity('#seleAreaCommpanyThird','#seleAreaCommpanyFouth');">
+													<option value="0">请选择省</option>
+												</select>
+												<select name="city" id="seleAreaCommpanyThird" onchange="getSelCity('#seleAreaCommpanyThird','#seleAreaCommpanyFouth');">
+													<option value="0">请选择市</option>
+												</select>
+												<select name="district" id="seleAreaCommpanyFouth">
+													<option value="-1">请选择区</option>
+												</select><span></span>
+											</td>
+										</tr>
+										<tr>
+											<th><i>*</i>公司详细地址：</th>
+											<td><input name="address" class="w200" type="text" value="" id="company_address_detail_2"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>公司类型：</th>
+											<td>
+												<select name="company_type" class="w200" id="company_type">
+													<option value="">请选择</option>
+													<option value="私营企业">私营企业</option>
+													<option value="个体户">个体户</option>
+													<option value="外企">外企</option>
+													<option value="中外合资">中外合资</option>
+												</select> <span></span>
+											</td>
+										</tr>
+										<tr>
+											<th><i>*</i>公司电话：</th>
+											<td><input type="text" name="tel" value="" class="w100" id="company_phone"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>公司规模：</th>
+											<td>员工总数(人)：<input type="text" class="w50" name="" value="" id="company_employee_count"> 注册资金(万元)：<input type="text" class="w50" name="" value="" id="company_registered_capital"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>联系人姓名：</th>
+											<td><input name="contacts_name" type="text" class="w100" value="" id="contacts_name_2"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>联系人电话：</th>
+											<td><input name="mobile" type="text" class="w100" value="" id="contacts_phone_2"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>电子邮箱：</th>
+											<td><input type="text" name="email" size="45" value="" class="w200" id="contacts_email_2"> <span></span></td>
+										</tr>
+									</tbody>
+									<tfoot><tr><td colspan="20">&nbsp;</td></tr></tfoot>
+								</table>
+								<table border="0" cellpadding="0" cellspacing="0" class="all">
+									<thead>
+										<tr>
+											<th colspan="20" align="left">营业执照信息（副本）</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<th><i>*</i>营业执照号：</th>
+											<td><input name="business_licence_number" type="text" class="w200" value="" id="business_licence_number"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>法定经营范围：</th>
+											<td><textarea name="business_sphere" rows="3" class="w200" id="business_sphere" style="padding: 5px;"></textarea> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>营业执照号电子版：</th>
+											<td>
+												<div>
+													<p><img id="imglogo4" src="" style="width: 100px; height: 100px; border: medium none; display: block;" /></p>
+													<a href="javascript:void(0);" style="display: block; position: relative; z-index: 1;">
+														<span style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+															<input hidefocus="true" size="1" class="input-file" name="file_upload" id="business_licence_number_electronic" nc_type="change_store_label" type="file" style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;" onchange="imgUpload4(this);">
+															<input type="hidden" id="logo4" value="" />
+														</span>
+														<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+													</a>
+												</div>
+												<span class="block">请确保图片清晰，文字可辨并有清晰的红色公章。</span>
+											</td>
+										</tr>
+									</tbody>
+									<tfoot><tr><td colspan="20">&nbsp;</td></tr></tfoot>
+								</table>
+								<table border="0" cellpadding="0" cellspacing="0" class="all">
+									<thead>
+										<tr>
+											<th colspan="20" align="left">组织机构代码证</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<th><i>*</i>组织机构代码：</th>
+											<td><input name="organization_code" type="text" class="w200" value="" id="organization_code"> <span></span></td>
+										</tr>
+										<tr>
+											<th><i>*</i>组织机构代码证电子版：</th>
+											<td>
+												<div>
+													<p><img id="imglogo5" src="" style="width: 100px; height: 100px; border: medium none; display: block;" /></p>
+													<a href="javascript:void(0);" style="display: block; position: relative; z-index: 1;">
+														<span style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+															<input hidefocus="true" size="1" class="input-file" name="file_upload" id="organization_code_electronic" nc_type="change_store_label" type="file" style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;" onchange="imgUpload5(this);">
+															<input type="hidden" id="logo5" value="" />
+														</span>
+														<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+													</a>
+												</div>
+												<span class="block">请确保图片清晰，文字可辨并有清晰的红色公章。</span>
+											</td>
+										</tr>
+									</tbody>
+									<tfoot><tr><td colspan="20">&nbsp;</td></tr></tfoot>
+								</table>
+								<table border="0" cellpadding="0" cellspacing="0" class="all">
+									<thead>
+										<tr>
+											<th colspan="20" align="left">一般纳税人证明<em>注：所属企业具有一般纳税人证明时，此项为必填。</em></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<th class="w150">一般纳税人证明：</th>
+											<td>
+												<div>
+													<p><img id="imglogo6" src="" style="width: 100px; height: 100px; border: medium none; display: block;" /></p>
+													<a href="javascript:void(0);" style="display: block; position: relative; z-index: 1;">
+														<span style="width: 97px; height: 34px; position: absolute; left: 0; top: 0; z-index: 2; cursor: pointer;">
+															<input hidefocus="true" size="1" class="input-file" name="file_upload" id="general_taxpayer" nc_type="change_store_label" type="file" style="width: 97px; height: 34px; padding: 0; margin: 0; border: none 0; opacity: 0; filter: alpha(opacity = 0); cursor: pointer;" onchange="imgUpload6(this);">
+															<input type="hidden" id="logo6" value="" />
+														</span>
+														<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+													</a>
+												</div>
+												<span class="block">请确保图片清晰，文字可辨并有清晰的红色公章。</span>
+											</td>
+										</tr>
+									</tbody>
+									<tfoot><tr><td colspan="20">&nbsp;</td></tr></tfoot>
+								</table>
+								<input type="hidden" name="shownum" value="1">
+								<input type="hidden" name="do" value="1">
+								<input type="hidden" name="company" value="1">
+								<div class="bottom">
+									<input type="button" value="上一步" class="btn" onclick="location.href='SHOP_MAIN/shop/applyfristagreement'">
+									<input type="button" value="下一步" class="btn" onclick="next_page()">
+								</div>
+							</form>
+						</div>
+					</div>
+				{/if}
+				</div>
+			</div>
+			<div id="applyThird"  style="display:none;">
+				<div class="headerLayout">
+					<div class="headerCon">
+						<h1 id="mallLogo"><a href="SHOP_MAIN/index/index" class="header-logo"><img src="__UPLOAD__/{$web_info['logo']}"></a></h1>
+						<div class="header-extra">
+							<div class="panel-heading">
+								<div class="more">
+									<div class="progress">
+										<div class="progress-wrap">
+											<div class="progress-item passed">
+												<div class="number">1</div>
+												<div class="progress-desc">入驻须知</div>
+											</div>
+										</div>
+										<div class="progress-wrap">
+											<div class="progress-item passed">
+												<div class="number">2</div>
+												<div class="progress-desc">公司信息认证</div>
+											</div>
+										</div>
+										<div class="progress-wrap">
+											<div class="progress-item ongoing">
+												<div class="number">3</div>
+												<div class="progress-desc">店铺信息认证</div>
+											</div>
+										</div>
+										<div class="progress-wrap">
+											<div class="progress-item tobe">
+												<div class="number">
+													<i class="tick"></i>
+												</div>
+												<div class="progress-desc">等待审核</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="store-joinin-apply">
+					<div class="main">
+						<div id="apply_company_info" class="apply-company-info">
+							<form id="form_store_info" name="form_company_info" action="" method="post" enctype="multipart/form-data" onsubmit="return supplier_Reg()">
+								<table border="0" cellpadding="0" cellspacing="0" class="all">
+									<thead>
+										<tr>
+											<th colspan="20" align="left">店铺经营信息</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<th class="w150"><i>*</i>店铺名称：</th>
+											<td><input name="supplier_name" type="text" class="w200" value="" id="shop_name"> <span></span><p class="emphasis">店铺名称注册后不可修改，请认真填写。</p></td>
+										</tr>
+										<tr>
+											<th><i>*</i>店铺等级：</th>
+											<td>
+												<select name="rank_id" size="1" id="shop_type_name">
+													<option value="0">请选择</option>
+													{foreach name="shop_type_list" item="vo"}
+													<option value="{$vo.instance_typeid}">{$vo.type_name}</option>
+													{/foreach}
+												</select> <span></span>
+												<div id="grade_explain" class="grade_explain"></div>
+											</td>
+										</tr>
+										<tr>
+											<th><i>*</i>店铺分类：</th>
+											<td>
+												<select name="type_id" size="1" id="shop_group_name">
+													<option value="0">请选择</option>
+													{foreach name="shop_group" item="vt"}
+													<option value="{$vt.shop_group_id}">{$vt.group_name}</option>
+													{/foreach}
+												</select>
+												<span></span>
+												<p class="emphasis">请根据您所经营的内容认真选择店铺分类，注册后商家不可自行修改。</p>
+											</td>
+										</tr>
+										
+							<!-- 			<tr>
+											<th class="w150">推荐人编号：</th>
+											<td>
+												<input name="supplier_name" type="text" class="w200" value="" id="assistant_code">
+												<p class="emphasis"></p>
+											</td>
+										</tr> -->
+									</tbody>
+									<tfoot><tr><td colspan="20">&nbsp;</td></tr></tfoot>
+								</table>
+								<input type="hidden" name="shownum" value="3">
+								<input type="hidden" name="do" value="1">
+								<div class="bottom">
+									<input type="button" value="上一步" class="btn" onclick="prev_page()">
+									<input type="button" value="下一步" class="btn" onclick="save()">
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{/block}
+{block name="RightSideBar"}{/block}
+{block name="bottom"}
+{include file='shop/blue/controlBottom'/} {/block}
+{block name="javascript"}
+<script src="__TEMP__/{$style}/public/js/address_new.js"></script>
+<script src="__STATIC__/js/file_upload.js" type="text/javascript"></script>
+<script type="text/javascript">
+var flag = 1;
+var assistant_uid = 0;
+function next_page(){
+	var apply_type=$("input[type='radio']:checked").val();
+	var flag=true;
+	if(apply_type==1){
+		flag=$.testing("#applySecond #apply_person_info");
+	}else{
+		flag=$.testing("#applySecond #apply_company_info");
+	}
+	if(flag){
+		$("#applySecond").hide();
+		$("#applyThird").show();
+		$.footer();
+	};
+}
+function prev_page(){
+	$("#applySecond").show();
+	$("#applyThird").hide();
+	$.footer();
+}
+function save(){
+// 	if($.testing("#applyThird")){
+		
+// 	}
+	var apply_type=$("input[type='radio']:checked").val();
+	if(apply_type==1){
+		var company_name=$("#company_name").val();
+		var company_address_detail=$("#company_address_detail").val();
+		var contacts_name=$("#contacts_name").val();
+		var contacts_phone=$("#contacts_phone").val();
+		var contacts_email=$("#contacts_email").val();
+		var company_province_id=$("#seleAreaNext").val();
+		var company_city_id=$("#seleAreaThird").val();
+		var company_district_id=$("#seleAreaFouth").val();
+		var contacts_card_no=$("#contacts_card_no").val();
+		var contacts_card_electronic_1=$("#logo1").val();
+		var contacts_card_electronic_2=$("#logo2").val();
+		var contacts_card_electronic_3=$("#logo3").val();
+		var bank_account_name=$("#bank_account_name").val();
+		var bank_account_number=$("#bank_account_number").val();
+		var bank_name=$("#bank_name").val();
+		var bank_code=$("#bank_code").val();
+	}else{
+		var company_name=$("#company_name_2").val();
+		var company_address_detail=$("#company_address_detail_2").val();
+		var contacts_name=$("#contacts_name_2").val();
+		var contacts_phone=$("#contacts_phone_2").val();
+		var contacts_email=$("#contacts_email_2").val();
+		var company_province_id=$("#seleAreaCommpanyNext").val();
+		var company_city_id=$("#seleAreaCommpanyThird").val();
+		var company_district_id=$("#seleAreaCommpanyFouth").val();
+		var company_type=$("#company_type").val();
+		var company_phone=$("#company_phone").val();
+		var company_employee_count=$("#company_employee_count").val();
+		var company_registered_capital=$("#company_registered_capital").val();
+		var business_licence_number=$("#business_licence_number").val();
+		var business_sphere=$("#business_sphere").val();
+		var business_licence_number_electronic=$("#logo4").val();
+		var organization_code=$("#organization_code").val();
+		var organization_code_electronic=$("#logo5").val();
+		var general_taxpayer=$("#logo6").val();
+	}
+
+	var shop_name=$("#shop_name").val();
+	var shop_type_id=$("#shop_type_name").val();
+	var assistant_code = 0;
+	var recommend_uid = 0;
+	var shop_group_id=$("#shop_group_name").val();
+	var shop_type_name=$("#shop_type_name option:selected").text(); 
+	var shop_group_name=$("#shop_group_name option:selected").text(); 
+
+	if(flag == 1){
+		var recommend_uid= assistant_uid;
+	}else{
+		return;
+	}
+	
+	if(shop_name == ""){
+		$("#shop_name").next().text("店铺名称不能为空").css({"float":"none"}).prev().focus();
+		return;
+	}else{
+		$("#shop_name").next().text("");
+	}
+	if(shop_type_id == 0){
+		$("#shop_type_name").next().text("请选择店铺等级").css({"float":"none"}).prev().focus();
+		return;
+	}else{
+		$("#shop_type_name").next().text("");
+	}
+	
+	if(shop_group_id == 0){
+		$("#shop_group_name").next().text("请选择店铺分类").css({"float":"none"}).prev().focus();
+		return;
+	}else{
+		$("#shop_group_name").next().text("");
+	}
+	$.ajax({
+		type:'post',
+		url:'SHOP_MAIN/shop/applysecondcompanyinfo',
+		data:{
+			"apply_type":apply_type,
+			"company_name":company_name,
+			"company_province_id":company_province_id,
+			"company_city_id":company_city_id,
+			"company_district_id":company_district_id,
+			"company_address_detail":company_address_detail,
+			"contacts_name":contacts_name,
+			"contacts_phone":contacts_phone,
+			"contacts_email":contacts_email,
+			"contacts_card_no":contacts_card_no,
+			"contacts_card_electronic_1":contacts_card_electronic_1,
+			"contacts_card_electronic_2":contacts_card_electronic_2,
+			"contacts_card_electronic_3":contacts_card_electronic_3,
+			"bank_account_name":bank_account_name,
+			"bank_account_number":bank_account_number,
+			"bank_name":bank_name,
+			"bank_code":bank_code,
+			"shop_name":shop_name,
+			"shop_type_name":shop_type_name,
+			"shop_group_name":shop_group_name,
+			"shop_type_id":shop_type_id,
+			"shop_group_id":shop_group_id,
+			"company_type":company_type,
+			"company_phone":company_phone,
+			"company_employee_count":company_employee_count,
+			"company_registered_capital":company_registered_capital,
+			"business_licence_number":business_licence_number,
+			"business_sphere": business_sphere,
+			"business_licence_number_electronic":business_licence_number_electronic,
+			"organization_code": organization_code,
+			"organization_code_electronic": organization_code_electronic,
+			"general_taxpayer": general_taxpayer,
+			"recommend_uid": recommend_uid
+		},
+		success:function(data){
+			$.msg(data["message"],{time:2000});
+			if (data["code"] > 0) {
+			//location.href="SHOP_MAIN/Shop/applyFinish";
+				location.reload();
+			}
+		}
+	});
+}
+
+/**
+ *图片上传
+ */
+/* function imgUpload(event) {
+	var fileid = $(event).attr("id");
+	var str = $(event).next().attr("id");
+	fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+} */
+function imgUpload1(event) {
+	var fileid = $(event).attr("id");
+	var data = { 'file_path' : UPLOADCOMMON };
+	uploadFile(fileid,data,function(res){
+		if(res.code){
+			$("#imglogo1").attr("src","__UPLOAD__/"+res.data);
+			$("#logo1").val(res.data);
+			showTip(res.message,"success");
+		}else{
+			showTip(res.message,"error");
+		}
+	});
+}
+function imgUpload2(event) {
+	var fileid = $(event).attr("id");
+	var data = { 'file_path' : UPLOADCOMMON };
+	uploadFile(fileid,data,function(res){
+		if(res.code){
+			$("#imglogo2").attr("src","__UPLOAD__/"+res.data);
+			$("#logo2").val(res.data);
+			showTip(res.message,"success");
+		}else{
+			showTip(res.message,"error");
+		}
+	});
+}
+function imgUpload3(event) {
+	var fileid = $(event).attr("id");
+	var data = { 'file_path' : UPLOADCOMMON };
+	uploadFile(fileid,data,function(res){
+		if(res.code){
+			$("#imglogo3").attr("src","__UPLOAD__/"+res.data);
+			$("#logo3").val(res.data);
+			showTip(res.message,"success");
+		}else{
+			showTip(res.message,"error");
+		}
+	});
+}
+function imgUpload4(event) {
+	var fileid = $(event).attr("id");
+	var data = { 'file_path' : UPLOADCOMMON };
+	uploadFile(fileid,data,function(res){
+		if(res.code){
+			$("#imglogo4").attr("src","__UPLOAD__/"+res.data);
+			$("#logo4").val(res.data);
+			showTip(res.message,"success");
+		}else{
+			showTip(res.message,"error");
+		}
+	});
+}
+function imgUpload5(event) {
+	var fileid = $(event).attr("id");
+	var data = { 'file_path' : UPLOADCOMMON };
+	uploadFile(fileid,data,function(res){
+		if(res.code){
+			$("#imglogo5").attr("src","__UPLOAD__/"+res.data);
+			$("#logo5").val(res.data);
+			showTip(res.message,"success");
+		}else{
+			showTip(res.message,"error");
+		}
+	});
+}
+function imgUpload6(event) {
+	var fileid = $(event).attr("id");
+	var data = { 'file_path' : UPLOADCOMMON };
+	uploadFile(fileid,data,function(res){
+		if(res.code){
+			$("#imglogo6").attr("src","__UPLOAD__/"+res.data);
+			$("#logo6").val(res.data);
+			showTip(res.message,"success");
+		}else{
+			showTip(res.message,"error");
+		}
+	});
+}
+
+/**
+ * 个人和企业切换
+ */
+function radioShow() {
+	var apply_type = $("input[name='apply_type']");
+	var showdiv = $(".apply-company-info");
+	for(i = 0; i < apply_type.length; i++) {
+		if(apply_type[i].checked) {
+			showdiv[i].style.display = "block";
+		} else {
+			showdiv[i].style.display = "none";
+		}
+	}
+}
+/**
+ * 省市区联动
+ */
+$(function() {
+		var selCity = $("#seleAreaNext");
+		var selCityCommpany= $("#seleAreaCommpanyNext");
+		// 添加省
+		$.ajax({
+			type : "post",
+			url : "getProvince",
+			dataType : "json",
+			success : function(data) {
+				//alert(data);
+				if (data != null && data.length > 0) {
+					for (var i = 0; i < data.length; i++) {
+						selCity.append("<option value='"+data[i].province_id+"'>"+data[i].province_name+"</option>");
+						selCityCommpany.append("<option value='"+data[i].province_id+"'>"+data[i].province_name+"</option>");
+					}
+				}
+			}
+		});
+	});
+	
+	//推荐人手机号
+	$("#assistant_code").blur(function(){
+		assistant_uid = 0;
+		if($(this).val().length>0){
+			if(isNaN($(this).val())){
+				$(this).next().text("请输入正确的推荐编号");
+				flag = -1;
+				$(this).focus();
+				return;
+			}
+			
+			$.ajax({
+				type : "post",
+				url:'SHOP_MAIN/shop/getShopAssistantCode',
+				data : {"assistant_code" : $(this).val()},
+				success : function(res){
+					//alert(JSON.stringify(res));
+					if(res.length>0){
+						assistant_uid = res[0].uid
+						$("#assistant_code").next().text("推荐编号可以使用");
+						flag = 1;
+					}else{
+						$("#assistant_code").next().text("推荐编号不存在");
+						flag = -1;
+					}
+				}
+			});
+		}else{
+			$("#assistant_code").next().text("");
+			flag = 1;
+		}
+	})
+	
+</script>
+{/block}

@@ -1,0 +1,193 @@
+@CHARSET "UTF-8";
+/*share*/
+.share .main {
+	overflow:hidden;
+}
+.share .icon-head {
+	margin:0 auto;
+	background:url("../imagesv2/icon.png") no-repeat;
+	vertical-align:middle;
+}
+.share .icon-head {
+	display:block;
+	width:40px;
+	height:40px;
+	background-position:-20px -434px;
+}
+.share .title {
+	margin:0;
+	padding:0;
+	border-bottom:1px solid #ececec;
+	text-align:center;
+	font-size:14px;
+	color:#333;
+	line-height:40px;
+	font-weight:normal;
+}
+.share dl {
+	overflow:hidden;
+	padding:0 6px 0 20px;
+}
+.share dt,.share dd {
+	float:left;
+}
+.share p {
+	margin:0;
+}
+.share .hot span {
+	vertical-align:middle;
+	color:#999;
+}
+.share .hot .star {
+	font-size:16px;
+}
+.tiphelp-info{
+	color: #3a87ad;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+	padding:10px;
+	margin:10px 15px;
+}
+
+.share .edit {
+	float:right;
+	margin-right:15px;
+	color:#00acec;
+}
+.share .edit:hover {
+	text-decoration:underline;
+}
+.share .card,.share .product,.share .store ,.share .plat{
+	float:left;
+	width:100%;
+	height:200px;
+	border:1px solid #ccc;
+	-webkit-border-radius:3px;
+	-o-border-radius:3px;
+	-moz-border-radius:3px;
+	border-radius:3px;
+	margin-bottom: 15px;
+}
+.share .card .head {
+	display:block;
+	width:40px;
+	height:40px;
+	padding:20px;
+	background:#f1f1f1;
+	-webkit-border-radius:40px;
+	-o-border-radius:40px;
+	-moz-border-radius:40px;
+	border-radius:40px;
+}
+.share .card .name {
+	}.share .card .pro-title {
+	font-size:14px;
+	font-weight:normal;
+	padding:0 20px;
+}
+.share .card .img, .share .product .img, .share .store .img, .share .plat .img{
+	display:block;
+	width:80px;
+	height:80px;
+	border:1px solid #f1f1f1;
+	background: #ececec;
+    text-align: center;
+	color: #c0c0c0;
+	line-height:80px;
+}
+.share .card .job {
+	margin-left:20px;
+}
+.share .card .company {
+	margin-top:5px;
+}
+.share .card .mobile {
+	margin-bottom:5px;
+}
+.share .product input {
+	display:none;
+	margin:0;
+}
+.share .product .pro-title {
+	font-size:14px;
+	font-weight:normal;
+	padding:0 20px;
+}
+.share .product .pro-title .text {
+	width:275px;
+	display:block;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+
+.share .product .price {
+	font-size:14px;
+}
+.share .product .price span.text {
+	max-width:80px;
+	overflow:hidden;
+}
+.share .product .number {
+	}.share .product .advertisiment {
+	margin:5px 0;
+}
+.share .product .advertisiment .text {
+	width:180px;
+	font-size: 12px;
+	display:block;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.share .store input {
+	display:none;
+	margin:0;
+}
+.share .store .store-title ,.share .plat .plat-title {
+	font-size:14px;
+	font-weight:normal;
+	padding:0 20px;
+}
+.share .store .store-title .text {
+	width:275px;
+	display:block;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.share .store .store-title .text.pre {
+	width:auto;
+	display:inline-block;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.share .store .store-title .storeName {
+	width:auto;
+	display:inline-block;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.share .store .advertisiment {
+	width:180px;
+	display:block;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.share .store .more ,.share .plat .platmore{
+	margin:5px 0;
+}
+.share .store .more .text {
+	width:180px;
+	display:block;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.share .button {
+	display:none;
+	margin:30px;
+}

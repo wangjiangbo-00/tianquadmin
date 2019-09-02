@@ -1,0 +1,142 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style type="text/css">
+.tal{text-align:left;}
+</style>
+{/block}
+{block name="main"}
+
+<div class="row padder-v">
+	<div class="col-sm-9" style="width:73%;">
+		<a href="PLATFORM_MAIN/member/addmemberlevel" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加等级 </a>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th class="center">等级名称</th>
+					<th class="left">升级条件</th>
+					<th class="center">折扣率（%）</th>
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+
+{/block}
+{block name="script"}
+
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+})
+	function LoadingInfo(page_index) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/member/memberlevellist",
+			async : true,
+			data : {
+				"page_index" : page_index, "search_text" :  search_text
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr align="center">';
+						html += '<td><div class="cell"><label ><input name="sub" type="checkbox" value="'+ data["data"][i]["level_id"]+'" ></label></div></td>';
+						//<input type="text"  value="'+ data["data"][i]["level_name"]+'" level_id="'+ data['data'][i]['level_id']+'"  class="level_name">
+						html += '<td >'+ data["data"][i]["level_name"]+'</td>';	
+						if(data['data'][i]['upgrade']==1){
+							html += '<td class="tal">累计积分满' + data['data'][i]['min_integral'] +'分</td>';
+						}else if(data['data'][i]['upgrade']==2){
+							html += '<td class="tal">消费额度满' + data['data'][i]['quota'] +'元</td>';
+						}else if(data['data'][i]['upgrade']==3 && data['data'][i]['relation']==1){
+							html += '<td class="tal">累计积分满' + data['data'][i]['min_integral'] +'分&nbsp;或&nbsp;消费额度满' + data['data'][i]['quota'] +'元</td>';
+						}else if(data['data'][i]['upgrade']==3 && data['data'][i]['relation']==2){
+							html += '<td class="tal">累计积分满' + data['data'][i]['min_integral'] +'分&nbsp;且&nbsp;消费额度满' + data['data'][i]['quota'] +'元</td>';
+						}else if(data['data'][i]['upgrade']==0){
+							html += '<td class="tal">无条件</td>';
+						}
+						html += '<td>' + data['data'][i]['goods_discount'] * 100 + '</td>';
+						if(data['data'][i]['is_default'] == 1){
+							html += '<td> <a href="PLATFORM_MAIN/member/updatememberlevel?level_id='+ data['data'][i]['level_id'] +'">修改</a></td>';
+						}else{
+							html += '<td><a href="PLATFORM_MAIN/member/updatememberlevel?level_id='+ data['data'][i]['level_id'] +'">修改</a>&nbsp;&nbsp;&nbsp;<a href="javascript:deleteMember('+data['data'][i]['level_id']+');">删除</a></td>';
+						}
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="5">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+				
+			}
+		});
+	}
+	//全选
+	function CheckAll(event){
+		var checked = event.checked;
+		$(".style0list tbody input[type = 'checkbox']").prop("checked",checked);
+	}
+	
+	function deleteMember(level_id){
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/member/deleteMemberLevel",
+			data : {
+				'level_id' : level_id
+			},
+			async : true,
+			success : function(data) {
+				if (data['code'] > 0) {
+					    showMessage('success', data["message"]);
+					    location.href="PLATFORM_MAIN/member/memberlevellist";
+				} else {
+						showMessage('error', data["message"]);
+					
+				}
+			}
+		});
+	}
+	/*修改等级名称*/
+// 	function load(){
+// 		$('.level_name').change(function(){
+// 			var field_name = 'level_name';
+// 			var field_value = $(this).val();
+// 			var level_id = $(this).attr('level_id');
+// 			$.ajax({
+// 				type:"post",
+// 				url:"ADMIN_MAIN/member/modityMemberLevelField",
+// 				data:{'field_name':field_name,'field_value':field_value,'level_id':level_id},
+// 				async:true,
+// 				success: function (data) {
+// 					if(data['code'] > 0){
+// 						/* showMessage('success', data["message"]); */
+// 					}else{
+// 						showMessage('error', data["message"]);
+// 					}
+// 				}
+// 			}); 
+// 		});
+// 	}
+</script>
+{/block}

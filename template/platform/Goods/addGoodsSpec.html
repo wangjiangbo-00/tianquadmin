@@ -1,0 +1,236 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.table{
+	width:98%;
+	display:table;
+    border-left: 1px dotted #e5e5e5;
+    border-right: 1px dotted #e5e5e5;
+    border-bottom: 1px dotted #e5e5e5;
+    background: rgba(204, 204, 204, 0.09);
+    padding: 0px 10px 10px 10px;
+}
+.table-body{
+	min-height:50px;
+	max-height:410px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+.inline-block{display:inline-block;}
+.w5{width:5%;}
+.w75{width:70%;}
+.w19{width:10%;text-align:center;}
+.w100{width:100%;
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px dotted #e5e5e5;}
+.add-spec{
+	height: 40px;
+    line-height: 40px;
+	border-bottom:1px dotted #E6E6E6;
+}
+input{
+	vertical-align: initial;
+}
+.table input[type="text"], input[type="password"], input.text, input.password {
+    font: 12px/20px Arial;
+    color: #777;
+    background-color: #FFF;
+    vertical-align: baseline;
+	margin-bottom:0px;
+}
+.set-style dl dt {
+	text-align:left;
+	    width: 7%;
+}
+label.line-label{
+	display:inline-block;
+	margin-right:10px;
+	font-weight:normal;
+}
+.edit_button{
+	background-color: #53b567;
+    border-color: #4bae5f;
+    color: #fff;
+    width: 80px;
+    line-height: 30px;
+    border: 0;
+}
+</style>
+{/block}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加规格 </header>
+	<div class="panel-body">
+		<div class="form-horizontal" id="goods_brand_form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">规格名称：</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="spec_name" name="spec_name" value="" required>
+				</div>
+<!-- 				<label class="col-md-8 error" for="brand_name" ></label> -->
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">规格排序：</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="sort" value="255" onkeyup='this.value=this.value.replace(/\D/gi,"")' required>
+				</div>
+<!-- 				<label class="col-md-9 error" for="brand_initial" ></label> -->
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">是否启用：</label>
+				<div class="col-md-4">
+					<label class="switch">
+                         <input id="is_visible" type="checkbox" >
+                         <span></span> 
+                    </label>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">展示方式：</label>
+				<div class="col-sm-2">
+					<label class="line-label"><input type="radio" name="show_type" id="show_type1" value="1" checked onchange="change_show_type(1)">文字</label>
+					<label class="line-label"><input type="radio" name="show_type" id="show_type2" value="2" onchange="change_show_type(2)">颜色</label>
+					<label class="line-label"><input type="radio" name="show_type" id="show_type3" value="3" onchange="change_show_type(3)">图片</label>
+				</div>
+				
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="table">
+				<div class="w100">
+					<div class="col-sm-2 control-label"></div>
+					<div class="inline-block w75">属性名称</div>
+					<div class="inline-block w19">操作</div>
+				</div>
+				<div class="table-body">
+				<div class="w100 spec_data">
+					<div class="col-sm-2 control-label"><label style="margin-left: 5px;"> <input type="checkbox" style=""></label></div>
+					<div class="inline-block w75">
+						<input type="text" name="spec_value" style="margin-right: 20px;">
+					</div>
+					<div class="inline-block w19"><a href="javascript:;" onclick="delSpecValue(this)">删除</a></div>
+				</div>
+				</div>
+				<div><div class="col-sm-2 control-label"></div><a href="javascript:;" onclick="addSpecValue(this)"><i class="fa fa-plus"></i>&nbsp;&nbsp;添加一个属性</a></div>
+			</div>
+            
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button class="edit_button" onclick="addGoodsSpec();">提交</button>
+<!-- 					<a href="javascript:void(0);" onclick="addGoodsBrandAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script>
+var flag = false;
+function addSpecValue(e){
+	var show_type = $("input[name='show_type']:checked").val();
+	var spec_data_num = $(".spec_data").length;
+	var html = '<div class="w100 spec_data">';
+		html += '<div class="col-sm-2 control-label"><label style="margin-left: 5px;"> <input type="checkbox"></label></div>';
+	if(show_type ==2){
+		html += '<div class="inline-block w75" style="margin-right: 4px;"><input type="text" name="spec_value" style="margin-right:20px;"><input type="color" name="spec_value_data" style="width:60px;margin-top:5px;"/></div>';
+	}else{
+		html += '<div class="inline-block w75" style="margin-right: 4px;"><input type="text" name="spec_value"  style="margin-right:20px;"></div>';
+	}
+	 html += '<div class="inline-block w19"><a href="javascript:;" onclick="delSpecValue(this)">删除</a></div></div>';
+	 $(e).parents(".table").find(".table-body").append(html);
+}
+function delSpecValue(e){
+	$( "#dialog" ).dialog({
+		buttons: {
+			"确定": function() {
+				$(this).dialog('close');
+				$(e).parents('.w100').remove();
+			},"取消,#e57373" : function(){
+				$(this).dialog('close');
+			}
+		},
+		contentText:"你确定删除吗？",
+		title:"消息提醒"
+	});
+}
+function addGoodsSpec() {
+	var spec_name = $.trim($("#spec_name").val());
+	var sort = $("#sort").val();
+	var show_type = $("input[name='show_type']:checked").val();
+	if ($("#is_visible").prop("checked")) {
+		var is_visible = 1;
+	} else {
+		var is_visible = 0;
+	}
+	if(show_type==2){
+		var data_obj = $(".spec_data");
+		var spec_value_str = '';
+		data_obj.each(function(i){
+			if(data_obj.eq(i) != ''){
+				var spec_value_name = $.trim(data_obj.eq(i).find("input[name='spec_value']").val());
+				var spec_value_data = data_obj.eq(i).find("input[name='spec_value_data']").val();
+				var new_str = '';
+				new_str = spec_value_name+ ':' +spec_value_data;
+				spec_value_str = spec_value_str + ',' + new_str;
+			}
+		});
+		spec_value_str = spec_value_str.substr(1);
+	}else{
+		var spec_value_obj = $("input[name='spec_value']");
+		var spec_value_str = '';
+		spec_value_obj.each(function(i){
+			if($.trim(spec_value_obj.eq(i).val()) != ''){
+				spec_value_str += ',' + $.trim(spec_value_obj.eq(i).val());
+			}
+		});
+		spec_value_str = spec_value_str.substr(1);
+	}
+	if(spec_name == ''){
+		showMessage('error', "规格名称不能为空");
+		$("#spec_name").focus();
+		return false;
+	}
+	if(spec_value_str == ''){
+		showMessage('error', "属性名称不能为空！");
+		$("input[name='spec_value']").focus();
+		return false;
+	}
+	if(flag){
+		return;
+	}
+	flag = true;
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/goods/addgoodsspec",
+		data : {
+			'spec_name' : spec_name,
+			'sort' : sort,
+			'is_visible' : is_visible,
+			'show_type' : show_type,
+			'spec_value_str' : spec_value_str,
+		},
+		success : function(data) {
+			if (data["code"] > 0) {
+				showMessage('success', "添加成功",'PLATFORM_MAIN/goods/goodsspeclist');
+			} else {
+				showMessage('error', "添加失败");
+				flag = false;
+			}
+		}
+	});
+}
+/**
+ * 改变展示方式
+ */
+function change_show_type(type){
+	if(type==2){
+		$("input[name='spec_value']").after('<input type="color" style="width:60px;margin-top:5px;" name="spec_value_data"/>');
+	}else{
+		$("input[name='spec_value']").next("input[type='color']").remove();
+	}
+}
+</script>
+{/block}

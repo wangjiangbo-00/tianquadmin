@@ -1,0 +1,190 @@
+{extend name="platform/base" /} {block name="main"}
+<style type="text/css">
+	.col-md-4{
+		width: 60%;
+	}
+	input[type="text"],textarea{
+		width:30%;
+	}
+	.item_chek{
+		display: block;
+		overflow: hidden;
+		clear: both;
+	}
+	.item_chek label{
+		display: inline-block;
+		line-height: 32px;
+		margin-right: 10px;
+	}
+	.item_chek label>input{
+		float: left;
+		margin-top: 9px;
+	}
+	.item_chek .item_left{
+		display: block;
+		float: left;
+		width: 8%;
+		margin-right: 2%;
+	}
+	.item_chek .item_right{float: left;display: block;width: 80%;}
+	.item_chek .item_right>label{float: left;display: block;}
+	.item_chek .item_right .item_content{
+		display: block;
+		min-height: 40px;
+	}
+</style>
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加店铺等级 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">等级名称</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="type_name" value="">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">排序</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="type_sort" value="">
+				</div>
+			</div>
+			
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">说明</label>
+				<div class="col-md-4">
+					<textarea name="type_desc" rows="5" cols="100" id="type_desc"></textarea>
+				</div>
+			</div>
+			
+			
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">排序</label>
+				<div class="col-md-4">
+					<label for="chek_all"><input type="checkbox" name="module_chek" id="chek_all" value="chek_all" />全选</label>
+					{volist name="module_list_one" id="vo"}
+					<div class="item_chek">
+						{if condition="$vo['level'] eq 1"}
+							<div class="item_left">
+								<label for="{$vo['module_id']}"><input type="checkbox" name="module_chek" id="{$vo['module_id']}" value="{$vo['module_id']}" />{$vo['module_name']}</label>		
+							</div>
+							<div class="item_right">
+							{volist name="module_list_two" id="vo_two"}
+								{if condition="$vo_two['pid'] eq $vo['module_id']"}
+									<label for="{$vo_two['module_id']}"><input type="checkbox" name="module_chek" id="{$vo_two['module_id']}" value="{$vo_two['module_id']}" />{$vo_two['module_name']}</label>
+									<div class="item_content">
+									【
+									{volist name="module_list_three" id="vo_three"}
+										{if condition="$vo_three['pid'] eq $vo_two['module_id']"}
+										<label for="{$vo_three['module_id']}"><input type="checkbox" name="module_chek" id="{$vo_three['module_id']}" value="{$vo_three['module_id']}" />{$vo_three['module_name']}</label>
+										{/if}
+									{/volist}】
+									</div>
+									<br/>
+								{/if}
+							{/volist}
+							</div>
+						{/if}
+					</div>
+					{/volist}
+					
+				</div>
+			</div>
+
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="addShopGroupAjax()"
+						class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+	//添加分组
+	function addShopGroupAjax() {
+		var type_name = $("#type_name").val();
+		var type_desc = $("#type_desc").val();
+		var type_sort = $("#type_sort").val();
+		var type_module_array='';
+		$('input[type="checkbox"]:checked').each(function(){
+			if($(this).val()!='chek_all'){
+				type_module_array+=$(this).val()+',';	
+			}
+		})
+		type_module_array=type_module_array.substring(0,type_module_array.length-1);
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Shop/addShopLevel",
+			data : {
+				'type_name' : type_name,
+				'type_desc' : type_desc,
+				'type_sort' : type_sort,
+				'type_module_array' : type_module_array
+			},
+			async : true,
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				if (data["code"] > 0) {
+					showMessage('success', "添加成功",'PLATFORM_MAIN/Shop/shoplevellist');
+				}else{
+					showMessage('error', "添加失败");
+				}
+			}
+		});
+	}
+	$(function(){
+		//全选
+		$('#chek_all').click(function(){
+			if($(this).is(":checked")){
+				$('input[type="checkbox"]').prop("checked",true);	
+			}else{
+				$('input[type="checkbox"]').prop("checked",false);
+			}
+		});
+		
+		$('input[type="checkbox"]').click(function(){
+			//添加选中
+			if($(this).is(":checked")){
+				$(this).parents('.item_content').prev().find('input[type="checkbox"]').prop("checked",true);
+				$(this).parents('.item_chek').children('.item_left').find('input[type="checkbox"]').prop("checked",true);
+				$('#chek_all').prop("checked",true);
+			}else{ //取消选中
+				//alert($(this).parents('.item_content').find('input[type="checkbox"]:checked').length);
+				if($(this).parents('.item_right').children('label').children('input[type="checkbox"]:checked').length==0){
+					$(this).parents('.item_chek').find('input').prop("checked",false);
+				}
+				if($('input[type="checkbox"]:checked').length==1){
+					$('#chek_all').prop("checked",false);
+				}
+			}
+		})
+		//选中取消子集
+		$('.item_left>label>input').click(function(){
+			if($(this).is(":checked")){
+				$(this).parents('.item_chek').find('input[type="checkbox"]').prop("checked",true);
+			}else{
+				$(this).parents('.item_chek').find('input[type="checkbox"]').prop("checked",false);
+			}
+		});
+		$('.item_right>label>input').click(function(){
+			if($(this).is(":checked")){
+				$(this).parent().next().find('input[type="checkbox"]').prop("checked",true);
+			}else{
+				$(this).parent().next().find('input[type="checkbox"]').prop("checked",false);
+			}
+		});
+	})
+	window.onload=function(){
+		$('.item_content').each(function(){
+			if($(this).find('input[type="checkbox"]').length==0){
+				$(this).html('');
+			}
+		});
+	}
+</script>
+{/block}

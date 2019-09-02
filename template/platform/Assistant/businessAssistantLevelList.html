@@ -1,0 +1,120 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-12">
+		<a href="PLATFORM_MAIN/Assistant/addOrUpdateBusinessAssistantLevel"
+			class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加招商等级
+		</a>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="10"><input type="checkbox"></th>
+					<th class="center">等级名称</th>
+					<th class="center">申请条件</th>
+					<th class="center">推荐佣金比率</th>
+					<th class="center">推广佣金比率</th>
+					<th class="center">上级推广佣金比率</th>
+					<th class="center">上上级推广佣金比率</th>
+					<th class="center">创建时间</th>
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Assistant/businessAssistantLevelList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['level_id']+'"></td>';
+						html += '<td class="center">' + data["data"][i]["level_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["level_money"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["recommend_rate"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["level_0"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["level_1"] + '</td>';
+						html += '<td class="center">' +data["data"][i]["level_2"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["create_time"] + '</td>';
+						html += '<td class="center">';
+						html += '<a href="PLATFORM_MAIN/Assistant/addOrUpdateBusinessAssistantLevel?level_id='+data['data'][i]['level_id']+'">编辑</a>&nbsp;&nbsp';
+						html += '<a href="javascript:void(0);" onclick="deleteBusinessAssistantLevel('+data['data'][i]['level_id']+');">删除</a>&nbsp;&nbsp';
+						html += '</td> ';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="9">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}	
+/**
+ * 删除招商员等级
+ */
+	
+	function deleteBusinessAssistantLevel(level_id){
+		$( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+            			type : "post",
+            			url : "PLATFORM_MAIN/Assistant/deleteBusinessAssistantLevel",
+            			async : true,
+            			data : {
+            				"level_id" : level_id
+            			},
+            			success : function(data) {
+            				if(data["code"] > 0 ){
+            					showMessage('success', data["message"],'PLATFORM_MAIN/Assistant/businessAssistantLevelList');
+            				}else{
+            					showMessage('error', data["message"]);
+            				}
+            			}
+            		})
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+            },
+            contentText:"你确定删除本招商员等级吗？",
+            title:"消息提醒"
+        });
+	} 
+
+</script>
+{/block}

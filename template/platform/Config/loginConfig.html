@@ -1,0 +1,187 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+
+   <header class="panel-heading text-right bg-light">
+     <ul class="nav nav-tabs pull-left">
+     {if condition="$type == 'qq'"}
+       <li class="active"><a href="#qq" data-toggle="tab">QQ登录</a></li>
+     {else/}
+       <li class=""><a href="#weixin" data-toggle="tab">微信登录</a></li>
+     {/if}
+     </ul>
+     <span class="hidden-sm">第三方登录</span>
+   </header>
+
+     <div class="panel-body">
+          <div class="tab-content">
+         	 {if condition="$type == 'qq'"}
+                     <div class="tab-pane fade active in" id="qq">
+						<div class="panel-body">
+							<form class="form-horizontal" method="get">
+								<div class="form-group">
+									<label class="col-sm-2 control-label">是否启用</label>
+									<div class="col-md-4">
+										<label class="switch">
+											<input type="checkbox" id="is_use" {if condition="$qq_config.is_use=='1'"}checked="checked"{/if}>
+											<span></span>
+										</label>
+									</div>
+								</div>
+								<div class="line line-dashed line-lg pull-in"></div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">APP_KEY</label>
+									<div class="col-md-4">
+										<input type="text" class="form-control" id="APP_KEY" value="{$qq_config.value.APP_KEY}">
+									</div>
+								</div>
+								<div class="line line-dashed line-lg pull-in"></div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">APP_SECRET</label>
+									<div class="col-md-4">
+										<input type="text" class="form-control" id="APP_SECRET" value="{$qq_config.value.APP_SECRET}">
+									</div>
+								</div>
+					            <div class="line line-dashed line-lg pull-in"></div>
+					            <div class="form-group">
+                                    <label class="col-lg-2 control-label">申请域名</label>
+                                    <div class="col-lg-10">
+                                        <p class="form-control-static">{$qq_config['value']['AUTHORIZE']}</p>
+                                    </div>
+                                </div>
+					            <div class="line line-dashed line-lg pull-in"></div>
+					            <div class="form-group">
+                                    <label class="col-lg-2 control-label">回调域名</label>
+                                    <div class="col-lg-10">
+                                        <p class="form-control-static">{$qq_config['value']['CALLBACK']}</p>
+                                    </div>
+                                </div>
+								<div class="line line-dashed line-lg pull-in"></div>
+								<div class="form-group">
+									<div class="col-sm-4 col-sm-offset-2">
+										<input type = "hidden" id="AUTHORIZE" value="{$qq_config['value']['AUTHORIZE']}">	
+										<input type = "hidden" id="CALLBACK" value="{$qq_config['value']['CALLBACK']}">
+										<a href="javascript:void(0);" onclick="setConfigAjax()" class="btn btn-primary">保存</a>
+									</div>
+								</div>
+							</form>
+						</div>
+                     </div>
+					 <script>
+						function setConfigAjax(){
+							var appkey = $("#APP_KEY").val();
+							var appsecret = $("#APP_SECRET").val();
+							var url = $("#AUTHORIZE").val();
+							var call_back_url = $("#CALLBACK").val();
+							var is_use = 0;
+							if($("#is_use").is(":checked")){
+								is_use = 1;
+							}
+							$.ajax({
+								type:"post",
+								url:"PLATFORM_MAIN/config/loginqqconfig",
+								data:{
+									'appkey':appkey,
+									'appsecret':appsecret,
+									'url':url,
+									'call_back_url':call_back_url,
+									"is_use" : is_use
+								},
+								success:function (data) {
+									if (data["code"] > 0) {
+										showMessage('success', data["message"],'PLATFORM_MAIN/config/loginconfig?type=qq');
+									}else{
+										showMessage('error', data["message"]);
+									}	
+								}
+							});
+						}
+					</script>
+                     {else/}
+                     <div class="tab-pane fade active in" id="weixin">
+						<div class="panel-body">
+							<form class="form-horizontal" method="get">
+								<div class="form-group">
+									<label class="col-sm-2 control-label">是否启用</label>
+									<div class="col-md-4">
+										<label class="switch">
+											<input type="checkbox" id="is_use" {if condition="$wchat_config.is_use=='1'"}checked="checked"{/if}>
+											<span></span>
+										</label>
+									</div>
+								</div>
+								<div class="line line-dashed line-lg pull-in"></div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">APP_KEY</label>
+									<div class="col-md-4">
+										<input type="text" class="form-control" id="APP_KEY" value="{$wchat_config['value']['APP_KEY']}">
+									</div>
+								</div>
+								<div class="line line-dashed line-lg pull-in"></div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">APP_SECRET</label>
+									<div class="col-md-4">
+										<input type="text" class="form-control" id="APP_SECRET" value="{$wchat_config['value']['APP_SECRET']}">
+									</div>
+								</div>
+					            <div class="line line-dashed line-lg pull-in"></div>
+					            <div class="form-group">
+                                    <label class="col-lg-2 control-label">申请域名</label>
+                                    <div class="col-lg-10">
+                                        <p class="form-control-static">{$wchat_config['value']['AUTHORIZE']}</p>
+                                    </div>
+                                </div>
+					            <div class="line line-dashed line-lg pull-in"></div>
+					            <div class="form-group">
+                                   <label class="col-lg-2 control-label">回调域名</label>
+                                   <div class="col-lg-10">
+                                       <p class="form-control-static">{$wchat_config['value']['CALLBACK']}</p>
+                                   </div>
+                               </div>
+								<div class="line line-dashed line-lg pull-in"></div>
+								<div class="form-group">
+									<div class="col-sm-4 col-sm-offset-2">
+										<input type = "hidden" id="AUTHORIZE" value="{$wchat_config['value']['AUTHORIZE']}">
+										<input type = "hidden" id="CALLBACK" value="{$wchat_config['value']['CALLBACK']}">
+										<button class="edit_button" onclick="setWeixinConfigAjax();">提交</button>
+									</div>
+								</div>
+							</form>
+						</div>
+                     </div>
+                     <script>
+							function setWeixinConfigAjax(){
+								var appkey = $("#APP_KEY").val();
+								var appsecret = $("#APP_SECRET").val();
+								var url = $("#AUTHORIZE").val();
+								var call_back_url = $("#CALLBACK").val();
+								var is_use = 0;
+								if($("#is_use").is(":checked")){
+									is_use = 1;
+								}
+								$.ajax({
+									type:"post",
+									url:"PLATFORM_MAIN/config/loginweixinconfig",
+									data:{
+										'appkey':appkey,
+										'appsecret':appsecret,
+										'url':url,
+										'call_back_url':call_back_url,
+										"is_use" : is_use
+									},
+									success:function (data) {
+										if (data["code"] > 0) {
+											showMessage('success', data["message"],'PLATFORM_MAIN/config/loginconfig?type=wchat');
+										}else{
+											showMessage('error', data["message"]);
+										}	
+									}
+								});
+							}
+						</script>
+                     {/if}
+         </div>
+    </div>
+</section>
+
+{/block}

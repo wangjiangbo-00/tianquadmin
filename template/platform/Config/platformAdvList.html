@@ -1,0 +1,120 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9 m-b-xs">
+		<a href="PLATFORM_MAIN/config/addplatformadv?ap_id={$ap_id}"
+			class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加广告 </a>
+	</div>
+	<div class="col-sm-2">
+		<input type="text" class="input-sm form-control" id="search_text"
+			placeholder="请输入广告名称">
+	</div>
+	<div class="col-sm-1">
+		<button class="btn btn-sm btn-default" type="button"
+			onclick="LoadingInfo(1)">搜索</button>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th>名称</th>
+					<th>所属广告位</th>
+					<th>链接地址</th>
+					<th class="center">排序</th>
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+		<input type="hidden" id="ap_id" value="{$ap_id}">
+	</div>
+	{include file="platform/page" /}
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+})
+//查询广告列表
+	function LoadingInfo(pageIndex) {
+		var ap_id = $("#ap_id").val();
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/config/platformadvlist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text, "ap_id" : ap_id
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data['data'].length > 0) {
+					for (var i = 0; i < data['data'].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['adv_id']+'"></td>';
+						html += '<td>'+ data['data'][i]['adv_title']+'</td>';
+						html += '<td>' + data['data'][i]["ap_info"]['ap_name'] + '</td>';
+						html += '<td>' + data['data'][i]["adv_url"] + '</td>';
+						html += '<td class="center">' + data['data'][i]["slide_sort"] + '</td>';
+						html += '<td class="center"><a href="PLATFORM_MAIN/Config/updatePlatformAdv?adv_id=' + data['data'][i]["adv_id"] + '">编辑</a> ';
+						html += '<a href="javascript:;" onclick="delPlatformAdv(' + data['data'][i]["adv_id"] + ')">删除</a></td> ';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="6">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}	
+	function delPlatformAdv(adv_id){
+		$( "#dialog" ).dialog({
+            buttons: {
+                "确定": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+            			type : "post",
+            			url : "PLATFORM_MAIN/config/delplatformadv",
+            			async : true,
+            			data : {
+            				"adv_id" : adv_id
+            			},
+            			success : function(data) {
+            				if(data["code"] > 0 ){
+            					showMessage('success', data["message"],'PLATFORM_MAIN/config/platformadvlist?ap_id={$ap_id}');
+            				}else{
+            					showMessage('error', data["message"]);
+            				}
+            			}
+            		})
+                },
+	            "取消,#e57373": function() {
+	                $(this).dialog('close');
+	            }
+            },
+            contentText:"你确定删除吗？",
+            title:"消息提醒"
+        });
+	}
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+</script>
+{/block}

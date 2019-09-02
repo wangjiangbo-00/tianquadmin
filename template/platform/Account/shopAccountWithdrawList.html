@@ -1,0 +1,150 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+              <header class="panel-heading"> 店铺提现列表</header>
+              <div class="table-responsive">
+                <table class="table table-striped b-t b-light text-sm">
+                  <thead>
+                    <tr>
+                      <th width="20"><input type="checkbox"></th>
+                      <th class="center">店铺名称 </th>
+                      <th class="center">提现流水号</th>
+                      <th class="center">提现银行名称</th>
+                      <th class="center">提现银行账号</th>
+                      <th class="center">提现账户姓名</th>
+                      <th class="center">手机</th>
+                      <th class="center">提现金额</th>
+                      <th class="center">当前状态</th>
+                      <th class="center">提现时间</th>
+                      <th class="center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="list">
+                    <tr></tr>
+                  </tbody>
+                </table>
+              </div>
+              {include file="platform/page" /}
+            </section>
+
+{/block}
+{block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/shop/shopAccountWithdrawList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				var html = '';
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						if(data["data"][i]["status"] == 0){
+							data["data"][i]["status_name"] = '审核中';
+						}else if(data["data"][i]["status"] == 1){
+							data["data"][i]["status_name"] = '已同意';
+						}else if(data["data"][i]["status"] == -1){
+							data["data"][i]["status_name"] = '已拒绝';
+						}
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['id']+'"></td>';
+						html += '<td class="center">' + data["data"][i]["shop_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["withdraw_no"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["bank_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["account_number"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["realname"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["mobile"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["cash"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["status_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["ask_for_date"] + '</td>';
+						html +="<td>";
+						if(data["data"][i]["status"] == 0 ){
+							html += '<a href="javascript:void(0);" onclick="audit_box(' +data["data"][i]["id"]+',' +data["data"][i]["shop_id"]+',1)">同意</a>&nbsp;<a href="javascript:void(0);" onclick="audit_box(' +data["data"][i]["id"]+',' +data["data"][i]["shop_id"]+',-1)">拒绝</a>';
+						}
+						html +="</td>";
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="11">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}	
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+	function audit_box(id, shop_id, is_audit){
+		if(is_audit == 1){
+			$( "#dialog" ).dialog({
+	            buttons: {
+	            	"同意,#e57373": function() {
+	                    $(this).dialog('close');
+	                    Andit(id,shop_id,is_audit)
+	                },
+	                "取消": function() {
+	                    $(this).dialog('close');                   
+	                }
+	            },
+	            contentText:"你确定同意提现审核",
+	            title:"审核提醒"
+	        });
+		}else{
+			$( "#dialog" ).dialog({
+	            buttons: {
+	            	"拒绝,#e57373": function() {
+	                    $(this).dialog('close');
+	                    Andit(id,shop_id,is_audit)
+	                },
+	                "取消": function() {
+	                    $(this).dialog('close');                   
+	                }
+	            },
+	            contentText:"你确定拒绝提现审核",
+	            title:"审核提醒"
+	        });
+		}
+		
+	}
+	function Andit(id,shop_id,status){
+
+                    $.ajax({
+            			type : "post",
+            			url : "PLATFORM_MAIN/shop/shopAccountWithdrawAudit",
+            			async : true,
+            			data : {
+            				"id" : id,
+            				"shop_id" : shop_id,
+            				"status" : status
+            			},
+            			success : function(data) {
+            				//alert(JSON.stringify(data));
+            				if(data["code"] > 0 ){
+            					showMessage('success', data["message"],'PLATFORM_MAIN/shop/shopAccountWithdrawList');
+            				}else{
+            					showMessage('error', data["message"]);
+            				}
+            			}
+            		})               
+	}
+</script>
+{/block}

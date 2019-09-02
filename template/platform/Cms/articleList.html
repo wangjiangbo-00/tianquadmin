@@ -1,0 +1,157 @@
+{extend name="platform/base" /}
+{block name="main"}
+              <div class="row padder-v">
+                <div class="col-sm-9">
+                  <a class="btn btn-sm btn-primary" href="PLATFORM_MAIN/Cms/addArticle" ><i class="fa fa-plus"></i>&nbsp;添加文章</a>
+                </div>
+                <div class="col-sm-2">
+                  <div class="input-group">
+                    <input type="text" id="search_text" class="input-sm form-control" placeholder="请输入文章">
+                  </div>
+                </div>
+                <div class="col-sm-1">
+                  <div class="input-group">
+                    <span class="input-group-btn">
+                    <button class="btn btn-sm btn-default" type="button" onclick="LoadingInfo(1)">搜索</button>
+                    </span> 
+                  </div>
+                </div>
+              </div>
+<section class="panel panel-default">
+              <div class="table-responsive">
+                <table  class="table table-striped b-t b-light text-sm">
+				 <thead>
+				 <tr>
+                    <th width="20"><input type="checkbox"></th>
+                    <th width="80">排序</th>
+                    <th>标题</th>
+                    <th class="center">分类</th>
+                    <th class="center">点击量/评论量</th>
+                    <th class="center">发布时间</th>
+                    <th class="center">状态</th>
+                    <th class="center">操作</th>
+				</tr>
+				 <tbody id="list">
+				 <tr></tr>
+				</tbody>
+			</table>
+              </div>
+              {include file="platform/page" /}
+            </section>
+{/block} 
+{block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//分页数据
+function LoadingInfo(pageIndex) {
+	var search_text = $("#search_text").val();
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Cms/articleList",
+		async : true,
+		data : {
+			"pageIndex" : pageIndex, "search_text" : search_text
+		},
+		success : function(data) {
+			//alert(JSON.stringify(data));
+			var html = '';
+			$("#total_count_num").text(data["total_count"]);
+			$("#page_count_num").text(data["page_count"]);
+			$("#page_count").val(data["page_count"]);
+			$("#pageNumber a").remove();
+			if (data["data"].length > 0) {
+				for (var i = 0; i < data["data"].length; i++) {
+					html += '<tr>';
+					html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['article_id']+'"></td>';
+					html += '<td><input type="text" value="'+ data["data"][i]["sort"]+'"  fieldid="'+ data['data'][i]['article_id']+'" class="num form-control" ></td>';	
+					html += '<td title="'+data["data"][i]["title"]+'">' + data["data"][i]["title"]+ '</td>';
+					html += '<td class="center">' + data["data"][i]["name"]+ '</td>';
+					html += '<td class="center">' + data["data"][i]["click"]+ ' / ' + data["data"][i]["comment_count"]+ '</td>';
+					html += '<td class="center">' + data["data"][i]["create_time"]+ '</td>';
+					if(data["data"][i]["status"]==0){
+						html += '<td class="center">草稿</td>';	
+					}else if(data["data"][i]["status"]==1){ 
+						html += '<td class="center">待审核</td>';
+					}else if(data["data"][i]["status"]==2){ 
+						html += '<td class="center">已发布</td>';
+					}else if(data["data"][i]["status"]==-1){ 
+						html += '<td class="center">回收站</td>';
+					}
+			        html += '<td class="center"><a target="_blank" href="SHOP_MAIN/cms/articleclassinfo?article_id='+ data['data'][i]['article_id']+'">预览</a>&nbsp;&nbsp;<a href="PLATFORM_MAIN/Cms/updateArticle?id='+ data['data'][i]['article_id']+'">修改</a>&nbsp;&nbsp;<a style="cursor: pointer;" onclick="deleteArticle('+data['data'][i]['article_id']+')">删除</a></td> ';
+				    html += '</tr>';
+				}
+			} else {
+				html += '<tr align="center"><th colspan="9">暂无分类</th></tr>';
+			}
+			$("#list").html(html);
+			var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			load();
+		}
+	});
+}	
+
+//删除分类
+function deleteArticle(article_id){
+	$( "#dialog" ).dialog({				
+        buttons: {
+            "确定": function() {
+                $(this).dialog('close');
+                $.ajax({
+    				type : "post",
+    				url : "PLATFORM_MAIN/Cms/deleteArticle",
+    				async : true,
+    				data : {
+    					"article_id" : article_id
+    				},
+    				success : function(data) {
+    					//alert(JSON.stringify(data));
+    					if (data["code"] > 0) {
+    						showMessage('success', data["message"]);
+    						LoadingInfo(1);
+    					}else{
+    						showMessage('error', data["message"]);
+    					}
+    				}
+    				})
+            },
+            "取消,#e57373": function() {
+                $(this).dialog('close');
+            }
+        },
+        contentText:"是否删除文章？",
+    });
+}
+/*修改排序*/
+function load(){
+	$('.num').change(function(){
+		var fieldid = $(this).attr('fieldid');
+		var sort = $(this).val();
+		//alert(sort);
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Cms/modifyArticleField",
+			data:{'fieldid':fieldid,'sort':sort},
+			async:true,
+			success: function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"]);
+					LoadingInfo(1);
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		}); 
+	});
+}
+	
+
+
+</script>
+{/block}

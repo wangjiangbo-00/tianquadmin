@@ -1,0 +1,180 @@
+{extend name="admin/base" /}
+{block name="resources"/}
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script> 
+<style  type="text/css">
+.statistics{
+	//border:1px solid #F5F6F5;
+	width:25%;
+	height:70px;
+	float:left;
+}
+.statistics img{
+	padding-left:15px;
+	padding-top:10px;
+	float:left;
+}
+.statistics  ul{
+	float:left;
+	font-size:12px;
+}
+.income{
+	width:100%;
+	height:260px;
+	clear:both;
+}
+.income-left{
+	float:left;
+	width:25%;
+	text-align:center;
+}
+.income-left ul{
+	margin:0;
+}
+.income-left ul li{
+	line-height:35px;
+}
+.income-right{
+	min-width:70%;
+	height:260px;
+	float:left;"
+}
+.withdraw-left{
+	float:left;
+	width:25%;
+	text-align:center;
+}
+.withdraw-left ul{
+	margin:0;
+}
+.withdraw-left ul li{
+	line-height:35px;
+}
+.withdraw-right{
+	min-width:70%;
+	height:260px;
+	float:left;"
+}
+.mytable select {
+width:150px;
+}
+</style>
+ {/block}
+{block name="main"}
+<table class="mytable" style="margin-top:20px;">
+	<tr>
+		<th>
+			<!-- 方式：
+			<select id="account_type">
+	                    	<option value="0">请选择发生方式</option>
+	                    	<option value="1">订单</option>
+	                    	<option value="2">提现</option>
+	        </select> -->
+			<input type="text" id="startDate" class="input-sm form-control"placeholder="请选择开始日期" onclick="WdatePicker()" />
+			<input type="text" id="endDate" placeholder="请选择结束日期" class="input-sm form-control"onclick="WdatePicker()" />
+			<input type="button" onclick="searchData()" value="搜索" />
+		</th>		
+	</tr>
+</table>
+<div class="mod-table" >
+	<div class="mod-table-head">
+		<div class="con style0list">
+			<table>
+				<colgroup>
+					<col style="width: 5%;">
+					<!-- <col style="width: 15%;"> -->
+					<col style="width: 15%;">
+					<col style="width: 15%;">
+					<col style="width: 15%;">
+					<col style="width: 20%;">
+					<col style="width: 30%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th><label style="margin-left: 5px;"> <input type="checkbox"  onclick="CheckAll(this)"></label></th>
+						<!-- <th>店铺</th> -->
+						<th>金额</th>
+						<th>发生方式</th>
+						<th>是否参与计算</th>
+						<th>创建时间</th>
+						<th>备注</th>						
+					</tr>
+				</thead>
+				<colgroup>
+					<col style="width: 5%;">
+					<!-- <col style="width: 15%;"> -->
+					<col style="width: 15%;">
+					<col style="width: 15%;">
+					<col style="width: 15%;">
+					<col style="width: 20%;">
+					<col style="width: 30%;">
+				</colgroup>
+				<tbody></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+{/block}
+{block name="script"}
+{include file="admin/pageCommon" /}
+
+<script>
+//查询
+function searchData(){
+	LoadingInfo(1);
+}
+//查询用户列表
+function LoadingInfo(page_index) {
+	var start_date = $("#startDate").val();
+	var end_date = $("#endDate").val();
+	//var account_type = $("#account_type").val();
+	$.ajax({
+		type : "post",
+		url : "ADMIN_MAIN/Account/ShopAccountRecordCount",
+		async : true,
+		data : {
+			"page_index" : page_index,
+			"start_date":start_date,
+			"end_date":end_date,
+			//"account_type":account_type
+		},
+		success : function(data) {
+			$("#page_count").val(data["list"]["page_count"]);
+			$("#pageNumber a").remove();
+			var html = '';
+			if (data["list"]["data"].length > 0) {
+				for (var i = 0; i < data["list"]["data"].length; i++) {
+					html += '<tr  align="center">';
+					html += '<td><input type="checkbox" name="sub" value="'+ data["list"]['data'][i]['id']+'"></td>';
+					/* html += '<td>' + data["list"]["data"][i]["shop_name"] + '</td>'; */
+					html += '<td>' + data["list"]["data"][i]["money"] + '</td>';
+					if(data["list"]["data"][i]["account_type"] == 1){
+						html += '<td>订单</td>';
+					}else{
+						html += '<td>提现</td>';
+					}
+					if(data["list"]["data"][i]["is_calculate"] == 1){
+						html += '<td><i class="fa fa-check text-success"></i></td>';
+					}else{
+						html += '<td><i class="fa fa-times"></i></td>';
+					}
+					html += '<td>' + data["list"]["data"][i]["create_time"] + '</td>';															
+					html += '<td>' + data["list"]["data"][i]["remark"] + '</td>';
+					
+					html += '</tr>';
+				}
+			} else {
+				html += '<tr align="center"><th colspan="11">暂无符合条件的数据记录</th></tr>';
+			}
+			$(".style0list tbody").html(html);
+			var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+		}
+	});
+}	
+
+</script>
+{/block}

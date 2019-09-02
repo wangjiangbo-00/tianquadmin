@@ -1,0 +1,46 @@
+{extend name="platform/base" /} 
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 用户通知 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">用户通知</label>
+                                            <div class="col-sm-4">
+                                                <div id="editor" class="form-control" style="overflow:scroll;height:150px;max-height:150px">{$user_notice}</div>
+                                            </div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="setUserNoticeAjax()"
+						class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+	/**
+	*添加广告位
+	*/
+	function setUserNoticeAjax() {
+		var user_notice = $("#editor").html();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/config/usernotice",
+			data : {
+				'user_notice' : user_notice,
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', "设置成功",'PLATFORM_MAIN/Config/usernotice');
+				}else{
+					showMessage('error', "设置失败");
+				}
+			}
+		});
+	}
+</script>
+{/block}

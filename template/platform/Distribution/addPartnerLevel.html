@@ -1,0 +1,79 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加股东等级 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">等级名称</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="level_name" name="level_name" value="" required>
+				</div>
+				<label class="col-md-8 error" for="level_name" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">升级条件</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="level_money" value="" onkeyup="javascript:CheckInputIntFloat(this);">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">股东分红佣金比率</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="commission_rate" value="" onkeyup="javascript:CheckInputIntFloat(this);">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button type="submit" class="btn btn-primary">保存</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script src="__STATIC__/js/limit_input_digit.js"></script>
+<script>	
+$().ready(function() {
+	$("#form").validate({
+		submitHandler:function(){
+			addPartherLevel();
+		}
+	});
+});
+	function addPartherLevel(){
+		var level_name = $("#level_name").val();
+		var level_money = $("#level_money").val();
+		var commission_rate = $("#commission_rate").val();
+		//var global_value = $("#global_value").val();
+		//var global_weight = $("#global_weight").val();
+		
+		if((parseFloat(commission_rate))>100 ){
+			showMessage('error', "佣金比率不可超过100%！");	
+			return false;
+		}
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Distribution/addPartnerLevel",
+			data:{
+				'level_name':level_name,
+				'level_money':level_money,
+				'commission_rate':commission_rate,
+				//'global_value':global_value,
+				//'global_weight':global_weight
+			},
+			async:true,
+			success:function (data) {
+				//alert(JSON.stringify(data));
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/Distribution/shareholderDividendsConfig");
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+</script>
+{/block}

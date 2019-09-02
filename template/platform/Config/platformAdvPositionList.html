@@ -1,0 +1,198 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style type="text/css">
+
+</style>
+{/block}
+ {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-2" style="width: 30%">
+		<a href="PLATFORM_MAIN/config/addplatformadvposition"
+			class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加广告位 </a>
+	</div>
+	<div class="col-sm-2" style="width:70%;">
+		<div style="width:38%;float:left;">
+		<p style="float:left;width:25%;">广告位名称：</p><input style="width:200px;" type="text" class="input-sm form-control" id="search_text" placeholder="请输入广告位名称">
+		</div>
+		<div style="width:43%;float:left;">
+			位置类型：
+			<select id="type" style="margin-left: 10px;border-color:#d9d9d9;color: #999;height:30px;">
+				<option value="">全部</option>
+				<option value="1">pc端</option>
+				<option value="2">手机端</option>
+			</select>
+			广告展示方式：
+			<select id="ap_display" style="margin-left: 10px;border-color:#d9d9d9;color: #999;height:30px;">
+				<option value="">全部</option>
+				<option value="0">幻灯片</option>
+				<option value="1">多广告展示</option>
+				<option value="2">单广告展示</option>
+			</select>
+		</div>
+		
+		<div class="col-sm-2">
+			<button class="btn btn-sm btn-default" type="button" onclick="LoadingInfo(1)" >搜索</button>
+		</div>
+	</div>
+	
+
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th>名称</th>
+					<th class="center">类别</th>
+					<th class="center">展示方式</th>
+					<th class="center">宽度/字数</th>
+					<th class="center">高度</th>
+					<th class="center">是否启用</th>
+					<th class="center">位置类型</th>
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+})
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		var type = $("#type").val();
+		var ap_display = $("#ap_display").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/config/platformadvpositionlist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text, "type" : type, "ap_display" : ap_display
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data['data'].length > 0) {
+					for (var i = 0; i < data['data'].length; i++) {
+						var ap_id = data['data'][i]['ap_id'];
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['ap_id']+'"></td>';
+						html += '<td>'+ data['data'][i]['ap_name']+'</td>';
+						html += '<td class="center">' + data['data'][i]["ap_class_name"] + '</td>';
+						html += '<td class="center">' + data['data'][i]["ap_display_name"] + '</td>';
+						html += '<td class="center">' + data['data'][i]["ap_width"] + '</td>';
+						html += '<td class="center">' + data['data'][i]["ap_height"] + '</td>';
+						if(data['data'][i]["is_use"] == 0){
+							html += '<td class="center"><a href="#" onclick="setPlatformAdvPositionUse(this,'+ ap_id +',1,'+data['data'][i]["is_del"]+');" class data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}else{
+							html += '<td class="center"><a href="#" onclick="setPlatformAdvPositionUse(this,'+ ap_id +',0,'+data['data'][i]["is_del"]+');" class="active" data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}
+						html += data['data'][i]["type"] == 1 ? '<td class="center">pc端</td>' : '<td class="center">手机端</td>';
+						html += '<td class="center"><a href="PLATFORM_MAIN/config/platformadvlist?ap_id=' + data['data'][i]["ap_id"] + '"> 管理广告</a> &nbsp;';
+						html += '<a href="PLATFORM_MAIN/Config/updateplatformadvposition?ap_id=' + data['data'][i]["ap_id"] + '"> 编辑</a> &nbsp;';
+						if(data['data'][i]["is_del"]==1){
+							html += '<a href="javascript:;"> </a></td> ';
+						}else{
+							html += '<a href="javascript:delShopAdvPosition(' + ap_id + ');"> 删除</a></td> ';
+						}
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="8">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}	
+$("#search_text").keypress(function(e){
+	if(e.keyCode == 13){
+		LoadingInfo(1);
+	}
+});
+/**
+ * 删除
+ */
+function delShopAdvPosition(ap_id){
+	$( "#dialog" ).dialog({
+        buttons: {
+            "确定": function() {
+                $(this).dialog('close');
+                $.ajax({
+        			type : "post",
+        			url : "PLATFORM_MAIN/system/delplatfromadvposition",
+        			async : true,
+        			data : {
+        				"ap_id" : ap_id
+        			},
+        			success : function(data) {
+        				
+        				if(data["code"] > 0 ){
+        					showMessage('success', data["message"],'PLATFORM_MAIN/config/platformadvpositionlist');
+        				}else{
+        					showMessage('error', data["message"]);
+        				}
+        			}
+        		})
+            },
+            "取消,#e57373": function() {
+                $(this).dialog('close');
+            }
+        },
+        contentText:"删除该广告位将会连广告一同删除，你确定删除该广告位吗？",
+        title:"消息提醒"
+    });
+}
+/**
+ * 启用与禁用
+ */
+function setPlatformAdvPositionUse(eve,ap_id,is_use,is_del){
+	if(is_use == 0 && is_del == 1){
+		showMessage('error','改广告位为系统指定不禁用');
+		return false;
+	}
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/config/setPlatformAdvPositionUse",
+		async : true,
+		data : {
+			"ap_id" : ap_id,
+			"is_use" : is_use
+		},
+		success : function(data) {
+			
+			if(data["code"] > 0 ){
+				
+				if(is_use==1){
+					showMessage('success','启用成功');
+					$(eve).addClass('active').attr('onclick','setPlatformAdvPositionUse(this,'+ap_id+',0,'+is_del+')').html('<i class="fa fa-check text-success text-active"></i>');
+				}else{
+					showMessage('success','禁用成功');
+					$(eve).removeClass('active').attr('onclick','setPlatformAdvPositionUse(this,'+ap_id+',1,'+is_del+')').html('<i class="fa fa-times text-danger text"></i>');
+				}
+			}else{
+				showMessage('error',data["message"]);
+			}
+		}
+	})
+}
+</script>
+{/block}

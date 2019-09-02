@@ -1,0 +1,84 @@
+{extend name="platform/base" /} {block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 一键关注设置 </header>
+	<div class="panel-body">
+		<div class="container-fluid">
+			<div class="row">
+				<div style="background: #FCF8E3;margin-left:20px;padding: 10px;border:1px solid #eee;"  class="col-lg-6 col-md-8 col-xs-11">
+			        <h5 style="color: #CD9F5B;font-family:'microsoft yahei' ">重要提示<i class=""></i></h5>
+			        <p style="color: #CD9F5B;font-size: 14px;">设置“一键关注”，需要你先在微信公众平台创建一条新的图文信息，你可以下载提示图片和压缩包到电脑中，也可以自己制作图片上传，尺寸360x200像素；创建之后，复制这条图文信息的链接并粘贴到下方的对话框，提交网址即可。</p>
+			        <div  class="form-group  col-lg-6 col-md-6 col-xs-10">
+			        	<input id="urlInput" value="{$one_key_url['url']}" type="text" class="form-control" placeholder="粘贴微信公众平台图文素材网址" style="border-radius: 3px;margin-left:-15px;">
+			        </div><br><br><br>
+			        <p id="tishi" style="font-size:12px;color: red;display: none; ">您输入的网址为空或不正确</p>
+			        <button class="btn" style="color: #fff;background-color: #65bd77;border-color: #65bd77;" type="button" id="btnSim" >提交网址</button>    
+			     </div>
+			</div>
+		    <div class="row" style="margin:20px 0;">
+		     	<div class=" col-lg-9 col-md-6 col-xs-12" >根据提示说明，登录微信公众平台，选择管理→素材管理，并创建一条新的图文消息，以下图为例：</div>			   
+		    </div>
+		    <div class="row">
+		     	<img src="ADMIN_IMG/onekey02.jpeg"  class=" col-lg-6 col-md-6 col-xs-12">
+		    </div>
+			<div class="row" style="margin:20px 0;">
+		     	<div class=" col-lg-9 col-md-12 col-xs-12" >根据提示说明，登录微信公众平台，选择管理→素材管理，并创建一条新的图文消息，以下图为例：</div>			   
+		     </div>
+		     <div class="row">
+		     	<img src="ADMIN_IMG/onekey02.jpeg"  class=" col-lg-6 col-md-6 col-xs-12">
+		     </div>
+		     <div class="row" style="margin:20px 0;">
+		     	<div class=" col-lg-9 col-md-9 col-xs-12" > 相信大家对创建图文消息的方法都已经很熟悉，这里我们就不再赘述了，只需要注意下边几点：</div>			   
+		     </div>
+		     <div class="row" style="margin:20px 0;">
+		     	<div class=" col-lg-9 col-md-9 col-xs-12"  style="color:red;"> 1、在第二步中下载的图片，这里要作为封面图片上传到图文消息，并选择封面图片显示在正文中；<br>2、这一条图文消息不必添加原文链接。下边几点：</div>			   
+		     </div>
+		     <div class="row" style="margin:20px 0;">
+		     	<div class=" col-lg-9 col-md-9 col-xs-12" > 保存该条图文消息，并在图文素材列表中找到它，对消息标题单击鼠标右键，选择复制链接。</div>			   
+		     </div>
+		     <div class="row">
+		     	<img src="ADMIN_IMG/onekey03.jpeg"  class=" col-lg-6 col-md-6 col-xs-12">
+		     </div>
+		     <div class="row" style="margin:20px 0;">
+		     	<div class=" col-lg-9 col-md-9 col-xs-12" > 回到微店管理后台，将复制的链接粘贴到一键关注界面的对话框中，点击提交网址。这样就完成了一键关注的设置。</div>			   
+		     </div>
+		     <div class="row">
+		     	<img src="ADMIN_IMG/onekey_04.png"  class=" col-lg-6 col-md-6 col-xs-12">
+		     </div>
+		</div>
+	</div>
+	{include file="admin/default/openDialog" /}
+	<script>
+        $(function () {
+            $("#btnSim").click(function () {
+
+                if($("#urlInput").val()=='' || !$('#urlInput').val().match(/^((https|http|ftp|rtsp|mms)?:\/\/)+[A-Za-z0-9]+\.[A-Za-z0-9]+[\/=\?%\-&_~`@[\]\':+!]*([^<>\"\"])*$/)){
+                    $('#tishi').fadeIn();
+                    return false;
+                }else{
+                    $('#tishi').fadeOut();
+                    $("#btnSim").attr("disabled", true);
+                }
+                
+                $.ajax({
+                    url:"PLATFORM_MAIN/Wchat/oneKeySubscribe",
+                    type: "post",
+                    async: true,
+                    data:{"url":$("#urlInput").val()},
+                    success: function (data) {
+                    	if(data['code']){
+	                        showMessage('success', data['message'], '#');
+                    	}else{
+	                        showMessage('error', data['message']);
+                    	}
+                                                                           
+                    }
+                });
+            });
+        });
+    
+        function hide(id) {
+            $("#"+id).hide()
+        }
+    </script>
+</section>
+{/block}

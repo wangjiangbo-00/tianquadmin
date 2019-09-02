@@ -1,0 +1,59 @@
+<!--滚动图右侧公告及其小菜单
+	2017年2月14日12:28:00
+-->
+<script type="text/javascript">
+$.ajax({
+	type:"post",
+	url:"SHOP_MAIN/components/getlogininfo",
+	success:function(data){
+		var login_info_html='';
+		if(data != null && data !=""){
+			if(data["user_info"]["nick_name"]!=null && data["user_info"]["nick_name"] != ""){
+				if(data["user_info"]["user_headimg"]==""){
+					login_info_html+='<div class="login_img"><img src="__TEMP__/{$style}/public/images/temp_default_user_portrait_0.png" alt="默认头像" /></div>';
+				}else{
+					login_info_html+='<div class="login_img"><img src="__UPLOAD__/'+data["user_info"]["user_headimg"]+'" alt="默认头像" /></div>';
+				}
+				login_info_html+='<div class="login-message" style="line-height:27px;"><p class="message-title">Hi,我是<a href="SHOP_MAIN/member/index" class="member_name" title="'+data["user_info"]["nick_name"]+'">'+data["user_info"]["nick_name"]+'</a></p><p class="message-operation"><a href="javascript:logout();" class="logout" >退出</a></p></div>';
+			}
+		}else{
+			login_info_html += '<div class="login_img">';
+			login_info_html += '<img src="__TEMP__/{$style}/public/images/temp_default_user_portrait_0.png" alt="默认头像" />';
+			login_info_html += '</div>';
+			login_info_html += '<div class="login-message">';
+			login_info_html += '<p class="message-title">Hi,欢迎登录{$title}</p>';
+			login_info_html += '<p class="message-operation" style="padding: 5px 0;">';
+			login_info_html += '<a href="javascript:;" class="login ajax-login">登录</a>';
+			login_info_html += '<a href="SHOP_MAIN/login/registerbox" class="register">注册</a>';
+			login_info_html += '</p></div>';
+		}
+		$('.right-login-message').html(login_info_html);
+	}
+});
+</script>
+<div class="right-sidebar NS-TEMPLATE-NAV-CONTAINER">
+	<!-- 个人信息 -->
+	<div class="right-login-message">
+		<div style="text-align:center;">
+			<img src="__TEMP__/{$style}/public/images/load_login.gif"/>
+			<p style="margin-top:10px;">加载中</p>
+		</div>
+	</div>
+	
+	<p class="right_title"><span>&nbsp;</span>公告</p>
+	<div class="proclamation1">
+		<ul class="mall-news">
+			{volist name="new_article" id="vo" empty="暂时没有公告"}
+			<li><a target="_blank" href="SHOP_MAIN/cms/articleclassinfo?article_id={$vo.article_id}" title=">{$vo.title}"><i></i>{$vo.title}</a></li>
+			{/volist}
+		</ul>
+	</div>
+			
+	<p class="right_title"><span>&nbsp;</span>管理</p>
+	<div class="shortcut-menu">
+		<a href="SHOP_MAIN/shop/applyindex" 
+			title="申请商家入驻；已提交申请，可查看当前审核状态。" class="store-join-btn" target="_blank">商家加盟</a>
+		<a href="ADMIN_MAIN/login" target="_blank" class="store-join-help">
+			登录商家管理中心</a>
+	</div>
+</div>

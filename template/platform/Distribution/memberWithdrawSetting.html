@@ -1,0 +1,117 @@
+{extend name="platform/base" /}
+{block name="resources"}
+<style>
+.withdraw_rule{float: left;height: 34px;line-height: 34px;color:red;display: none;}
+</style>
+{/block}
+ {block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold">提现设置</header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">最低提现金额</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="cash_min" value="{$withdraw_info.withdraw_cash_min}">
+					<p style="margin: 10px 0 0;color: #BBB;">提现金额将不小于此值才能提现</p>
+				</div>
+				<div class="withdraw_rule" id="verification_cash">提现金额不能为空</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">提现倍数</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="multiple" value="{$withdraw_info.withdraw_multiple}">
+				</div>
+				<div class="withdraw_rule" id="verification_multiple">提现倍数不能为空</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">提现手续费比例%</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="poundage" value="{$withdraw_info.withdraw_poundage}">
+					<p style="margin: 10px 0 0;color: #BBB;">为0表示不收手续费</p>
+				</div>
+				<div class="withdraw_rule" id="verification_poundage">提现手续费不能为空</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">提现提示信息</label>
+				<div class="col-md-4">
+					<textarea name="store_zy" rows="2" id="message"
+						class="form-control" maxlength="50">{$withdraw_info.withdraw_message}</textarea>
+				</div>
+				<div class="withdraw_rule" id="verification_message">提现提示信息不能为空</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:setMemberwithdrawAjax()" class="btn btn-primary">保存</a>
+					<input type="hidden" id="withdraw_id" value="{$withdraw_info.id}">
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+function setMemberwithdrawAjax() {
+	var withdraw_id = $("#withdraw_id").val();
+	var cash_min = $("#cash_min").val();
+	var multiple = $("#multiple").val();
+	var poundage = $("#poundage").val();
+	var message = $("#message").val();
+	if(cash_min == ''){
+		$("#cash_min").focus();
+		$("#verification_cash").show();
+		$("#verification_multiple").hide();
+		$("#verification_poundage").hide();
+		$("#verification_message").hide();
+		return false;
+	}else if(multiple == ''){
+		$("#multiple").focus();
+		$("#verification_cash").hide();
+		$("#verification_multiple").show();
+		$("#verification_poundage").hide();
+		$("#verification_message").hide();
+		return false;
+	}else if(poundage == ''){
+		$("#poundage").focus();
+		$("#verification_cash").hide();
+		$("#verification_multiple").hide();
+		$("#verification_poundage").show();
+		$("#verification_message").hide();
+		return false;
+	}else if(message == ''){
+		$("#message").focus();
+		$("#verification_cash").hide();
+		$("#verification_multiple").hide();
+		$("#verification_poundage").hide();
+		$("#verification_message").show();
+		return false;
+	}
+	$("#verification_cash").hide();
+	$("#verification_multiple").hide();
+	$("#verification_poundage").hide();
+	$("#verification_message").hide();
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Distribution/memberWithdrawSetting",
+		data : {
+			'id':withdraw_id,
+			'cash_min' : cash_min,
+			'multiple' : multiple,
+			'poundage' : poundage,
+			'message' : message
+		},
+		success : function(data) {
+			if (data > 0) {
+				showMessage('success',"提交成功","PLATFORM_MAIN/Distribution/memberWithdrawSetting");
+			} else {
+				showMessage('error',"提交失败");
+			}
+		}
+	});
+}
+</script>
+{/block}

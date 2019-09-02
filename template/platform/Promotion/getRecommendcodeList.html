@@ -1,0 +1,277 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.fa {
+    display: grid;
+   
+}
+</style>
+{/block}
+ {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-4">
+		<a onclick="generatecode()"
+		   class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 生成激活码</a>
+
+		<a onclick="delsendoutcode()"
+		   class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 批量删除已送出</a>
+	</div>
+</div>
+
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+
+					<th>编号</th>
+					<th>激活码</th>
+					<th>状态</th>
+					<th>创建时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} 
+{block name="script"}
+<script type="text/javascript">
+    function sendoutcode(id){
+        $( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+                        type : "post",
+                        url : "PLATFORM_MAIN/Promotion/sendoutcode",
+                        async : true,
+                        data : {
+                            "id" : id
+                        },
+                        success : function(data) {
+                            if(data["code"] > 0 ){
+                                showMessage('success', "操作成功",'PLATFORM_MAIN/Promotion/getRecommendcodeList');
+                            }else{
+                                showMessage('error', "操作失败");
+                            }
+                        }
+                    })
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+
+            },
+            contentText:"你确定要设置改激活码状态为送出吗？",
+            title:"消息提醒"
+        });
+    }
+
+
+    function generatecode(){
+        $( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+                        type : "post",
+                        url : "PLATFORM_MAIN/Promotion/generateCode",
+                        async : true,
+                        data : {
+                            "num" : 20
+                        },
+                        success : function(data) {
+                            if(data["code"] > 0 ){
+                                showMessage('success', "操作成功",'PLATFORM_MAIN/Promotion/getRecommendcodeList');
+                            }else{
+                                showMessage('error', "操作失败");
+                            }
+                        }
+                    })
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+
+            },
+            contentText:"你确定需要生成一批新的激活码吗？",
+            title:"消息提醒"
+        });
+    }
+
+    function takebackcode(id){
+        $( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+                        type : "post",
+                        url : "PLATFORM_MAIN/Promotion/takebackcode",
+                        async : true,
+                        data : {
+                            "id" : id
+                        },
+                        success : function(data) {
+                            if(data["code"] > 0 ){
+                                showMessage('success', "操作成功",'PLATFORM_MAIN/Promotion/getRecommendcodeList');
+                            }else{
+                                showMessage('error', "操作失败");
+                            }
+                        }
+                    })
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+
+            },
+            contentText:"你确定要设置改激活码状态为未送出吗？",
+            title:"消息提醒"
+        });
+    }
+
+
+    function deletecode(id){
+        $( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+                        type : "post",
+                        url : "PLATFORM_MAIN/Promotion/deletecode",
+                        async : true,
+                        data : {
+                            "id" : id
+                        },
+                        success : function(data) {
+                            if(data["code"] > 0 ){
+                                showMessage('success', "操作成功",'PLATFORM_MAIN/Promotion/getRecommendcodeList');
+                            }else{
+                                showMessage('error', "操作失败");
+                            }
+                        }
+                    })
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+
+            },
+            contentText:"你确定要删除激活码吗？",
+            title:"消息提醒"
+        });
+    }
+
+
+    function delsendoutcode(){
+        $( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+                        type : "post",
+                        url : "PLATFORM_MAIN/Promotion/delsendoutcode",
+                        async : true,
+                        data : {
+
+                        },
+                        success : function(data) {
+                            if(data["code"] > 0 ){
+                                showMessage('success', "操作成功",'PLATFORM_MAIN/Promotion/getRecommendcodeList');
+                            }else{
+                                showMessage('error', "操作失败");
+                            }
+                        }
+                    })
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+
+            },
+            contentText:"你确定要删除激活码吗？",
+            title:"消息提醒"
+        });
+    }
+$(function(){
+	LoadingInfo(1);
+});
+function LoadingInfo(pageIndex) {
+    var search_text = $("#search_text").val();
+    $.ajax({
+        type : "post",
+        url : "PLATFORM_MAIN/Promotion/getRecommendcodeList",
+        async : true,
+        data : {
+            "pageIndex" : pageIndex, "status" : status
+        },
+        success : function(data) {
+
+
+            $("#total_count_num").text(data["total_count"]);
+            $("#page_count_num").text(data["page_count"]);
+            $("#page_count").val(data["page_count"]);
+            $("#pageNumber a").remove();
+            var html = '';
+            if (data["data"].length > 0) {
+                for (var i = 0; i < data["data"].length; i++) {
+                    var status = parseInt(data['data'][i]['status']);
+
+                    switch(status){
+                        case 0:
+                            var status_name = '未使用';
+                            break;
+                        case 1:
+                            var status_name = '已送出';
+                            break;
+                        case 2:
+                            var status_name = '已使用';
+                            break;
+
+                    }
+                    html += '<tr >';
+                    html += '<td>' + data["data"][i]["id"] + '</td>';;
+                    html += '<td>' + data["data"][i]["code"] + '</td>';;
+                    html += '<td>'+ status_name +'</td>';
+
+                    html += '<td>' + data["data"][i]["createtime"]  + '</td>';
+
+                    html += '<td>';
+
+                    if(status == 0)
+					{
+                        html += '<a href="javascript:void(0);"onclick="sendoutcode('+data["data"][i]["id"]+')">送出</a>&nbsp;';
+					}
+					else  if(status == 1)
+					{
+                        html += '<a href="javascript:void(0);"onclick="takebackcode('+data["data"][i]["id"]+')">收回</a>&nbsp;';
+					}
+
+                    html += '<a href="javascript:void(0);"onclick="deletecode('+data["data"][i]["id"]+')">删除</a>&nbsp;';
+
+                    html += '</td>';
+                    html += '</tr>';
+                }
+            } else {
+                html += '<tr align="center"><th colspan="7">暂无符合条件的数据记录</th></tr>';
+            }
+            $("#list").html(html);
+            var totalpage = $("#page_count").val();
+            if (totalpage == 1) {
+                changeClass("all");
+            }
+            var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+            $("#pageNumber").append($html);
+
+
+        }
+    });
+}
+
+</script>
+{/block}

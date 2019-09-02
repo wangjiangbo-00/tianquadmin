@@ -1,0 +1,93 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+	.chairs-css{color: #999;height:18px;line-hegiht:18px;margin-bottom:0;}
+	.search-css{float:right;}
+	.button-css{border-radius:0;border:1px solid #aaa;height:24px;background-color:#e8e8e8;}
+</style>
+{/block}
+{block name="main"} 
+            <div class="row">
+              <div class="col-md-12">
+               <p class="chairs-css">今日新增会员：{$user_today_num}&nbsp;|&nbsp;本月新增会员：{$user_month_num}&nbsp;|&nbsp;会员总数：{$user_count_num}</p>
+                <section class="panel panel-default">
+                  <header class="panel-heading font-bold">
+                  新增会员
+                  <div class="search-css">
+                  	注册时间：
+					<input type="text" id="startDate" class="input-medium" placeholder="请选择开始日期" onclick="WdatePicker()" value="{$start_date}"/>
+					&nbsp;-&nbsp;
+					<input type="text" id="endDate" placeholder="请选择结束日期" class="input-medium" onclick="WdatePicker()"value="{$end_date}" />
+                  	<input class="button-css"type="button" onclick="showCharts()" value="搜索" />
+                  </div>
+                  
+                  </header>
+                  <div class="panel-body">
+                    <div id="container" style="height:210px"></div>
+                  </div>                
+                </section>
+              </div>
+            </div>
+{/block}
+{block name="script"}            
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script>
+<script src="__STATIC__/js/highcharts.js"></script>
+<script src="__STATIC__/js/exporting.js"></script>           
+<script>
+$(function(){
+	
+	showCharts();
+}) 
+//显示统计图
+function  showCharts(){
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/statistics/getmembermonthcount",
+		async : true,
+		data:{"start_date":$("#startDate").val(),"end_date":$("#endDate").val()},
+		success : function(data) {
+			//alert(JSON.stringify(data));
+			var chart = new Highcharts.Chart('container', {
+				
+			    title: {
+			        text: '会员新增趋势',
+			        x: -20
+			    },
+			   
+			    xAxis: {
+			        categories: data[0],
+			        tickInterval:5
+			    },
+			    yAxis: {
+			        title: {
+			            text: '人数'
+			        },
+			        plotLines: [{
+			            value: 0,
+			            width: 1,
+			            color: '#808080'
+			        }]
+			    },
+			    credits:{
+			        enabled:false // 禁用版权信息
+			    },	
+			    tooltip: {
+			        valueSuffix: '人'
+			    },
+			    legend: {
+			        layout: 'vertical',
+			        align: 'right',
+			        verticalAlign: 'middle',
+			        borderWidth: 0
+			    },
+			    series: [{
+			        name: '新增会员',
+			        data: data[1]
+			    }]
+			});	
+		}
+	});
+	
+}
+</script>
+{/block}

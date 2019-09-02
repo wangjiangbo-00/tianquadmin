@@ -1,0 +1,59 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 积分奖励设置 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="user_form" name="form" action="javascript:;">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">签到送积分</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="sign_point" name="admin_name" value="{$res.sign_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">分享送积分</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="share_point" name="admin_name" value="{$res.share_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">会员注册送积分</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="reg_member_self_point" name="admin_name" value="{$res.reg_member_self_point}" required onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button type="submit" class="btn btn-primary" onclick="setRewardRuleAjax();">保存</button>	
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+	function setRewardRuleAjax(){
+		var sign_point = $("#sign_point").val();
+		var share_point = $("#share_point").val();
+		var reg_member_self_point = $("#reg_member_self_point").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Bonuses/indexFx1",
+			data : {
+				"sign_point" : sign_point,
+				"share_point" : share_point,
+				"reg_member_self_point" : reg_member_self_point
+			},
+			success : function(data){
+				if(data['code']>0){
+					location.reload();
+				}else{
+					showMessage("error", "设置失败！");
+				}
+			}
+		})
+	}
+</script>
+{/block}

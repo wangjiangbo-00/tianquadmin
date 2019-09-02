@@ -1,0 +1,152 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加广告 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">广告名称</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="adv_title" value="">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">所属广告位</label>
+				<div class="col-md-4">
+					<select id="ap_id" name="account" class="form-control m-b">
+					{volist name="$platform_adv_position_list" id="vo"}
+						<option value="{$vo['ap_id']}" {if condition="$ap_id eq $vo['ap_id']"}selected{/if}>{$vo['ap_name']}</option>
+					{/volist}
+					</select>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">广告图片</label>
+				<div class="col-md-4">
+					<p><img id="imgLogo" src="" class="imglogo"/></p>
+                                            	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                                            		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+                                            		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+														id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+														onchange="imgUpload(this);"> 
+														<input type="hidden" id="Logo" value="" />
+													</span>
+													<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+												</a>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">背景色</label>
+				<div class="col-md-1">
+						<input id="colorpicker"/>
+<!-- 					<input type="color" class="form-control" id="background" value="#FFFFFF"> -->
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">链接地址</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="adv_url" value="">
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">排序</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="slide_sort" value="">
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="addPlatformAdvAjax()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+
+<script>	
+$(function (){
+	$("#colorpicker").spectrum({
+	    color: "#f00",
+	    showInput: true,
+		preferredFormat: true,
+		showPalette: true,
+	});	
+});
+
+	/**
+	*添加广告位
+	*/
+	function addPlatformAdvAjax() {
+		var adv_title = $("#adv_title").val();
+		var ap_id = $("#ap_id").val();
+		var adv_image = $("#Logo").val();
+		var adv_url = $("#adv_url").val();
+		var slide_sort = $("#slide_sort").val();
+		var background = $("#colorpicker").val();
+//  		verify(ad_image, link_url);
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/config/addplatformadv",
+			data : {
+				'adv_title' : adv_title,
+				'ap_id' : ap_id,
+				'adv_image' : adv_image,
+				'adv_url' : adv_url,
+				'slide_sort' : slide_sort,
+				'background' : background
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', "添加成功",'PLATFORM_MAIN/config/platformadvlist?ap_id='+ap_id);
+				}else{
+					showMessage('error', "添加失败");
+				}
+			}
+		});
+	}
+	/**
+	*模块输入信息验证
+	*/
+	function verify( ad_image,link_url){
+		if(ad_image == ''){
+			$("#ad_image").parent().next().show();
+			return flase;
+		}else{
+			$(".error").hide();
+		}
+		if(link_url == ''){
+			$("#link_url").parent().next().show();
+			return flase;
+		}else{
+			$(".error").hide();
+		}
+	}
+	/**
+	 *图片上传
+	 */
+// 	function imgUpload(event) {
+// 		var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+// 		fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+// 	}
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

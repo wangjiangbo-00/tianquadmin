@@ -1,0 +1,123 @@
+{extend name="platform/base" /}
+{block name="main"}
+<div class="row padder-v">
+                <div class="col-sm-12">
+  <a href="PLATFORM_MAIN/Config/addHelpClass" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加帮助类型</a>
+                </div>
+              </div>
+<section class="panel panel-default">
+              <div class="table-responsive">
+                <table class="table table-striped b-t b-light text-sm">
+                  <thead>
+                    <tr>
+                      <th width="20"><input type="checkbox"></th>
+                      <th width="80">排序</th>
+                      <th>类型名称 </th>
+                      <th class="center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="list">
+                    <tr></tr>
+                  </tbody>
+                </table>
+              </div>
+              {include file="platform/page" /}
+            </section>
+
+{/block}
+{block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/config/helpclass",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['class_id']+'"></td>';
+						html += '<td><input class="form-control" type="text" value="' + data["data"][i]["sort"] + '"  id="sort'+i+'"   onchange="load('+data["data"][i]["id"]+','+i+','+data["data"][i]["class_id"]+')"></td>';
+						html += '<td><input class="form-control" type="text" value="' + data["data"][i]["class_name"] + '"  id="class_name'+i+'" fieldid='+ data['data'][i]['id']+'  onchange="load('+data["data"][i]["id"]+','+i+','+data["data"][i]["class_id"]+')"></td>';
+						html += '<td class="center">';
+						html += '<a href="javascript:void(0);" onclick="help_delete('+data['data'][i]['class_id']+');">删除</a>';
+// 						html += ' <a href="PLATFORM_MAIN/config/helpdocument">内容</a></td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="6">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}	
+	/*
+	*删除
+	*/
+	function help_delete(id){
+		$( "#dialog" ).dialog({
+	        buttons: {
+	            "确定": function() {
+	                $(this).dialog('close');
+	                $.ajax({
+	        			type : "post",
+	        			url: "PLATFORM_MAIN/config/classdelete",
+	        			async : true,
+	        			data: { "id": id },
+	        			success : function(data) {
+	        				if(data["code"] > 0 ){
+	        					showMessage('success', data["message"],'PLATFORM_MAIN/config/helpclass');
+	        				}else{
+	        					showMessage('error', data["message"]);
+	        				}
+	        			}
+	        		});
+	            },
+	            "取消,#e57373": function() {
+	                $(this).dialog('close');
+	            }
+	        },
+	        contentText:"你确定删除该类型吗？",
+	        title:"消息提醒"
+	    });
+	}
+	/*
+	*修改input值
+	*/
+	function load(id,index,class_id){
+		var class_name = $("#class_name"+index).val();
+		var sort = $("#sort"+index).val();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/config/updateclass",
+			data:{'id':id,'class_name':class_name,'sort':sort,"class_id":class_id},
+			async:true,
+			success: function (data) {
+				//alert(JSON.stringify(data));
+				if(data <= 0){
+					showMessage('error', data['message']);
+				}
+			}
+		});
+	}
+	
+</script>
+{/block}

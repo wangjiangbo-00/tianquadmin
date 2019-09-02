@@ -1,0 +1,82 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+
+</style>
+
+{/block}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> seo设置 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">标题副加字</label>
+				<div class="col-md-4" style="width:80%;">
+					<input type="text" class="form-control" id="title" value="{$info.seo_title}" style="width:30%;">
+				</div>
+				<p class="col-sm-4" style="margin-left: 200px;margin-top: 10px;color: #BBB;width:100%;">网页标题通常是搜索引擎关注的重点，本附加字设置出现在标题中商城名称后，如有多个关键字，建议用分隔符分隔</p>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">商城关键字</label>
+				<div class="col-md-4" style="width:80%;">
+					<input type="text" class="form-control" id="meta" value="{$info.seo_meta}" style="width:30%;">
+				</div>
+				<p class="col-sm-4" style="margin-left: 200px;margin-top: 10px;color: #BBB;width:100%;">Keywords项出现在页面头部的标签中，用于记录本页面的关键字，多个关键字请用分隔符分隔</p>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">关键词描述</label>
+				<div class="col-md-4" style="width:80%;">
+					<input type="text" class="form-control" id="desc" value="{$info.seo_desc}" style="width:30%;">
+				</div>
+				<p class="col-sm-4" style="margin-left: 200px;margin-top: 10px;color: #BBB;width:100%;">Description出现在页面头部的Meta标签中，用于记录本页面的摘要与描述，建议不超过80个字</p>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">其他页头信息</label>
+				<div class="col-md-4" style="width:80%;">
+					<textarea style="width:300px;height:100px;border-color:#d9d9d9;" id="other">{$info.seo_other}</textarea>
+				</div>
+				<p class="col-sm-4" style="margin-left: 200px;margin-top: 10px;color: #BBB;width:100%;">如需在中添加其他的HTML代码，可以使用本设置，否则请留空</p>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="setConfigAjax()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+
+	function setConfigAjax(){
+		var title = $('#title').val();
+		var meta = $("#meta").val();
+		var desc = $("#desc").val();
+		var other = $("#other").val();
+		$.ajax({
+			type:"post",
+			url : "PLATFORM_MAIN/config/seoconfig",
+			async : true,
+			data : {
+				"seo_title" : title,
+				"seo_meta" : meta,
+				"seo_desc" : desc,
+				"seo_other" : other
+			},
+			success : function(data){
+				if(data['code'] > 0)
+					{
+						showMessage('success', data["message"]);
+						location.href="PLATFORM_MAIN/config/seoconfig";
+					}else{
+						showMessage('error', data["message"]);
+					}
+			}
+		})
+	}
+</script>
+{/block}

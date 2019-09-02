@@ -1,0 +1,157 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 编辑友情链接 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label"><span style="color:red;margin-right:10px;">*</span>名称</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="link_title" value="{$link_info['link_title']}">
+				</div>
+				<p class="error" style="display:none;color:red;">请输入名称</p>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">图片</label>
+				<div class="col-md-10">
+					<p>
+					{if condition="$link_info['link_pic'] eq ''"}
+					<img id="imgLogo" src="" class="imglogo"/>
+					{else/}
+					<img id="imgLogo" src="__UPLOAD__/{$link_info['link_pic']}" class="imglogo"/>
+					{/if}
+					</p>
+                                            	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                                            		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+                                            		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+														id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+														onchange="imgUpload(this);"> 
+														<input type="hidden" id="Logo" value="{$link_info['link_pic']}" />
+													</span>
+													<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+												</a>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">是否新窗口打开</label>
+				<div class="col-md-4">
+					 <label for="navigationtype1"><input type="radio" value="1" name="navigationtype" id="navigationtype1" {if condition="$link_info.is_blank eq 1"}checked{/if}/>是</label>
+			         <label for="navigationtype2"><input type="radio" value="0" name="navigationtype" id="navigationtype2" {if condition="$link_info.is_blank eq 0"}checked{/if}/>否</label>
+				</div>
+			</div>
+            
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">是否显示</label>
+				<div class="col-md-4">
+					 <label for="showtype1"><input type="radio" value="1" name="showtype" id="showtype1" {if condition="$link_info.is_show eq 1"}checked{/if}/>是</label>
+		   			 <label for="showtype2"><input type="radio" value="0" name="showtype" id="showtype2" {if condition="$link_info.is_show eq 0"}checked{/if}/>否</label>
+				</div>
+			</div>
+            
+            <div class="line line-dashed line-lg pull-in"></div> 
+            <div class="form-group">
+				<label class="col-sm-2 control-label">链接地址</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="link_url" value="{$link_info['link_url']}">
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">排序</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="link_sort" value="{$link_info['link_sort']}">
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<input type="hidden" id="link_id" value="{$link_info['link_id']}">
+					<a href="javascript:void(0);" onclick="updateLinkAjax()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+	/**
+	*模块输入信息验证
+	*/
+/* 	function verify( ad_image,link_url){
+		if(ad_image == ''){
+			$("#ad_image").parent().next().show();
+			return flase;
+		}else{
+			$(".error").hide();
+		}
+		if(link_url == ''){
+			$("#link_url").parent().next().show();
+			return flase;
+		}else{
+			$(".error").hide();
+		}
+	} */
+	/**
+	*修改模块
+	*/
+	function updateLinkAjax() {
+		var link_id = $("#link_id").val();
+		var link_title = $("#link_title").val();
+		var link_pic = $("#Logo").val();
+		var link_url = $("#link_url").val();
+		var link_sort = $("#link_sort").val();
+		var is_blank = $("input[name='navigationtype']:checked").val();
+		var is_show = $("input[name='showtype']:checked").val();
+		if(link_title.length == 0){
+			$("#link_title").focus();
+			$("#link_title").parent().next(".error").show();
+			return false;
+		}else{
+			$(".error").hide();
+		}
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/config/updatelink",
+			data : {
+				'link_id' : link_id,
+				'link_title' : link_title,
+				'link_pic' : link_pic,
+				'link_url' : link_url,
+				'link_sort' : link_sort,
+				'is_blank' : is_blank,
+				'is_show' : is_show
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', "编辑成功",'PLATFORM_MAIN/config/linklist');
+				}else{
+					showMessage('error', "编辑失败");
+				}
+			}
+		});
+	}
+	/**
+	 *图片上传
+	 */
+// 	function imgUpload(event) {
+// 		var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+// 		fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+// 	}
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

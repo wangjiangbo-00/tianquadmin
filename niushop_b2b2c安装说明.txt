@@ -1,0 +1,87 @@
+Niushop商城系统 - 团队十年电商经验汇集巨献!
+
+
+1、非授权用户严禁去除Niushop相关的版权信息，仅限个人使用，禁止商用。
+
+
+2、请尊重Niushop开发人员劳动成果，严禁使用本系统转卖、销售或二次开发后转卖、销售等商业行为！
+
+3、请关注Niushop官方网址了解产品最新咨询、功能升级、BUG修复。
+
+Niushop官方网址: http://www.niushop.com.cn
+
+由于此版本是公测版本，里面有测试数据供大家测试，因此不进行安装程序
+
+
+Niushop安装环境：
+
+1、PHP5.4版本以上，支持PHP7.0
+
+2、支持rewrite伪静态规则
+
+3、支持php扩展：php_curl,php_gd2
+
+
+使用说明：
+
+
+1. 将程序中的niushop_b2b2c.sql导入数据库中
+
+2. 配置数据库，数据库配置文件在application/database.php
+
+3. 配置upload目录  将upload文件夹以及子项文件及配置成777权限
+
+4. 公测版测试账号：
+	
+	平台端：
+
+	http://域名/index.php/platform     账号admin   密码123456    配置伪静态后 ：http://域名/platform
+
+	店铺后台：
+	
+  	http://域名/index.php/admin  配置伪静态后:   http://域名/index.php/admin
+     
+	 账号：官方旗舰店:  admin 123456
+
+		海尔专卖店:  lg  123456
+
+		乔丹旗舰店：qd  123456
+                                           
+		苏泊尔专卖店: sbr  123456
+
+伪静态环境配置：
+    
+	[ Apache ]
+	1. httpd.conf配置文件中加载了mod_rewrite.so模块
+	2. AllowOverride None 将None改为 All
+	
+	
+	[ IIS ]
+	如果你的服务器环境支持ISAPI_Rewrite的话，可以配置httpd.ini文件，添加下面的内容：
+	RewriteRule (.*)$ /index\.php\?s=$1 [I]
+	在IIS的高版本下面可以配置web.Config，在中间添加rewrite节点：
+	<rewrite>
+	<rules>
+	<rule name="OrgPage" stopProcessing="true">
+	<match url="^(.*)$" />
+	<conditions logicalGrouping="MatchAll">
+	<add input="{HTTP_HOST}" pattern="^(.*)$" />
+	<add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+	<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+	</conditions>
+	<action type="Rewrite" url="index.php/{R:1}" />
+	</rule>
+	</rules>
+	</rewrite>
+	
+	[nginx]
+	在Nginx低版本中，是不支持PATHINFO的，但是可以通过在Nginx.conf中配置转发规则实现：
+	location / {
+            if (!-e $request_filename) {
+                rewrite  ^(.*)$  /index.php?s=$1  last;  
+                break;
+            }
+        }
+
+	
+            

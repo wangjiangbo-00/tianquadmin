@@ -1,0 +1,98 @@
+{extend name="platform/base" /} {block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加商品分类 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="goods_category_form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">商品分类名称</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="category_name" name="category_name" required value="">
+				</div>
+				<label class="col-md-8 error" for="category_name"></label>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">分类图片</label>
+				<div class="col-md-10">
+					<p><img id="imgLogo" src="" class="imglogo"/></p>
+					<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                              		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;">
+			                                   		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+														   id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+														   onchange="imgUpload(this);">
+								<input type="hidden" id="Logo" value="" />
+							 </span>
+						<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+					</a>
+				</div>
+			</div>
+
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button type="submit" class="btn btn-primary">保存</button>
+<!-- 					<a href="javascript:void(0);" onclick="addGoodsCategoryAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+	$().ready(function() {
+		$("#goods_category_form").validate({
+			submitHandler : function() {
+				addQueryCategoryAjax();
+			}
+		});
+	});
+	/**
+	 *添加模块
+	 */
+	function addQueryCategoryAjax() {
+		var category_name = $("#category_name").val();
+
+        var logo = $("#Logo").val();
+
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/query/addQuestionCategory",
+			data : {
+				'name' : category_name,
+				'logo':logo,
+
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],'PLATFORM_MAIN/query/querycategorylist');
+				} else {
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+	/**
+	 *图片上传
+	 */
+/* 	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var str = $(event).next().attr("id");
+		fileCommonUpload("UPLOAD_URL", fileid, "__UPLOAD__", str);
+	} */
+	/**
+	 *图片上传
+	 */
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src",res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

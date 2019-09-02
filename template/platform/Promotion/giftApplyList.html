@@ -1,0 +1,312 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<link rel="stylesheet" type="text/css" href="ADMIN_CSS/member_list.css" />
+<style>
+	/* .adduserinfo{
+        background: #65bd77;
+        border: 0;
+        color: #fff;
+        line-height: 30px;
+    } */
+	.tdheader{
+		min-width: 100px;
+	}
+	#lotterypic{
+		width: 60px;
+		height: 60px;
+	}
+</style>
+
+{/block}
+
+{block name="main"}
+
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+
+					<th>抽奖标题</th>
+					<th>商品名称</th>
+					<th>商品图片</th>
+					<th>店铺名称</th>
+					<th>有效时间</th>
+					<th>活动状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} 
+{block name="script"}
+<script type="text/javascript">
+
+    var giftlist = [];
+    function agreeGift(giftid){
+        $( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+                        type : "post",
+                        url : "PLATFORM_MAIN/Promotion/agreegift",
+                        async : true,
+                        data : {
+                            "giftid" : giftid
+                        },
+                        success : function(data) {
+                            if(data["code"] > 0 ){
+                                showMessage('success', "操作成功",'PLATFORM_MAIN/Promotion/giftApplyList');
+                            }else{
+                                showMessage('error', "操作失败");
+                            }
+                        }
+                    })
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+
+            },
+            contentText:"你确定同意吗？",
+            title:"消息提醒"
+        });
+    }
+
+    function disagreeGift(giftid){
+        $( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+                        type : "post",
+                        url : "PLATFORM_MAIN/Promotion/disagreegift",
+                        async : true,
+                        data : {
+                            "giftid" : giftid
+                        },
+                        success : function(data) {
+                            if(data["code"] > 0 ){
+                                showMessage('success', "操作成功",'PLATFORM_MAIN/Promotion/giftApplyList');
+                            }else{
+                                showMessage('error', "操作失败");
+                            }
+                        }
+                    })
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+
+            },
+            contentText:"你确定拒绝吗？",
+            title:"消息提醒"
+        });
+    }
+$(function(){
+	LoadingInfo(1);
+});
+function LoadingInfo(pageIndex) {
+    var search_text = $("#search_text").val();
+    $.ajax({
+        type : "post",
+        url : "PLATFORM_MAIN/Promotion/giftApplyList",
+        async : true,
+        data : {
+            "pageIndex" : pageIndex, "search_text" : search_text
+        },
+        success : function(data) {
+
+
+            $("#total_count_num").text(data["total_count"]);
+            $("#page_count_num").text(data["page_count"]);
+            $("#page_count").val(data["page_count"]);
+            $("#pageNumber a").remove();
+            var html = '';
+            if (data["data"].length > 0) {
+                giftlist = data["data"];
+                for (var i = 0; i < data["data"].length; i++) {
+                    var status = parseInt(data['data'][i]['status']);
+
+                    switch(status){
+                        case 0:
+                            var status_name = '未发布';
+                            break;
+                        case 1:
+                            var status_name = '申请上架中';
+                            break;
+                        case 2:
+                            var status_name = '申请成功';
+                            break;
+                        case 3:
+                            var status_name = '申请失败';
+                            break;
+                        case 4:
+                            var status_name = '展示中';
+                            break;
+                        case 5:
+                            var status_name = '已开始';
+                            break;
+
+                        case 6:
+                            var status_name = '已开奖';
+                            break;
+
+                        case 7:
+                            var status_name = '已结束';
+                            break;
+                    }
+                    html += '<tr >';
+                    html += '<td>' + data["data"][i]["gift_name"] + '</td>';;
+                    html += '<td>' + data["data"][i]["goods_name"] + '</td>';;
+                    html += '<td>' + data["data"][i]["goods_picture"] + '</td>';;
+                    html += '<td>' + data["data"][i]["ownername"] + '</td>';;
+                    html += '<td>' + data["data"][i]["start_time"] + ' 至 ' + data["data"][i]["end_time"] + '</td>';
+                    html += '<td>'+ status_name +'</td>';
+                    html += '<td>';
+
+                    html += '<a href="javascript:void(0);"onclick="agreeGift('+data["data"][i]["gift_id"]+')">同意</a>&nbsp;';
+                    html += '<a href="javascript:void(0);"onclick="disagreeGift('+data["data"][i]["gift_id"]+')">拒绝</a>&nbsp;';
+                    html += '<a href="javascript:void(0);"onclick="giftInfo('+i+')">详情</a>&nbsp; ';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+            } else {
+                html += '<tr align="center"><th colspan="7">暂无符合条件的数据记录</th></tr>';
+            }
+            $("#list").html(html);
+            var totalpage = $("#page_count").val();
+            if (totalpage == 1) {
+                changeClass("all");
+            }
+            var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+            $("#pageNumber").append($html);
+
+
+        }
+    });
+}
+
+
+    function giftInfo(index){
+
+
+        var lottery = giftlist[index];
+
+        if(lottery)
+        {
+            $("#giftInfo").modal("show");
+            $("#gift_name").text(lottery["gift_name"]);
+            $("#time").text(lottery['start_time']+' 至 '+lottery['end_time']);
+            var mode = parseInt(lottery["mode"]);
+            var modestr = "";
+            if(mode == 1)
+            {
+                modestr = "定时开奖";
+            }
+            else if(mode == 2)
+            {
+                modestr = "手气抽奖";
+            }
+            else if(mode == 3)
+            {
+                modestr = "助力抽奖";
+            }
+            else if(mode == 4)
+            {
+                modestr = "满人抽奖";
+            }
+            else if(mode == 5)
+            {
+                modestr = "手动抽奖";
+            }
+
+
+            $("#mode").text(modestr);
+            $("#parms").text(lottery["parms"]);
+            $("#max_num").text(lottery["max_num"]+"件");
+            $("#instruction").text(lottery["goods_name"]);
+
+            $("#lotterypic").attr("src",lottery["goods_picture"]);
+            $("#remarks").text(lottery["remarks"]);
+
+            $("#user_propagate").text(lottery["user_propagate"]);
+
+        }
+        else
+        {
+            showMessage('error', "未找到抽奖信息");
+        }
+
+    }
+
+</script>
+
+<div class="modal" id="giftInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel">赠品详情</h4>
+			</div>
+			<div class="modal-body">
+				<div class="modal-infp-style">
+					<table>
+						<tr>
+							<td>抽奖名称</td>
+							<td id="gift_name"></td>
+						</tr>
+						<tr>
+							<td>有效期</td>
+							<td id="time"></td>
+						</tr>
+						<tr>
+							<td>开奖方式</td>
+							<td id="mode"></td>
+						</tr>
+
+						<tr>
+							<td>开奖参数</td>
+							<td id="parms"></td>
+						</tr>
+						<tr>
+							<td>奖品数量</td>
+							<td id="max_num"></td>
+						</tr>
+
+						<tr>
+							<td>奖品说明</td>
+							<td id="instruction"></td>
+						</tr>
+
+						<tr>
+							<td>开奖备注</td>
+							<td id="remarks"></td>
+						</tr>
+
+						<tr>
+							<td>奖品图片</td>
+							<td ><img src="" id="lotterypic" /></td>
+						</tr>
+
+
+						<tr>
+							<td class="tdheader">推广信息</td>
+							<td id="user_propagate"></td>
+						</tr>
+
+					</table>
+
+				</div>
+			</div>
+			<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button></div>
+		</div>
+	</div>
+</div>
+{/block}

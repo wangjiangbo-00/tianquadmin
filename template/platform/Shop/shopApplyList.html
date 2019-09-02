@@ -1,0 +1,132 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9"></div>
+	<div class="col-sm-2">
+		<div class="input-group">
+			<input type="text" id="search_text" class="input-sm form-control"
+				placeholder="请输入店铺名称">
+		</div>
+	</div>
+	<div class="col-sm-1">
+		<button class="btn btn-sm btn-default" type="button"
+			onclick="LoadingInfo(1)">搜索</button>
+	</div>
+</div>
+<section class="panel panel-default">
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+				<th width="20"><input type="checkbox"></th>
+				<th class="center">用户名</th>
+				<th class="center">店铺名称</th>
+				<th class="center">店铺类型</th>
+				<th class="center">状态</th>
+				<th class="center">开店时长</th>
+				<th class="center">操作</th>
+			</tr>
+		</thead>
+		<tbody id="list">
+			<tr></tr>
+		</tbody>
+	</table>
+	{include file="platform/page" /}
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Shop/shopApplyList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['shop_id']+'"></td>';
+// 						html += '<td class="center">' + data["data"][i]["user_name"] + '</td>';
+						
+						
+						if(data["data"][i]["user_headimg"] ==""){
+							html += '<td class="center"><img src="__STATIC__/images/default_user_portrait.gif" class="head-portrait" style="border-radius: 50%;"/><br/>'+data["data"][i]["real_name"]+'</td>';
+						}else{
+							html += '<td class="center"><img src="__UPLOAD__/'+data["data"][i]["user_headimg"]+'" class="head-portrait" style="border-radius: 50%;"/><br/>'+data["data"][i]["real_name"]+'</td>';
+						}
+						
+						
+						html += '<td class="center">' + data["data"][i]["shop_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["shop_type_name"] + '</td>';
+						if(data["data"][i]['apply_state'] == 1){
+							html += '<td class="center" style="color:#ffc333;">已提交申请</td>';
+						}else if(data["data"][i]['apply_state'] == 2){
+							html += '<td class="center" style="color:green;">审核通过</td>';
+						}else if(data["data"][i]['apply_state'] == -1){
+							html += '<td class="center" style="color:red;">审核失败</td>';
+						}
+						html += '<td class="center">'+ data["data"][i]['apply_year']+'年</td>';
+						if(data["data"][i]['apply_state'] == 1){
+							html += '<td class="center"><a href="PLATFORM_MAIN/shop/shopVerify?id='+ data["data"][i]['apply_id']+'">查看</a>&nbsp;&nbsp;<a href="javascript:void(0);" onclick="save(1,'+ data["data"][i]['apply_id']+')">通过</a>&nbsp;&nbsp;<a href="javascript:void(0);" onclick="save(2,'+ data["data"][i]['apply_id']+')">拒绝</a></td>';
+						}else if(data["data"][i]['apply_state'] == 2){
+							html += '<td class="center"><a href="PLATFORM_MAIN/shop/shopVerify?id='+ data["data"][i]['apply_id']+'">查看</a></td>';
+						}else if(data["data"][i]['apply_state'] == -1){
+							html += '<td class="center"><a href="PLATFORM_MAIN/shop/shopVerify?id='+ data["data"][i]['apply_id']+'">查看</a></td>';
+						}
+
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="8">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}	
+	function save(type,apply_id){
+		  if(type == 1){
+			  type = 'agree';
+		  }else if(type == 2){
+			  type = 'disagree';
+		  }else{
+			  return false;
+		  }
+		      $.ajax({
+		    	  type:"post",
+		    	  url:"PLATFORM_MAIN/Shop/ajax_shopVerify",
+		    	  data:{'apply_id':apply_id,'type':type},
+		    	  async : true,
+		    	  success:function(data){
+		    		  //alert(JSON.stringify(data)); 
+		    		  if (data["code"] > 0) {
+							showMessage('success', data["message"], 'PLATFORM_MAIN/Shop/shopApplyList');
+					  }else{
+							showMessage('error', data["message"]);
+						   } 
+		    	  }
+		      })
+	  }
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+</script>
+{/block}

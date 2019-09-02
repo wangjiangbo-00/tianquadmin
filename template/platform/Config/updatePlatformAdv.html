@@ -1,0 +1,158 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 编辑广告位 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">广告名称</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="adv_title" value="{$adv_info['adv_title']}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">所属广告位</label>
+				<div class="col-md-4">
+					<select id="ap_id" name="account" class="form-control m-b">
+					{volist name="$platform_adv_position_list" id="vo"}
+						<option value="{$vo['ap_id']}" {if condition="$adv_info['ap_id'] eq $vo['ap_id']"}selected{/if}>{$vo['ap_name']}</option>
+					{/volist}
+					</select>
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">广告图片</label>
+				<div class="col-md-10">
+					<p>
+					{if condition="$adv_info['adv_image'] eq ''"}
+					  <img id="imgLogo" src="" class="imglogo"/>
+					{else/}
+					  <img id="imgLogo" src="__UPLOAD__/{$adv_info['adv_image']}" class="imglogo"/>
+					{/if}
+					</p>
+                                            	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                                            		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+                                            		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+														id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+														onchange="imgUpload(this);"> 
+														<input type="hidden" id="Logo" value="{$adv_info['adv_image']}" />
+													</span>
+													<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+												</a>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">背景色</label>
+				<div class="col-md-1">
+<!-- 					<input id="colorpicker" value="{$adv_info['background']}"/> -->
+					<input type="color" class="form-control" id="colorpicker" value="{$adv_info['background']}">
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">链接地址</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="adv_url" value="{$adv_info['adv_url']}">
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label">排序</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="slide_sort" value="{$adv_info['slide_sort']}">
+				</div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+				<input type="hidden" id="adv_id" value="{$adv_info['adv_id']}">
+					<a href="javascript:void(0);" onclick="updatePlatformAdvAjax()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+$(function (){
+	$("#colorpicker").spectrum({
+	    color: "{$adv_info['background']}",
+	    showInput: true,
+	    preferredFormat: true,
+	    showPalette: true,
+	});	
+});
+	/**
+	*模块输入信息验证
+	*/
+	function verify( ad_image,link_url){
+		if(ad_image == ''){
+			$("#ad_image").parent().next().show();
+			return flase;
+		}else{
+			$(".error").hide();
+		}
+		if(link_url == ''){
+			$("#link_url").parent().next().show();
+			return flase;
+		}else{
+			$(".error").hide();
+		}
+	}
+	/**
+	*修改模块
+	*/
+	function updatePlatformAdvAjax() {
+		var	adv_id = $("#adv_id").val();
+		var adv_title = $("#adv_title").val();
+		var ap_id = $("#ap_id").val();
+		var adv_image = $("#Logo").val();
+		var adv_url = $("#adv_url").val();
+		var slide_sort = $("#slide_sort").val();
+		var background = $("#colorpicker").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/config/updateplatformadv",
+			data : {
+				'adv_id' : adv_id,
+				'adv_title' : adv_title,
+				'ap_id' : ap_id,
+				'adv_image' : adv_image,
+				'adv_url' : adv_url,
+				'slide_sort' : slide_sort,
+				'background' : background
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', "编辑成功",'PLATFORM_MAIN/config/platformadvlist?ap_id='+ap_id);
+				}else{
+					showMessage('error', "编辑失败");
+				}
+			}
+		});
+	}
+	/**
+	 *图片上传
+	 */
+// 	function imgUpload(event) {
+// 		var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+// 		fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+// 	}
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

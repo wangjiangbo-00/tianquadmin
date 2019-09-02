@@ -1,0 +1,182 @@
+{extend name="platform/base" /} {block name="main"}
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="10"><input type="checkbox"></th>
+					<th class="center">编号</th>
+					<th class="center">招商员信息</th>
+					<th class="center">会员信息</th>
+					<th class="center">招商员等级</th>
+					<th class="center">上级招商员</th>
+					<th class="center">支付金额</th>
+					<th class="center">状态</th>
+					<th class="center">支付类型</th>
+					<th class="center">创建时间</th>
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="refusal_box" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">拒绝理由</h4>
+            </div>
+            <div class="modal-body">
+            <input type="hidden" value="" id="apply_id"/>
+            	<div>
+            	<span>拒接理由</span>
+            		<textarea id="refusal" class="refusal_textarea" style="width:400px;height:100px;"></textarea>
+            	</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="refusalApply();">提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Assistant/businessAssistantApplyList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+// 				document.write(JSON.stringify(data));
+// 				alert(JSON.stringify(data));
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						if(data["data"][i]["audit"] == 0){
+							$audit_name = '已申请待支付';
+						}else if(data["data"][i]["audit"] == 1){
+							$audit_name = '已审核';
+						}else if(data["data"][i]["audit"] == 2){
+							$audit_name = '已支付';
+						}else if(data["data"][i]["audit"] == -1){
+							$audit_name = '锁定';
+						}else{
+							$audit_name = '已拒绝';
+						}
+						if(data["data"][i]["parent_assistant_id"]==0){
+							$parent_assistant_name="--";
+						}else{
+							$parent_assistant_name=data["data"][i]["parent_assistant_real_name"]+"("+data["data"][i]["parent_recommon_code"]+")";
+						}
+						if(data["data"][i]["pay_method"]==1){
+							$pay_method_name="微信支付";
+						}else if(data["data"][i]["pay_method"]==1){
+							$pay_method_name="支付宝支付";
+						}else{
+							$pay_method_name="线下支付";
+						}
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['uid']+'"></td>';
+						html += '<td class="center">' + data["data"][i]["apply_id"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["real_name"] + '<br/>' + data["data"][i]["mobile"] +'</td>';
+						
+						<!-- 头像：昵称、 -->
+						var img = '<img src="PLATFORM_IMG/avatar_default.jpg" style="border-radius: 50%;"/>';
+						if(data['data'][i]['user_info']['user_headimg']!=null && data['data'][i]['user_info']['user_headimg'] != ''){
+							img = '<div style="width:70px;margin:0 auto;height:50px;"><img src="__UPLOAD__/' +data['data'][i]['user_info']['user_headimg']+'"  style="height:100%;max-width:100%;"/></div>';
+						}
+						html += '<td class="center">'+ img + data['data'][i]['user_info']['nick_name'] + "</td>";
+						
+						html += '<td class="center">' + data["data"][i]["level_info"]["level_name"] + '</td>';
+						html += '<td class="center">' + $parent_assistant_name + '</td>';
+						html += '<td class="center">' + data["data"][i]["pay_money"] + '</td>';
+						html += '<td class="center">' + $audit_name + '</td>';
+						html += '<td class="center">' + $pay_method_name + '</td>';
+						html += '<td class="center">' + data["data"][i]["create_time"] + '</td>';
+						html += '<td class="center">';
+						if(data['data'][i]['audit'] == 2 ){
+							html += '<a href="javascript:void(0);" onclick="agree('+data["data"][i]["apply_id"]+', 1)">通过</a>&nbsp;&nbsp;<a href="javascript:void(0);" onclick="refusalApplyBox('+data["data"][i]["apply_id"]+')">拒绝</a> ';
+						}
+						html += '</td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="10" class="center">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}	
+	
+	function agree(apply_id,audit){
+		if(audit == 1){
+			var refusal = '';		
+		}else{		
+			var refusal = $("#refusal").val();			
+		}
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Assistant/businessAssistantApplyAudit",
+			async : true,
+			data : {
+				"apply_id" : apply_id,
+				"audit" : audit,
+				"refusal":refusal
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				if(data["code"] > 0 ){
+					if(audit != 1){
+						$("#refusal_box").modal('hide');
+					}
+					showMessage('success', data["message"],'PLATFORM_MAIN/Assistant/businessAssistantApplyList');
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+	//拒绝弹出框
+	function refusalApplyBox(apply_id){
+		$("#apply_id").val(apply_id);
+		$("#refusal_box").modal('show');
+	}
+	//拒绝
+	function refusalApply(){
+		var apply_id = $("#apply_id").val();
+	
+		agree(apply_id, -2);
+	}
+</script>
+{/block}

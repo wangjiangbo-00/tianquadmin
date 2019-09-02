@@ -1,0 +1,386 @@
+{extend name="admin/base" /}
+{block name="resources"/}
+<script src="ADMIN_JS/My97DatePicker/WdatePicker.js" type="text/javascript"></script>
+<style  type="text/css">
+.set-style{
+	width:100%;
+}
+.set-style dl{
+	width:100%;
+	font-size: 0;
+	/* line-height: 20px; */
+	clear: both;
+	padding: 0;
+	margin: 0;
+	border-bottom: dotted 1px #E6E6E6;
+	overflow: hidden;
+}
+.set-style dl dt{
+	font-size: 12px;
+	line-height: 32px;
+	vertical-align: top;
+	letter-spacing: normal;
+	word-spacing: normal;
+	text-align: right;
+	display: inline-block;
+	width: 19%;
+	padding: 10px 1% 10px 0;
+	margin: 0;
+	font-weight:normal;
+}
+.set-style dl dd{
+	font-size: 12px;
+	line-height: 32px;
+	vertical-align: top;
+	letter-spacing: normal;
+	word-spacing: normal;
+	display: inline-block;
+	width: 78%;
+	padding: 10px 0 10px 0;
+}
+.set-style dl dd input[type="text"]{
+	font: 12px/20px Arial;
+	color: #777;
+	background-color: #FFF;
+	vertical-align: top;
+	display: inline-block;
+	height:24px;
+	line-height:24px;
+	padding: 4px;
+	border: 1px solid #CCC;
+	outline: 0 none;
+	width: 400px;
+	margin:0;
+}
+.set-style dl dd input[type="text"].w70{
+	width:70px;
+}
+.set-style dl dd textarea{
+    font: 12px/20px Arial;
+    color: #777;
+    background-color: #FFF;
+    vertical-align: top;
+    display: inline-block;
+    height: 60px;
+    padding: 4px;
+    border: solid 1px #CCC;
+    outline: 0 none;
+	width: 400px;
+	margin:0;
+}
+.hint{
+    font-size: 12px;
+    line-height: 16px;
+    color: #BBB;
+    margin-top: 10px;
+}
+.set-style dl dd p img{
+	border: medium none;
+	vertical-align: middle;
+}
+.class-logo{
+	background-color: #FFF;
+	position: relative;
+	z-index: 1;
+}
+.class-logo p{
+	width: 120px;
+	height: 100px;
+	line-height: 0;
+	background-color: #FFF;
+	text-align: center;
+	vertical-align: middle;
+	display: table-cell;
+	*display: block;
+	overflow: hidden;
+	margin: 0 0 10px;
+	border: dashed 1px #E6E6E6;
+}
+.class-logo p img{
+	max-width: 120px;
+	max-height: 100px;
+	border: medium none;
+	vertical-align: middle;
+	margin-top: expression(60-this.height/2);
+	*margin-top: expression(30-this.height/2);
+}
+
+.set-style dl dd p{
+	margin-bottom:0;
+}
+
+.table-div  table tr td{
+	    border: 1px solid #e6e6e6;
+    padding: 10px;
+}
+.goodlist-table tr td{
+	    border: 1px solid #e6e6e6;
+    padding: 10px;
+}
+.form-horizontal .control-group {
+    margin-bottom: 0px;
+}
+.form-horizontal .controls {
+    margin-left: 20px; 
+}
+.help-inline{
+	    height: 30px;
+    	line-height: 30px;
+}
+input[type="radio"]{
+	margin-top:6px;
+}
+.controls table tr td input[type="radio"]{
+	margin:0px;
+}
+</style>
+ {/block}
+{block name="main"}
+<div class="set-style">
+	<dl>
+		<dt>活动名称:</dt>
+		<dd><input type="text" id="gift_name" maxlength="10"><p class="error">请输入活动名称</p></dd>
+
+	</dl>
+
+	<dl>
+		<dt>开奖模式：</dt>
+		<dd>
+			<select id="mode" >
+				<option value="1">定时开奖</option>
+				<option value="2">手气抽奖</option>
+				<option value="3">助力抽奖</option>
+				<option value="4">满人开奖</option>
+				{/foreach}
+			</select>
+			<p class="hint">定时开奖开奖时间为活动截止时间,助力抽奖手气抽奖开放时间为活动开始时间，关闭时间为活动截止时间</p>
+		</dd>
+	</dl>
+
+	<dl>
+		<dt>活动时间:</dt>
+		<dd>
+			<input class="input-medium" type="text" id="start_time" style="width:250px;"onclick="WdatePicker({skin:'twoer',dateFmt:'yyyy-MM-dd HH:mm:00'})" autocomplete="off">
+			<span class="mlr5">-</span> 
+			<input class="input-medium" size="15"type="text" id="end_time" style="width:250px;"onclick="WdatePicker({skin:'twoer',dateFmt:'yyyy-MM-dd HH:mm:00'})" autocomplete="off">
+			<p class="hint">建议--定时开奖开奖时间设置在18:30,手气抽奖开始设置在20:08</p>
+			<p class="hint">注意--开始和结束时间差小于48个小时,建议设置12-24个小时</p>
+		</dd>
+	</dl>
+	<dl>
+		<dt>领取有效期:</dt>
+			<dd><input class="input-mini w70" type="text" id="days"><span class="help-inline">天</span></dd>
+	</dl>
+
+	<dl class="chancedl">
+		<dt>手气概率:</dt>
+		<dd>
+			<input class="input-mini w70" type="text" id="parms" value="500" placeholder="500">
+			<p class="hint">设置值为N，实际概率为1/N,请输入大于10的数字</p>
+		</dd>
+
+	</dl>
+
+	<dl class="chancedl_people">
+		<dt>开奖人数:</dt>
+		<dd>
+			<input class="input-mini w70" type="text" id="parms_people" value="500" placeholder="500">
+			<p class="hint">设置满人开奖的人数</p>
+		</dd>
+
+	</dl>
+
+	<dl>
+		<dt>礼物数量:</dt>
+		<dd>
+			<input class="input-mini w70" type="text" id="max_num" ><span class="help-inline" >件</span>
+			<p class="hint">送出礼物的数量,目前支持设置(1-5)件</p>
+		</dd>
+	</dl>
+	<dl>
+		<dt>商品类型：</dt>
+		<dd>
+			<select id="goodsType">
+				<option value="0">请选择商品</option>
+				{foreach name="goodslist" item="goods"}
+
+				<option value="{$goods.goods_id}">{$goods.goods_name}</option>
+
+				{/foreach}
+			</select>
+
+		</dd>
+	</dl>
+
+	<dl>
+		<dt>礼物备注:</dt>
+		<dd>
+			<input class="input-medium" type="text" id="remarks" ><span class="help-inline"></span>
+			<p class="hint">多规格商品在此处输入具体规格</p>
+		</dd>
+	</dl>
+	<button class="edit_button" onclick="addGift();">提交</button>
+</div>
+
+<script>
+$(function(){
+	$('.type_dl dd').hide();
+	$("#some_pro").show();
+    $(".chancedl").hide();
+
+    $("#mode").bind("change",function(){
+
+        //获取被选中的option的值
+        var id = $(this).val();
+        //获取自定义属性的值
+
+
+        if(id == 1)
+        {
+            $(".chancedl").hide();
+            $(".chancedl_people").hide();
+
+        }
+        else if(id == 2 || id == 3)
+		{
+            $(".chancedl").show();
+            $(".chancedl_people").hide();
+		}
+
+        else if(id == 4)
+        {
+            $(".chancedl").hide();
+            $(".chancedl_people").show();
+        }
+
+
+    });
+});
+var flag = false;//防止重复提交
+	//保存
+	function addGift(){
+		var gift_name = $("#gift_name").val();
+		var start_time = $("#start_time").val();
+		var end_time = $("#end_time").val();
+		var days = $("#days").val();
+		var max_num = $("#max_num").val();
+        var remarks = $("#remarks").val();
+
+        var mode = parseInt($("#mode").val());
+
+        if(mode == 2 || mode == 3)
+		{
+            var parms = parseInt($("#parms").val()) ;
+		}
+		else if(mode == 4)
+		{
+            var parms = parseInt($("#parms_people").val()) ;
+		}
+		else
+		{
+            var parms = 0 ;
+		}
+
+
+        var goodsid = $("#goodsType option:selected").val();
+
+        if(max_num<1 || max_num>5)
+		{
+            showMessage('error', "奖品数量必须在1-5之间");
+
+            return false;
+		}
+
+		if(mode == 2 && parms< 10)
+		{
+            showMessage('error', "手气模式下,概率值请设置大于10");
+
+            return false;
+		}
+
+        if(verify(gift_name, start_time, end_time, goodsid)) {
+            if (flag) {
+                return;
+            }
+            $.ajax({
+                type: "post",
+                url: "ADMIN_MAIN/promotion/addgift",
+                data: {
+                    'gift_name': gift_name,
+                    'start_time': start_time,
+                    'end_time': end_time,
+                    'days': days,
+                    'max_num': max_num,
+                    'goods_id': goodsid,
+                    'remarks': remarks,
+
+                    'mode': mode,
+                    'parms': parms,
+                },
+                async: true,
+                success: function (data) {
+                    if (data["code"] > 0) {
+                        showMessage('success', data["message"], 'ADMIN_MAIN/promotion/giftlist');
+                    } else {
+                        showMessage('error', data["message"]);
+                    }
+                }
+            });
+        }
+	}
+
+function verify(name, start_time, end_time, goodid){
+    if(name == ''){
+        $("#gift_name").parent().find('.error').show();
+        return false;
+    }else{
+        $(".error").hide();
+    }
+    if(start_time == '' || end_time == ''){
+        $("#end_time").next('.error').show();
+        return false;
+    }else{
+        $(".error").hide();
+    }
+    var dataTime = nowDate();
+    var now = new Date(dataTime.replace("-", "/").replace("-", "/"));
+    var end = new Date(end_time.replace("-", "/").replace("-", "/"));
+    var start = new Date(start_time.replace("-", "/").replace("-", "/"));
+    if(end < now){
+        $("#end_time").next().next('.error').show();
+        return false;
+    }else{
+        $(".error").hide();
+    }
+    if(end < start){
+        $("#end_time").next().next().next('.error').show();
+        return false;
+    }else{
+        $(".error").hide();
+    }
+    if(goodid < 0){
+        $("#notSelect").show();
+        return false;
+    }else{
+        $("#notSelect").hide();
+    }
+    return true;
+}
+
+function nowDate(){
+    var myDate = new Date();
+    //获取当前年
+    var year=myDate.getFullYear();
+    //获取当前月
+    var month=myDate.getMonth()+1;
+    //获取当前日
+    var date=myDate.getDate();
+    var h=myDate.getHours();//获取当前小时数(0-23)
+    var m=myDate.getMinutes();//获取当前分钟数(0-59)
+    var s=myDate.getSeconds();
+
+    var now=year+'-'+month+"-"+date+" "+h+':'+m+":"+s;
+    return now;
+}
+</script>
+{/block}

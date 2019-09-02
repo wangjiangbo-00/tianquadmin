@@ -1,0 +1,33 @@
+{extend name="shop/default/Shop/base" /}
+{block name="resources"}
+<!-- 添加css、字体文件文件 -->
+
+
+<link rel="stylesheet" type="text/css" href="__TEMP__/{$style}/public/css/ns_shop_common.css">
+{/block}
+
+{block name="main"}
+	<div class="condition-screen w1210">
+		<div class="blank15"></div>
+		<div class="content-wrap category-wrap clearfix">
+			{include file='shop/default/Goods/controlStoreClassification'/}
+			{include file='shop/default/Shop/controlShopGoodList'/}
+		</div>
+		
+	</div>
+
+{/block}
+
+{block name="javascript"}
+
+<!-- 添加js文件 -->
+<script type="text/javascript" src="__TEMP__/{$style}/public/js/ns_index.js"></script>	
+<script type="text/javascript">
+$(function(){
+	var goods_group_id='{$goods_group_id}';
+	var even=$(".parent_li a[name=\'"+goods_group_id+"\']");
+	even.addClass('current');
+	even.parents('.parent_li').children('span').trigger('click');
+})
+</script>
+{/block}

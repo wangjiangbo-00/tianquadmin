@@ -1,0 +1,163 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.text-active, .active>.text {
+    display: block;
+}
+</style>
+{/block}
+ {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9">
+		<a href="javascript:;" onclick="addGoodsSpec()" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加规格 </a>
+	</div>
+	
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th>规格名称</th>
+					<th class="center">规格属性</th>
+					<th class="center">排序</th>
+					<th class="center">启用</th>
+<!-- 					<th class="center">是否推荐</th> -->
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} {block name="script"}
+<script type="text/javascript">	
+function setGoodsSpecField(id, name, e){
+	if(name == 'is_visible'){
+		var value = $(e).attr("is_visible");
+	}else{
+		var value = $(e).val();
+	}
+	$.ajax({
+		type:"post",
+		url:"PLATFORM_MAIN/goods/setgoodsspecfield",
+		data:{
+			'id' : id,
+			'name' : name,
+			'value' : value
+			},
+		async:true,
+		success: function (data) {
+			if(data['code'] > 0){
+				if(name == 'is_visible'){
+					if(value == 1)
+					{
+						$("#isvisible_"+id).html('<i class="fa fa-check text-success text-active"></i>');
+						$("#isvisible_"+id).attr("is_visible", '0');
+					}else{
+						$("#isvisible_"+id).html('<i class="fa fa-times text-danger text"></i>');
+						$("#isvisible_"+id).attr("is_visible", '1');
+					}
+				}
+				showMessage('success', data["message"]);
+			}else{
+				showMessage('error', data["message"]);
+			}
+		}
+	}); 
+}
+/* 跳转到添加规格 */
+function addGoodsSpec() {
+	location.href = "PLATFORM_MAIN/goods/addgoodsspec";
+}
+$(function(){
+	LoadingInfo(1);
+});
+	//加载数据
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/goods/goodsspeclist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['spec_id']+'"></td>';
+						html += '<td>'+ data["data"][i]["spec_name"] +'</td>';
+						html += '<td class="center">' + data["data"][i]["spec_value_name_list"] + '</td>';
+						html += '<td class="center"><input style="width:50px;" type="text" id="sort" value="' + data["data"][i]["sort"] + '" onchange="setGoodsSpecField('+data["data"][i]["spec_id"]+', \'sort\', this);"/></td>';
+						if(data["data"][i]["is_visible"]){
+							html += '<td class="center"><a href="javascript:;" class="is_visible" id="isvisible_'+data["data"][i]["spec_id"]+'" is_visible="0" onclick="setGoodsSpecField('+data["data"][i]["spec_id"]+', \'is_visible\' , this)"><i class="fa fa-check text-success text-active"></i></a></td>';
+						}else{
+							html += '<td class="center"><a href="javascript:;" class="is_visible" id="isvisible_'+data["data"][i]["spec_id"]+'" is_visible="1" onclick="setGoodsSpecField('+data["data"][i]["spec_id"]+', \'is_visible\', this)"><i class="fa fa-times text-danger text"></i></a></td>';
+						}
+						html += '<td class="center"><a href="PLATFORM_MAIN/goods/updategoodsspec?spec_id=' + data["data"][i]["spec_id"] + '">修改</a>  <a href="javascript:delSpec(' + data["data"][i]["spec_id"] + ')">删除</a></td> ';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="6">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}
+	/* 删除属性 */
+	function delSpec(spec_id) {
+		$( "#dialog" ).dialog({
+			buttons: {
+				"确定": function() {
+					$(this).dialog('close');
+					$.ajax({
+						type : "post",
+						url : "PLATFORM_MAIN/goods/deletegoodsspec",
+						data : {
+							'spec_id' : spec_id.toString()
+						},
+						dataType : "json",
+						success : function(data) {
+							if (data['code'] > 0) {
+	 							showMessage('success', data["message"], "PLATFORM_MAIN/goods/goodsspeclist");
+							}else if(data['code'] == 0){
+	 							showMessage('error', data["message"]);
+							}else if(data['code'] == -1){
+								showMessage('error', '当前规格正在使用中，不能删除！');
+							}
+						}
+					});
+				},"取消,#e57373" : function(){
+					$(this).dialog('close');
+				}
+			},
+			contentText:"你确定删除吗？",
+			title:"消息提醒"
+		});
+	}
+	
+	
+	
+	
+	
+	
+	
+</script>
+{/block}

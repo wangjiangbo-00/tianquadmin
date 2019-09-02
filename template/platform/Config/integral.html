@@ -1,0 +1,131 @@
+{extend name="platform/base" /}
+{block name="right_tab"}
+{/block}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold" style="height:40px;line-height:40px;"> 
+		 <ul class="nav nav-tabs pull-left">
+		 	<li class=""><a href="PLATFORM_MAIN/config/pointconfig">积分管理</a></li>
+         	<li class="active"><a href="PLATFORM_MAIN/config/integral">积分奖励</a></li>
+       	</ul>
+	</header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">会员注册送积分:</label>
+				<div class="col-md-2">
+					<input name="UserCode" id="reg_member_self_point" class="form-control" type="number" min="0"  value="{$res.reg_member_self_point}"  onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')" />
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label"></label>
+				<div class="col-md-1" style="width:auto;">
+					<label class="switch">
+                         <input id="register_open" type="checkbox" onchange="setIntegralAjax();"  class="checkbox" {if condition="$integralConfig['register_integral'] eq 1"}checked="checked"{/if}>
+                         <span></span> 
+                    </label>
+				</div>
+				<div class="col-sm-2" style="padding:7px;">是否启用会员注册送积分</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+           <div class="form-group">
+				<label class="col-sm-2 control-label">签到送积分:</label>
+				<div class="col-md-2">
+					<input name="UserCode" id="sign_point" type="number" class="form-control" value="{$res.sign_point}"  min="0" onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')"  >
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label"></label>
+				<div class="col-md-1" style="width:auto;">
+					<label class="switch">
+                         <input id="sign_open" type="checkbox" onchange="setIntegralAjax();" class="checkbox" {if condition="$integralConfig['sign_integral'] eq 1"}checked="checked"{/if}>
+                         <span></span> 
+                    </label>
+				</div>
+				<div class="col-sm-2" style="padding:7px;">是否启用签到送积分</div>
+			</div>
+			
+			<div class="line line-dashed line-lg pull-in"></div>
+           <div class="form-group">
+				<label class="col-sm-2 control-label">分享送积分:</label>
+				<div class="col-md-2">
+					<input name="UserCode" id="share_point" type="number"  class="form-control" value="{$res.share_point}" min="0"  onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')" >
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label"></label>
+				<div class="col-md-1" style="width:auto;">
+					<label class="switch">
+                        <input id="share_open" type="checkbox" onchange="setIntegralAjax();" class="checkbox" {if condition="$integralConfig['share_integral'] eq 1"}checked="checked"{/if}>
+                         <span></span> 
+                    </label>
+				</div>
+				<div class="col-sm-2" style="padding:7px;">是否启用分享送积分</div>
+			</div>
+			
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="setRewardRuleAjax()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+
+<script>
+function setIntegralAjax(){
+	if($("#register_open").prop("checked")){
+		var register = 1;
+	}else{
+		var register = 0;
+	}
+	if($("#sign_open").prop("checked")){
+		var sign = 1;
+	}else{
+		var sign = 0;
+	}
+	if($("#share_open").prop("checked")){
+		var share = 1;
+	}else{
+		var share = 0;
+	}
+	$.ajax({
+		type : 'post',
+		url : 'PLATFORM_MAIN/config/setintegralajax',
+		data : {
+			'register':register,
+			'sign':sign,
+			'share':share
+		},
+		success : function(data){
+		
+		}
+	})
+}
+function setRewardRuleAjax(){
+	var sign_point = $("#sign_point").val();
+	var share_point = $("#share_point").val();
+	var reg_member_self_point = $("#reg_member_self_point").val();
+	$.ajax({
+		type : 'post',
+		url : 'PLATFORM_MAIN/config/integral',
+		data : {
+			"sign_point" : sign_point,
+			"share_point" : share_point,
+			"reg_member_self_point" : reg_member_self_point
+		},
+		success : function(data){
+			if(data['code'] >=0){
+				showMessage("success", "设置成功！", "PLATFORM_MAIN/config/integral");
+			}else{
+				showMessage("error", "设置失败");
+			}
+		}
+	})
+}
+</script>
+{/block}

@@ -1,0 +1,134 @@
+{extend name="platform/base" /} {block name="main"}
+<style type="text/css">
+	.col-md-4{
+		width: 60%;
+	}
+	input[type="text"],textarea{
+		width:30%;
+	}
+	.item_chek{
+		display: block;
+		overflow: hidden;
+		clear: both;
+	}
+	.item_chek label{
+		display: inline-block;
+		line-height: 32px;
+		margin-right: 10px;
+	}
+	.item_chek label>input{
+		float: left;
+		margin-top: 9px;
+	}
+	.item_chek .item_left{
+		display: block;
+		float: left;
+		width: 8%;
+		margin-right: 2%;
+	}
+	.item_chek .item_right{float: left;display: block;width: 80%;}
+	.item_chek .item_right>label{float: left;display: block;}
+	.item_chek .item_right .item_content{
+		display: block;
+		min-height: 40px;
+	}
+</style>
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 修改交易商等级 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">等级名称</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="level_name" value="{$level_info['level_name']}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">申请条件</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="level_money" value="{$level_info['level_money']}">
+				</div>
+			</div>
+			
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">推荐佣金比率</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="recommend_rate" value="{$level_info['recommend_rate']}">
+				</div>
+			</div>
+			
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">推广佣金比率</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="level_0" value="{$level_info['level_0']}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">上级推广佣金比率</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="level_1" value="{$level_info['level_1']}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">上上级推广佣金比率</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="level_2" value="{$level_info['level_2']}">
+				</div>
+			</div>
+
+
+
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="addOrUpdateBusinessAssistantLevel()"
+						class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+	//添加分组
+	function addOrUpdateBusinessAssistantLevel() {
+		var level_name=$('#level_name').val();
+		var level_money = $("#level_money").val();
+		var recommend_rate = $("#recommend_rate").val();
+		var level_0 = $("#level_0").val();
+		var level_1 = $("#level_1").val();
+		var level_2 = $("#level_2").val();
+		if(parseFloat(level_0) + parseFloat(level_1) + parseFloat(level_2) >100){
+			showMessage('error', "佣金比率不可超过100%");
+			return false;
+		}
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Assistant/addOrUpdateBusinessAssistantLevel",
+			data : {
+				'level_name':level_name,
+				'level_money' : level_money,
+				'recommend_rate' : recommend_rate,
+				'level_0' : level_0,
+				'level_1' : level_1,
+				'level_2': level_2,
+				'level_id':{$level_id}
+			},
+			async : true,
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				if (data["code"] > 0) {
+					showMessage('success', "提交成功",'PLATFORM_MAIN/Assistant/businessAssistantLevelList');
+				}else{
+					showMessage('error', "提交失败");
+				}
+			}
+		});
+	}
+	
+</script>
+{/block}

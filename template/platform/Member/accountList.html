@@ -1,0 +1,200 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script>
+<style>
+.input-medium{
+	width: 202px;
+    padding: 3px 12px;
+    margin-left: 10px;
+}
+</style>
+{/block}
+
+ {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-2" style="width:90%;">
+		<div class="input-group" style="float:right;">
+			<input type="text" id='startDate' placeholder="请选择开始日期" class="input-medium" onclick="WdatePicker()"/>
+		    <input type="text" id='endDate' placeholder="请选择结束日期" class="input-medium" onclick="WdatePicker()" />
+			<select name="form_type" id="form_type" class="input-medium" style="color:#BBB;">
+				<option value="">请选择类别</option>
+				<option value="1">商城订单</option>
+				<option value="2">订单退还</option>
+				<option value="3">兑换</option>
+				<option value="4">充值</option>
+				<option value="5">签到</option>
+				<option value="6">分享</option>
+				<option value="7">注册</option>
+				<option value="8">提现</option>
+				<option value="9">提现退还</option>
+				<option value="10">调整</option>
+			</select>
+			<input type="text" class="input-medium" id='search_text' placeholder="请输入会员昵称" />
+		</div>
+	</div>
+	<div class="col-sm-1">
+		<div class="input-group">
+			<span class="input-group-btn">
+				<button class="btn btn-sm btn-default" type="button"
+					onclick="LoadingInfo(1)">搜索</button>
+			</span>
+		</div>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th class="tal">会员昵称</th>
+					<th class="center">类别</th>
+					<th class="center">金额</th>
+					<th class="center">描述</th>
+					<th>时间</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} {block name="script"}
+<script type="text/javascript">
+
+$(function(){
+	LoadingInfo(1);
+})
+	function LoadingInfo(pageIndex) {
+	var search_text = $("#search_text").val();
+	var start_date = $("#startDate").val();
+	var end_date = $("#endDate").val();
+	var form_type = $("#form_type").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/member/accountlist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text":search_text, "form_type":form_type, "start_date":start_date, "end_date":end_date
+			},
+			success : function(data) {
+// 				alert(JSON.stringify(data));
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><div class="cell"><label ><input name="sub" type="checkbox" value="'+ data["data"][i]["uid"]+'" ></label></div></td>';
+						html += '<td>' + data["data"][i]["nick_name"]+ '</td>';
+						html += '<td class="center">' + data["data"][i]["type_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["number"] + '</td>';	
+						html += '<td class="center">' + data["data"][i]["text"] + '</td>';
+						html += '<td >' + data["data"][i]["create_time"] + '</td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="9">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+ 					var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+				
+			}
+		});
+	}
+	//全选
+	function CheckAll(event){
+		var checked = event.checked;
+		$(".style0list tbody input[type = 'checkbox']").prop("checked",checked);
+	}
+	//充值购物币弹出
+	function showRechargeCoin(uid){
+	$("#uid").val(uid);
+	$("#rechargeCoin").modal('show');
+	}
+	//充值购物币提交
+	function addRechargeCoin(){
+		var uid = $("#uid").val();
+		var num =$("#num").val();
+		var text = $("#text").val();
+		if(isNaN(num)){
+			showMessage('error', '输入的购物币必须是整数！');
+			return;
+		}
+		//alert(uid);
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Member/addRechargeCoin",
+			data:{
+				'id' : uid,
+				'num' : num,
+				'text' : text
+			},
+			async:true,
+			success:function (data) {
+				//alert(JSON.stringify(data));
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/Member/memberList");
+					$("#rechargeCoin").modal('hide');
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+	
+	
+	//锁定会员
+	function lockuser(uid)
+	{
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Member/memberLock",
+			async : true,
+			data : {
+				"id" : uid
+			},
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],'PLATFORM_MAIN/Member/memberList');
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+	//解锁会员
+	function unlockuser(uid)
+	{
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Member/memberUnlock",
+			async : true,
+			data : {
+				"id" : uid
+			},
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],'PLATFORM_MAIN/Member/memberList');
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+</script>
+{/block}

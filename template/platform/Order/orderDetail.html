@@ -1,0 +1,166 @@
+{extend name="platform/base" /} {block name="main"}
+	<div class="padder-v">
+		<form class="form-horizontal">
+			<section class="panel panel-default">
+				<header class="panel-heading font-bold"> 订单信息 </header>
+				<div class="panel-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<label class="col-md-2 control-label">订单号</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.out_trade_no}</p>
+							</div>
+							<label class="col-md-2 control-label">订单状态</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.status_name}</p>
+							</div>
+							<label class="col-md-2 control-label">订单总额</label>
+							<div class="col-md-4">
+								<p class="form-control-static" style="color:#ff5400;">
+										<span>商品总金额：￥{$order['goods_money']}，</span>
+				
+										{if condition="$order['user_platform_money']>0"}
+										<span>余额支付：￥{$order['user_platform_money']}，</span>
+										{/if}
+										
+										{if condition="$order['coupon_money']>0"}
+										<span>优惠券：￥{$order['coupon_money']}，</span>
+										{/if}
+										
+										{if condition="$order['tax_money']>0"}
+										<span>发票税额：￥{$order['tax_money']}，</span>
+										{/if}
+										
+										{if condition="$order['promotion_money']>0"}
+										<span>满减优惠：￥{$order['promotion_money']}，</span>
+										{/if}
+										
+										{if condition="$order['point']>0"}
+										<span>使用积分：{$order['point']}，</span>
+										{/if}
+								
+										<span> 实际需支付：<b class="real-pay c-red">￥{$order['order_money']}</b></span>
+										<span>（含运费 ￥{$order['shipping_money']}）</span>
+								</p>
+							</div>
+							<label class="col-md-2 control-label">运费</label>
+							<div class="col-md-4">
+								<p class="form-control-static">￥ {$order.shipping_money}</p>
+							</div>
+						</div>
+						<div class="line line-dashed line-lg pull-in"></div>
+						<div class="form-group">
+							<label class="col-md-2 control-label">买家</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.user_name}</p>
+							</div>
+							<label class="col-md-2 control-label">店铺</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.shop_name}</p>
+							</div>
+							<label class="col-md-2 control-label">支付方式</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.payment_type_name}</p>
+							</div>
+							<label class="col-md-2 control-label">下单时间</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.create_time}</p>
+							</div>
+							<label class="col-md-2 control-label">支付时间</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.pay_time}</p>
+							</div>
+							<label class="col-md-2 control-label">完成时间</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.finish_time}</p>
+							</div>
+						</div>
+					</form>
+				</div>
+			</section>
+			<section class="panel panel-default">
+				<header class="panel-heading font-bold"> 收货人信息 </header>
+				<div class="panel-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<label class="col-md-2 control-label">收货人姓名</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.receiver_name}</p>
+							</div>
+							<label class="col-md-2 control-label">电话号码</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order.receiver_mobile}</p>
+							</div>
+							<label class="col-md-2 control-label">详细地址</label>
+							<div class="col-md-4">
+								<p class="form-control-static">{$order['address']}&nbsp;{$order.receiver_address}</p>
+							</div>
+							<label class="col-md-2 control-label">发货单号</label>
+							<div class="col-md-4">
+								<p class="form-control-static"> </p>
+							</div>
+						</div>
+					</form>
+				</div>
+			</section>
+<!-- 			<section class="panel panel-default"> -->
+<!-- 				<header class="panel-heading font-bold"> 发货信息 </header> -->
+<!-- 				<div class="panel-body"> -->
+<!-- 					<form class="form-horizontal"> -->
+<!-- 						<div class="form-group"> -->
+<!-- 							<label class="col-md-2 control-label">发货人</label> -->
+<!-- 							<div class="col-md-4"> -->
+<!-- 								<p class="form-control-static"> </p> -->
+<!-- 							</div> -->
+<!-- 							<label class="col-md-2 control-label">电话号码</label> -->
+<!-- 							<div class="col-md-4"> -->
+<!-- 								<p class="form-control-static"> </p> -->
+<!-- 							</div> -->
+<!-- 							<label class="col-md-2 control-label">发货地</label> -->
+<!-- 							<div class="col-md-4"> -->
+<!-- 								<p class="form-control-static"> </p> -->
+<!-- 							</div> -->
+<!-- 						</div> -->
+<!-- 					</form> -->
+<!-- 				</div> -->
+<!-- 			</section> -->
+					<section class="panel panel-default">
+						<div class="table-responsive">
+							<table class="table table-striped b-t b-light text-sm">
+								<thead>
+									<tr>
+										<th>商品信息</th>
+										<th>单价</th>
+										<th>数量</th>
+									</tr>
+								</thead>
+								<tbody>
+								{foreach name="$order['order_goods']" item="v"}
+									<tr>
+										<td>
+											<img alt="" src="__ROOT__/{$v.picture_info.pic_cover_micro}">
+											<span>{$v.goods_name}</span>
+										</td>
+										<td>￥ {$v['price']}</td>
+										<td>{$v['num']}</td>
+									</tr>
+								{/foreach}
+								</tbody>
+							</table>
+						</div>
+					</section>
+			<section class="panel panel-default">
+				<header class="panel-heading font-bold"> 操作历史 </header>
+				<div class="panel-body">
+					<div class="col-sm-12">
+						<div class="list-group bg-white">
+							{foreach name="$order.order_action" item="vo"}
+								<span class="list-group-item"> 操作： {$vo.action} &nbsp;&nbsp;&nbsp;操作人：{$vo.user_name}&nbsp;&nbsp;&nbsp; 操作时间：{$vo.action_time}</span>
+							{/foreach}
+						</div>
+					</div>
+				</div>
+			</section>
+		</form>
+	</div>
+{/block}

@@ -1,0 +1,104 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-4">
+		<a href="PLATFORM_MAIN/Query/addQuestionCategory"
+			class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加分类</a>
+	</div>
+</div>
+<section class="panel panel-default">
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+
+				<th class="center">分类名字</th>
+
+				<th class="center" width="100">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			{foreach name="category_list" item="v1"}
+			<tr class="pid_0" style="height: 30px;">
+				<td>
+					<div class="col-md-12">
+						<input type="text" class="form-control"
+							fieldid="{$v1['id']}" fieldname="category_name"
+							value="{$v1['catname']}">
+					</div>
+				</td>
+
+
+
+				<td class="center"><a
+					href="PLATFORM_MAIN/query/updatequerycategory?id={$v1['id']}">修改</a>
+					<a href="javascript:void(0);"
+					onclick="delCategory({$v1['id']})">删除</a></td>
+			</tr>
+			 {/foreach}
+		</tbody>
+	</table>
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$("table input").change(function(){
+	var fieldid = $(this).attr('fieldid');
+	var fieldname = $(this).attr('fieldname');
+	var fieldvalue = $(this).val();
+	changeField(fieldid,fieldname,fieldvalue);
+});
+function changeField(fieldid,fieldname,fieldvalue){
+	$.ajax({
+		type:"post",
+		url:"PLATFORM_MAIN/goods/modifygoodscategoryfield",
+		data:{'fieldid':fieldid,'fieldname':fieldname,'fieldvalue':fieldvalue},
+		async:true,
+		success: function (data) {
+			if(data['code'] <= 0){
+				showMessage('error',data['message']);
+			}
+		}
+	});
+}
+	function tab_switch(module_id){
+		if($(".pid_"+module_id).css('display') != 'none'){
+			$(".tab_jian_"+module_id).hide();
+			$(".tab_jia_"+module_id).show();
+			$(".pid_"+module_id).hide(300);
+		}else{
+			$(".tab_jian_"+module_id).show();
+			$(".tab_jia_"+module_id).hide();
+			$(".pid_"+module_id).show(500);
+		}
+	}
+	/* 删除分类 */
+	function delCategory(id) {
+		$( "#dialog" ).dialog({
+            buttons: {
+                "确定": function() {
+                    $(this).dialog('close');
+					$.ajax({
+						type : "post",
+						url : "PLATFORM_MAIN/query/deleteQuestionCategory",
+						data : {
+							'id' : id
+						},
+						async : true,
+						success : function(data) {
+							if(data['code'] > 0){
+								showMessage('success', data["message"],'PLATFORM_MAIN/query/querycategorylist');
+							}else{
+								showMessage('error', data["message"]);
+							}
+						}
+					});
+                },
+                "取消,#e57373": function() {
+                    $(this).dialog('close');
+                }
+            },
+            contentText:"你确定删除吗？",
+            title:"消息提醒"
+        });
+	}
+</script>
+{/block}

@@ -1,0 +1,118 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9">
+		<a href="PLATFORM_MAIN/Goods/addGoodsBrand"
+			class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加品牌 </a>
+	</div>
+	<div class="col-sm-2">
+		<input type="text" class="input-sm form-control" id="search_text"
+			placeholder="请输入品牌名称">
+	</div>
+	<div class="col-sm-1">
+		<button class="btn btn-sm btn-default" type="button"
+			onclick="LoadingInfo(1)">搜索</button>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th>图片</th>
+					<th class="center">品牌名称</th>
+					<th class="center">所属分类</th>
+					<th class="center">品牌首字母</th>
+<!-- 					<th class="center">是否推荐</th> -->
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} {block name="script"}
+<script type="text/javascript">	
+$(function(){
+	LoadingInfo(1);
+});
+	//加载数据
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/goods/goodsbrandlist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['brand_id']+'"></td>';
+						html += '<td><img src="__UPLOAD__/'+ data["data"][i]["brand_pic"] +'" style="height:50px;"></td>';
+						html += '<td class="center">' + data["data"][i]["brand_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["category_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["brand_initial"] + '</td>';
+// 						if(data['data'][i]["brand_recommend"] == 0){
+// 							html += '<td class="center"><a href="javascript:void(0);" class data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+// 						}else{
+// 							html += '<td class="center"><a href="javascript:void(0);" class="active" data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+// 						}
+						html += '<td class="center"><a href="PLATFORM_MAIN/Goods/updateGoodsBrand?brand_id=' + data["data"][i]["brand_id"] + '">修改</a>  <a href="javascript:void(0);" onclick="delBrand(' + data["data"][i]["brand_id"] + ')">删除</a></td> ';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="6">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}
+	/* 删除品牌 */
+	function delBrand(brand_id) {
+		$( "#dialog" ).dialog({
+            buttons: {
+                "确定": function() {
+                    $(this).dialog('close');
+					$.ajax({
+						type : "post",
+						url : "PLATFORM_MAIN/goods/deletegoodsbrand",
+						data : {
+							'brand_id' : brand_id
+						},
+						async : true,
+						success : function(data) {
+							if (data['code'] > 0) {
+								showMessage('success', data["message"],'PLATFORM_MAIN/goods/goodsbrandlist');
+							}else{
+								showMessage('error', data["message"]);
+							}
+						}
+					});
+                },
+                "取消,#e57373": function() {
+                    $(this).dialog('close');
+                }
+            },
+            contentText:"你确定删除吗？",
+            title:"消息提醒"
+        });
+	}
+</script>
+{/block}

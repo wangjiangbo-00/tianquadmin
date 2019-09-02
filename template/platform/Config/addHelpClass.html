@@ -1,0 +1,53 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加帮助类型</header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="form" name="form" onsubmit="">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">类型名称</label>
+				<div class="col-md-3">
+					<input type="text" class="form-control" id="class_name" value="">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">文章排序</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="sort"  value="0">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="addHelpClassAjax()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+{/block} 
+{block name="script"}
+<script type="text/javascript">
+     function addHelpClassAjax(){
+    	 var class_name = $("#class_name").val();
+    	 var sort = $("#sort").val();
+    	 $.ajax({
+    		type:"post",
+    	    url:"PLATFORM_MAIN/Config/addHelpClass",
+    	    data:{
+    	      'class_name':class_name,   
+    	      'sort':sort
+    		},
+    	    async : true,
+    	    success:function(data){
+    	    	if (data["code"] > 0) {
+					showMessage('success', data["message"],'PLATFORM_MAIN/Config/helpClass');
+    			}else{
+    				showMessage('error', data["message"]);
+    			} 
+    	    } 
+    	});
+     }
+  </script>
+{/block}

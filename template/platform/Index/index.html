@@ -1,0 +1,768 @@
+{extend name="platform/base" /} 
+{block name="resources"}
+<script src="__STATIC__/js/highcharts.js"></script>
+<script src="__STATIC__/js/exporting.js"></script>
+<style>
+.nav-box{
+	
+}
+.index-dl{
+	border:1px solid ;
+	overflow:hidden;
+	padding:20px;
+	color:#FFF;
+}
+.index-dl dt,.index-dl dd{
+	float:left;
+}
+.dl-ul{
+	-webkit-padding-start: 0;
+	list-style-type: none;
+	margin-bottom:0;
+	padding-left:10px;
+}
+.dl-ul li:nth-child(1){
+	font-size:20px;
+	height:40px;
+	line-height:50px;
+	min-width:76px;
+}
+.dl-ul li:nth-child(2){
+	font-size:12px;
+	height:36px;
+	line-height:20px;
+	min-width:80px;
+}
+.nav-box:nth-child(1) dl{
+	background-color:#0286e0;
+}
+.nav-box:nth-child(2) dl{
+	background-color:#ff8420;
+}
+.nav-box:nth-child(3) dl{
+	background-color:#ff4f4f;
+}
+.nav-box:nth-child(4) dl{
+	background-color:#02e03b;
+}
+.nav-box:nth-child(5) dl{
+	background-color:#ff7246;
+}
+.nav-box:nth-child(6) dl{
+	background-color:#438aff;
+}
+.b-f{
+	color:#4cc0c1;
+}
+</style>
+{/block}
+{block name="main"}
+<div class="index-head">
+		<div class="row">
+			<div class="col-md-2 nav-box" >
+				<dl class="index-dl">
+					<dd><img src="PLATFORM_IMG/index/platform_nav_1.png"/></dd>
+					<dd class="col-sm-6" >
+						<ul class="dl-ul">
+							<li>{$sale_data.sale_money_day}</li>
+							<li>今日销售总额</li>
+						</ul>
+					</dd>
+				</dl>
+			</div>
+			<div class="col-md-2 nav-box" >
+				<dl class="index-dl">
+					<dd><img src="PLATFORM_IMG/index/platform_nav_2.png"/></dd>
+					<dd class="col-sm-6" >
+						<ul class="dl-ul">
+							<li>{$sale_data.sale_num_day}</li>
+							<li>今日订单总数</li>
+						</ul>
+					</dd>
+				</dl>
+			</div>
+			
+			<div class="col-md-2 nav-box">
+				<dl class="index-dl">
+					<dd><img src="PLATFORM_IMG/index/platform_nav_4.png"/></dd>
+					<dd class="col-sm-6" >
+						<ul class="dl-ul">
+							<li>{$sale_data.shop_num}</li>
+							<li>入驻店铺数</li>
+						</ul>
+					</dd>
+				</dl>
+			</div>
+			<div class="col-md-2 nav-box" >
+				<dl class="index-dl">
+					<dd><img src="PLATFORM_IMG/index/platform_nav_5.png"/></dd>
+					<dd class="col-sm-6" >
+						<ul class="dl-ul">
+							<li>{$sale_data.fans_num}</li>
+							<li>关注粉丝数</li>
+						</ul>
+					</dd>
+				</dl>
+			</div>
+		
+		</div>
+	
+</div>
+<div class="index-content">
+	<div class="row">
+		<div class="col-md-6">
+			<section class="panel panel-default">
+				<header class="panel-heading font-bold">订单</header>
+				<div class="panel-body" >
+					<div class="row text-center no-gutter" style="height:138.5px;padding-top:40px;">
+					<!-- font-bold 字体加粗-->
+						<div class="col-xs-3  b-light">
+							<span class="h2  m-t block b-f m-b">{$order_data.daifukuan}</span> <small
+								class="text-muted m-b block">待付款</small>
+						</div>
+						<div class="col-xs-3  b-light">
+							<span class="h2  m-t block b-f  m-b">{$order_data.daifahuo}</span> <small
+								class="text-muted m-b block">待发货</small>
+						</div>
+						<div class="col-xs-3  b-light">
+							<span class="h2 m-t block b-f  m-b">{$order_data.yifahuo}</span> <small
+								class="text-muted m-b block">已发货</small>
+						</div>
+						<div class="col-xs-3">
+							<span class="h2 m-t block b-f  m-b">{$order_data.yishouhuo}</span> <small
+								class="text-muted m-b block">已收货</small>
+						</div>
+					</div>
+					<div class="row text-center no-gutter" style="height:138.5px;padding-top:20px;">
+						<div class="col-xs-3  b-light">
+							<span class="h2 m-t block b-f m-b">{$order_data.yiwancheng}</span> <small
+								class="text-muted m-b block">已完成</small>
+						</div>
+						<div class="col-xs-3  b-light">
+							<span class="h2 m-t block b-f m-b">{$order_data.yiguanbi}</span> <small
+								class="text-muted m-b block">已关闭</small>
+						</div>
+						<div class="col-xs-3  b-light">
+							<span class="h2 m-t block b-f m-b">{$order_data.tuikuanzhong}</span> <small
+								class="text-muted m-b block">退款中</small>
+						</div>
+			<!-- 			<div class="col-xs-3">
+							<span class="h2 m-t block b-f m-b">{$order_data.yituikuan}</span> <small
+								class="text-muted m-b block">已退款</small>
+						</div> -->
+					</div>
+				</div>
+				
+			</section>
+		</div>
+		<div class="col-md-6">
+		<section class="panel panel-default">
+			<header class="panel-heading font-bold">会员</header>
+			<div class="panel-body">
+				<div id="userRegCharts" style="height: 210px"></div>
+			</div>
+			<footer class="panel-footer bg-white no-padder">
+				<div class="row text-center no-gutter">
+					<div class="col-xs-3 b-r b-light">
+						<span class="h4 font-bold m-t block" id="user_num_count">0</span> <small
+							class="text-muted m-b block">会员总数</small>
+					</div>
+					<div class="col-xs-3 b-r b-light">
+						<span class="h4 font-bold m-t block" id="user_num_day">0</span> <small
+							class="text-muted m-b block">本日新增</small>
+					</div>
+					<div class="col-xs-3 b-r b-light">
+						<span class="h4 font-bold m-t block" id="user_num_yesterday">0</span> <small
+							class="text-muted m-b block">昨日新增</small>
+					</div>
+					<div class="col-xs-3">
+						<span class="h4 font-bold m-t block" id="user_num_month">0</span> <small
+							class="text-muted m-b block">本月新增</small>
+					</div>
+				</div>
+			</footer>
+		</section>
+	</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-6">
+			<section class="panel panel-default">
+				<header class="panel-heading font-bold">商品</header>
+				<div class="panel-body">
+					<div id="goods_create" style="height: 210px"></div>
+				</div>
+				<footer class="panel-footer bg-white no-padder">				
+					<div class="row text-center no-gutter">
+						
+						<div class="col-xs-3 b-r b-light">
+							<span class="h4 font-bold m-t block" id="goods_num_count">0</span> <small
+								class="text-muted m-b block">总商品数</small>
+						</div>
+						<div class="col-xs-3 b-r b-light">
+							<span class="h4 font-bold m-t block" id="goods_num_day">0</span> <small
+								class="text-muted m-b block">本日新增</small>
+						</div>
+						<div class="col-xs-3 b-r b-light">
+							<span class="h4 font-bold m-t block" id="goods_num_yesterday" >0</span> <small
+								class="text-muted m-b block">昨日新增</small>
+						</div>
+						<div class="col-xs-3">
+							<span class="h4 font-bold m-t block" id="goods_num_month">0</span> <small
+								class="text-muted m-b block">本月新增</small>
+						</div>
+					</div>
+				</footer>
+			</section>
+		</div>
+		<div class="col-md-6">
+			<section class="panel panel-default">
+				<header class="panel-heading font-bold">店铺</header>
+				<div class="panel-body">
+					<div id="shop_create" style="height: 210px"></div>
+				</div>
+				<footer class="panel-footer bg-white no-padder">
+					<div class="row text-center no-gutter">
+						<div class="col-xs-3 b-r b-light">
+							<span class="h4 font-bold m-t block" id="shop_num_count">0</span> <small
+								class="text-muted m-b block">总和</small>
+						</div>
+						<div class="col-xs-3 b-r b-light">
+							<span class="h4 font-bold m-t block" id="shop_num_day">0</span> <small
+								class="text-muted m-b block">本日新增</small>
+						</div>
+						<div class="col-xs-3 b-r b-light">
+							<span class="h4 font-bold m-t block" id="shop_num_yesterday">0</span> <small
+								class="text-muted m-b block">昨日新增</small>
+						</div>
+						<div class="col-xs-3">
+							<span class="h4 font-bold m-t block"  id="shop_num_month">0</span> <small
+								class="text-muted m-b block">本月新增</small>
+						</div>
+					</div>
+				</footer>
+			</section>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<section class="panel panel-default">
+				<header class="panel-heading font-bold">订单统计</header>
+				<div class="panel-body">
+					<div id="orderCharts" style="height: 210px"></div>
+				</div>			
+			</section>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<section class="panel panel-default">
+				<header class="panel-heading font-bold">销售统计</header>
+				<div class="panel-body">
+					<div id="goods_sales_money" style="height: 210px"></div>
+				</div>				
+			</section>
+		</div>
+	</div>
+</div>
+{/block}
+{block name="script"}
+<script>
+var chart,salesStatistical,weixinChart,weixinStatistical,weixinTimeStatistical,weixinOption,weixinChartsTitle, orderChartsTitle;
+var saleMoneyStatistical = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var saleMoneyTimeStatistical = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+var saleMoneyChart;
+var shopCreateChart;
+var shopCreateTimeStatistical=["1日","2日","3日","4日","5日","6日","7日","8日","9日","10日","11日","12日","13日","14日","15日","16日","17日","18日","19日","20日","21日","22日","23日","24日","25日","26日","27日","28日","29日","30日","31日"];
+var shopCreateStatistical = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var goodsCreateChart;
+var goodsCreateTimeStatistical=["1日","2日","3日","4日","5日","6日","7日","8日","9日","10日","11日","12日","13日","14日","15日","16日","17日","18日","19日","20日","21日","22日","23日","24日","25日","26日","27日","28日","29日","30日","31日"];
+var goodsCreateStatistical = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var weixinTimeStatistical=["1日","2日","3日","4日","5日","6日","7日","8日","9日","10日","11日","12日","13日","14日","15日","16日","17日","18日","19日","20日","21日","22日","23日","24日","25日","26日","27日","28日","29日","30日","31日"];
+var weixinStatistical = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var salesStatistical=[["1日",0],["2日",0],["3日",0],["4日",0],["5日",0],["6日",0]["7日",0],["8日",0],["9日",0],["10日",0],["11日",0],["12日",0],["13日",0],["14日",0],["15日",0],["16日",0],["17日",0],["18日",0],["19日",0],["20日",0],["21日",0],["22日",0],["23日",0],["24日",0],["25日",0],["26日",0],["27日",0],["28日",0],["29日",0],["30日",0],["31日",0]];
+$(function() {
+	// 加载页面Title以及用户名称
+	// 关注人数统计
+	var focusNumberStatistical = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+	chart = new Highcharts.Chart({
+		chart : {
+			type : 'column',
+			renderTo : 'orderCharts'
+		},
+		title : {
+			text : orderChartsTitle,
+			align : "left",
+			useHTML : true
+		},
+		lang : {
+			printChart : "打印",
+			downloadPNG : "导出PNG格式图片",
+			downloadJPEG : "导出JPEG格式图片",
+			downloadPDF : "导出PDF格式图片",
+			downloadSVG : "导出SVG格式图片"
+		},
+		xAxis : {
+			type : 'category',
+			labels : {
+				rotation : -45,
+				style : {
+					fontSize : '13px',
+					fontFamily : 'Verdana, sans-serif'
+				}
+			}
+		},
+		yAxis : {
+			min : 0,
+			title : {
+				text : ''
+			}
+		},
+		legend : {
+			enabled : false
+		},
+		credits : {
+			enabled : false,// 默认值，如果想去掉版权信息，设置为false即可
+			text : "Niushop开源商城", // 显示的文字
+			href : '#', // 链接地址
+		},
+		series : [ {
+			name : '销量统计',
+			data : salesStatistical,
+			dataLabels : {
+				enabled : false,
+				color : '#FFFFFF',
+				align : 'right',
+				format : '{point.y:.1f}', // one decimal
+				y : 0, // 10 pixels down from the top
+				style : {
+					fontSize : '12px',
+					fontFamily : 'Verdana, sans-serif'
+				}
+			}
+		} ]
+	});
+
+
+	/*focusChartsTitle += '<span class="charts-title-ordernum">关注用户总数<i>0</i></span>';
+	focusChartsTitle += '<span class="charts-title-ordernum">浏览用户总数<i>0</i></span>';*/
+	weixinChart = new Highcharts.Chart("userRegCharts",{
+	//$('#focusCharts').highcharts({
+				/*chart : {
+					type : 'spline',
+					renderTo : 'focusCharts'
+				},*/
+				title : {
+					text : weixinChartsTitle,
+					align : "left",
+					useHTML : true
+				},
+				xAxis : {
+					categories : weixinTimeStatistical
+				},
+				lang : {
+					printChart : "打印",
+					downloadPNG : "导出PNG格式图片",
+					downloadJPEG : "导出JPEG格式图片",
+					downloadPDF : "导出PDF格式图片",
+					downloadSVG : "导出SVG格式图片"
+				},
+				yAxis : {
+					title : {
+						text : ''
+					},
+					plotLines : [ {
+						value : 0,
+						width : 1,
+						color : '#808080'
+					} ]
+				},
+				tooltip : {
+				// valueSuffix : '°C'
+				},
+				legend : {
+					enabled : false
+				},
+				credits : {
+					enabled : false,// 默认值，如果想去掉版权信息，设置为false即可
+					text : '牛酷商城', // 显示的文字
+					href : '#', // 链接地址
+				},
+				exporting : {
+					allowHTML : true,
+					buttons : {
+						contextButton : {
+						// text : '导出'
+						}
+					}
+				},
+				series : [ {
+					name : '关注人数',
+					data : weixinStatistical
+				}				
+				]
+			});
+	//商品销售额
+	saleMoneyChart = new Highcharts.Chart("goods_sales_money",{		
+		title : {
+			text : "",
+			align : "center",
+			useHTML : true
+		},
+		xAxis : {
+			categories : saleMoneyTimeStatistical
+		},
+		lang : {
+			printChart : "打印",
+			downloadPNG : "导出PNG格式图片",
+			downloadJPEG : "导出JPEG格式图片",
+			downloadPDF : "导出PDF格式图片",
+			downloadSVG : "导出SVG格式图片"
+		},
+		yAxis : {
+			title : {
+				text :"元"
+			},
+			plotLines : [ {
+				value : 0,
+				width : 1,
+				color : '#808080'
+			} ]
+		},
+		tooltip : {
+			 valueSuffix : "元"
+		},
+		legend : {
+			enabled : false
+		},
+		credits : {
+			enabled : false,// 默认值，如果想去掉版权信息，设置为false即可
+			text : '牛酷商城', // 显示的文字
+			href : '#', // 链接地址
+		},
+		exporting : {
+			allowHTML : true,
+			buttons : {
+				contextButton : {
+				// text : '导出'
+				}
+			}
+		},
+		series : [ {
+			name : '销售额',
+			data : saleMoneyStatistical
+		}]
+	});
+	//店铺入驻数量
+	shopCreateChart = new Highcharts.Chart("shop_create",{		
+		title : {
+			text : "",
+			align : "center",
+			useHTML : true
+		},
+		xAxis : {
+			categories : shopCreateTimeStatistical
+		},
+		lang : {
+			printChart : "打印",
+			downloadPNG : "导出PNG格式图片",
+			downloadJPEG : "导出JPEG格式图片",
+			downloadPDF : "导出PDF格式图片",
+			downloadSVG : "导出SVG格式图片"
+		},
+		yAxis : {
+			title : {
+				text :"家"
+			},
+			plotLines : [ {
+				value : 0,
+				width : 1,
+				color : '#808080'
+			} ]
+		},
+		tooltip : {
+			 valueSuffix : "家"
+		},
+		legend : {
+			enabled : false
+		},
+		credits : {
+			enabled : false,// 默认值，如果想去掉版权信息，设置为false即可
+			text : '牛酷商城', // 显示的文字
+			href : '#', // 链接地址
+		},
+		exporting : {
+			allowHTML : true,
+			buttons : {
+				contextButton : {
+				// text : '导出'
+				}
+			}
+		},
+		series : [ {
+			name : '销售额',
+			data : shopCreateStatistical
+		}]
+	});
+	//商品添加数量
+	goodsCreateChart = new Highcharts.Chart("goods_create",{		
+		title : {
+			text : "",
+			align : "center",
+			useHTML : true
+		},
+		xAxis : {
+			categories : goodsCreateTimeStatistical
+		},
+		lang : {
+			printChart : "打印",
+			downloadPNG : "导出PNG格式图片",
+			downloadJPEG : "导出JPEG格式图片",
+			downloadPDF : "导出PDF格式图片",
+			downloadSVG : "导出SVG格式图片"
+		},
+		yAxis : {
+			title : {
+				text :"件"
+			},
+			plotLines : [ {
+				value : 0,
+				width : 1,
+				color : '#808080'
+			} ]
+		},
+		tooltip : {
+			 valueSuffix : "件"
+		},
+		legend : {
+			enabled : false
+		},
+		credits : {
+			enabled : false,// 默认值，如果想去掉版权信息，设置为false即可
+			text : '牛酷商城', // 显示的文字
+			href : '#', // 链接地址
+		},
+		exporting : {
+			allowHTML : true,
+			buttons : {
+				contextButton : {
+				// text : '导出'
+				}
+			}
+		},
+		series : [ {
+			name : '销售额',
+			data : goodsCreateStatistical
+		}]
+	});
+});
+$(function(){
+	onloadWeiXinFansChart();
+	onloadOrderChart();
+	getGoodsSalesCharts();
+	getShopCreateCharts();
+	getgoodsCreateCharts();
+	getGoodsCreateCount();
+	getUserRegCount();
+	getShopCreateCount();
+});
+/**
+ * fans关注图标数据
+ * @param e
+ */
+function onloadWeiXinFansChart() {
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/index/getuserregchartcount",
+		async : true,
+		success : function(data) {	
+			weixinTimeStatistical = data[0];
+			weixinChart.update({
+				xAxis : {
+					categories : weixinTimeStatistical
+				},
+				series : [ {
+					name : "人数(人)",
+					data : data[1]
+				}]
+			})
+		}
+	});
+}
+
+/**
+ * 订单数据
+ */
+function onloadOrderChart() {
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/index/getorderchartcount",
+		async : true,
+		success : function(data) {	
+			//alert(JSON.stringify(data));
+		
+			salesStatistical = data;
+			var series = chart.series;
+			while (series.length > 0) {
+				series[0].remove(false);
+			}
+			chart.addSeries({
+				data : salesStatistical
+			}, false);
+			chart.redraw();
+		}
+	});
+}
+function getGoodsSalesCharts(){
+	//type 走势图类型 2 金额 1 数量
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/index/getgoodssaleschartcount",
+		async : true,
+		success : function(data) {	
+				saleUnit = "元";
+				saleNumStatistical = data[0];
+				saleMoneyChart.update({
+					xAxis : {
+						categories : saleNumStatistical
+					},
+					tooltip : {
+						 valueSuffix : saleUnit
+					},
+					series : [ {
+						name : "销售金额",
+						data : data[1]
+					}],
+					yAxis : {
+						title : {
+							text :saleUnit
+						},
+						plotLines : [ {
+							value : 0,
+							width : 1,
+							color : '#808080'
+						} ]
+					},
+				})				
+		}
+	});
+}
+//入驻店铺统计
+function getShopCreateCharts(){
+	//type 走势图类型 2 金额 1 数量
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/index/getshopcreatenumchartcount",
+		async : true,
+		success : function(data) {	
+				saleUnit = "家";
+				shopCreateTimeStatistical = data[0];
+				shopCreateChart.update({
+					xAxis : {
+						categories : shopCreateTimeStatistical
+					},
+					tooltip : {
+						 valueSuffix : saleUnit
+					},
+					series : [ {
+						name : "入驻店铺数",
+						data : data[1]
+					}],
+					yAxis : {
+						title : {
+							text :saleUnit
+						},
+						plotLines : [ {
+							value : 0,
+							width : 1,
+							color : '#808080'
+						} ]
+					},
+				})				
+		}
+	});
+}
+//新建商品统计
+function getgoodsCreateCharts(){
+	//type 走势图类型 2 金额 1 数量
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/index/getgoodscreatechartcount",
+		async : true,
+		success : function(data) {	
+				saleUnit = "件";
+				goodsCreateTimeStatistical = data[0];
+				goodsCreateChart.update({
+					xAxis : {
+						categories : goodsCreateTimeStatistical
+					},
+					tooltip : {
+						 valueSuffix : saleUnit
+					},
+					series : [ {
+						name : "添加商品数",
+						data : data[1]
+					}],
+					yAxis : {
+						title : {
+							text :saleUnit
+						},
+						plotLines : [ {
+							value : 0,
+							width : 1,
+							color : '#808080'
+						} ]
+					},
+				})				
+		}
+	});
+}
+//商品统计详情
+function getGoodsCreateCount(){
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Index/getgoodscreatecount",
+		async : true,
+		success : function(data) {	
+			$("#goods_num_day").text(data.num_day);
+			$("#goods_num_yesterday").text(data.num_yesterday);
+			$("#goods_num_month").text(data.num_month);
+			$("#goods_num_count").text(data.num_count);
+			
+		}
+	})
+}
+//会员统计详情
+function getUserRegCount(){
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/index/getuserregcount",
+		async : true,
+		success : function(data) {	
+			$("#user_num_day").text(data.user_num_day);
+			$("#user_num_yesterday").text(data.user_num_yesterday);
+			$("#user_num_month").text(data.user_num_month);
+			$("#user_num_count").text(data.user_num_count);
+			
+		}
+	})
+}
+//店铺入驻商品统计详情
+function getShopCreateCount(){
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/index/getshopcreatecount",
+		async : true,
+		success : function(data) {	
+			$("#shop_num_day").text(data.shop_num_day);
+			$("#shop_num_yesterday").text(data.shop_num_yesterday);
+			$("#shop_num_month").text(data.shop_num_month);
+			$("#shop_num_count").text(data.shop_num_count);
+			
+		}
+	})
+}
+</script>
+{/block}
+

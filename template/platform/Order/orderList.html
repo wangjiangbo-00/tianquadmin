@@ -1,0 +1,119 @@
+{extend name="platform/base" /}
+{block name="resources"}
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script>
+<style>
+.col-sm-9 {
+    width: 50%;
+}
+</style>
+{/block}
+
+ {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9" style="width:21%;"></div>
+	<div class="col-sm-2">
+		<input type="text" id="search_text" class="input-sm form-control" placeholder="请输入订单号">
+	</div>
+	<input type="text" id='startDate' placeholder="请选择开始日期" class="input-medium" style="float:left;width:203px;margin-right:5px;padding:5px 10px;height:30px;border:1px solid #d9d9d9;" onclick="WdatePicker()"/>
+	<input type="text" id='endDate' placeholder="请选择结束日期" class="input-medium" style="float:left;width:203px;margin-right:5px;padding:5px 10px;height:30px;border:1px solid #d9d9d9;" onclick="WdatePicker()" />
+	<div style="width: 17%;float: left;">
+		<div style="width:30%;float:left;line-height: 30px;">订单状态</div>
+		<select style="width: 70%;height: 30px;border-color: #d9d9d9;" id="order_status">
+			<option value="">全部</option>
+			<option value="0">待付款</option>
+			<option value="1">待发货</option>
+			<option value="2">待收货</option>
+			<option value="3">已收货</option>
+			<option value="4">交易成功</option>
+			<option value="5">已关闭</option>
+			<option value="-1">退款中</option>
+			<option value="-2">已退款</option>
+		</select>
+	</div>
+	<div class="col-sm-1">
+		<button class="btn btn-sm btn-default" type="button"
+			onclick="LoadingInfo(1)">搜索</button>
+	</div>
+</div>
+<section class="panel panel-default">
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+				<th width="20"><input type="checkbox"></th>
+				<th>订单编号</th>
+				<th>店铺</th>
+				<th>买家</th>
+				<th>下单时间</th>
+				<th>订单总额</th>
+				<th>订单状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody id="list">
+			<tr></tr>
+		</tbody>
+	</table>
+	{include file="platform/page" /}
+</section>
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		var start_date = $("#startDate").val();
+		var end_date = $("#endDate").val();
+// 		var user_name = $("#userName").val();
+// 		var order_no = $("#orderNo").val();
+		var order_status = $("#order_status").val();	
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/order/orderlist",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex,
+				"order_no" : search_text,
+				"order_status":order_status,
+				"start_date":start_date,
+				"end_date":end_date
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['ordre_id']+'"></td>';
+						html += '<td>'+data['data'][i]['out_trade_no']+'</td>';
+						html += '<td>' + data["data"][i]["shop_name"] + '</td>';
+						html += '<td>' + data["data"][i]["user_name"] + '</td>';
+						html += '<td>' + data["data"][i]["create_time"] + '</td>';
+						html += '<td>￥ ' + data["data"][i]["order_money"] + '</td>';
+						html += '<td>' + data["data"][i]["status_name"] + '</td>';
+						html += '<td><a href="PLATFORM_MAIN/order/orderdetail?order_id=' + data["data"][i]["order_id"] + '">查看</a></td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="8">暂无符合条件的订单</th></tr>';
+				}
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+</script>
+{/block}

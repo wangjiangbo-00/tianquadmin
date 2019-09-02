@@ -1,0 +1,155 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-9">
+		<a href="PLATFORM_MAIN/Auth/addUser" class="btn btn-sm btn-primary"><i
+			class="fa fa-plus"></i> 添加用户 </a>
+	</div>
+	<div class="col-sm-2">
+		<input type="text" id="search_text" class="input-sm form-control"
+			placeholder="请输入用户名">
+	</div>
+	<div class="col-sm-1">
+		<button class="btn btn-sm btn-default" type="button"
+			onclick="LoadingInfo(1)">搜索</button>
+	</div>
+</div>
+<section class="panel panel-default">
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+				<th width="20"><input type="checkbox"></th>
+				<th>用户头像</th>
+				<th class="center">登录账号</th>
+				<th class="center">所属用户组</th>
+				<th class="center">状态</th>
+				<th class="center">操作</th>
+			</tr>
+		</thead>
+		<tbody id="list">
+			<tr></tr>
+		</tbody>
+	</table>
+	{include file="platform/page" /}
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Auth/userList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['uid']+'"></td>';
+						html += '<td><img src="__STATIC__/images/default_user_portrait.gif" style="height:50px;"/></td>';
+						html += '<td class="center">' + data["data"][i]["admin_name"] + '</td>';
+						html += data["data"][i]["group_name"] ? '<td class="center">' + data["data"][i]["group_name"] + '</td>' : '<td class="center"></td>';
+						html += data["data"][i]["user_status"] == 0 ? '<td  class="center" style="color:red;">锁定</td>' : '<td class="center" style="color:green;">正常</td>';
+						if(data['data'][i]['is_admin'] == 1){
+							html += '<td class="center">超级管理员不可编辑</td>';
+						}else{
+							html += '<td class="center"><a href="PLATFORM_MAIN/Auth/editUser?uid=' + data["data"][i]["uid"] + '">修改</a>&nbsp;&nbsp; ';
+							html += data["data"][i]["user_status"] == 0 ? '<a href="javascript:void(0);" onclick="unlock('+data["data"][i]["uid"]+', 1)">解锁</a>&nbsp;&nbsp; ' : '<a href="javascript:void(0);" onclick="lock('+data["data"][i]["uid"]+', 0)">锁定</a>&nbsp;&nbsp; ';
+							html += '<a href="javascript:void(0);" onclick="resetPassword(' + data["data"][i]["uid"] + ')">重置密码</a></td>';
+						}
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="6">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}	
+	function resetPassword(uid){
+		$( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+            			type : "post",
+            			url : "PLATFORM_MAIN/Auth/resetUserPassword",
+            			async : true,
+            			data : {
+            				"uid" : uid
+            			},
+            			success : function(data) {
+            				if(data["code"] > 0 ){
+            					showMessage('success', data["message"],'PLATFORM_MAIN/Auth/userList');
+            				}else{
+            					showMessage('error', data["message"]);
+            				}
+            			}
+            		})
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+            },
+            contentText:"你确定重置密码：123456？",
+            title:"消息提醒"
+        });
+	}
+	function lock(uid){
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Auth/userLock",
+			async : true,
+			data : {
+				"uid" : uid,
+			},
+			success : function(data) {
+				if(data["code"] > 0 ){
+					showMessage('success', data["message"],'PLATFORM_MAIN/Auth/userList');
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+	function unlock(uid){
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Auth/userUnlock",
+			async : true,
+			data : {
+				"uid" : uid,
+			},
+			success : function(data) {
+				if(data["code"] > 0 ){
+					showMessage('success', data["message"],'PLATFORM_MAIN/Auth/userList');
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+</script>
+{/block}

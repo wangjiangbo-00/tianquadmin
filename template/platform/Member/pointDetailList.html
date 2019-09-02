@@ -1,0 +1,119 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script>
+<style>
+.input-medium{
+	width: 200px;
+    margin-left: 15px;
+    height: 30px;
+    padding-left: 5px;
+}
+</style>
+{/block}
+ {block name="main"}
+<div class="row padder-v">
+<!-- 	<div class="col-sm-9" style="width:50%;"></div> -->
+	<div style="width:65%;float:right;">
+		<div class="col-sm-2" style="width:auto;">
+			<div class="input-group">
+				<input type="text" id='startDate' placeholder="请选择开始日期" class="input-medium" onclick="WdatePicker()"/>
+				<input type="text" id='endDate' placeholder="请选择结束日期" class="input-medium" onclick="WdatePicker()" />
+				<input type="text" id='search_text' placeholder="请输入会员昵称" class="input-medium"/>
+			</div>
+		</div>
+		<div class="col-sm-1">
+			<div class="input-group">
+				<span class="input-group-btn">
+					<button class="btn btn-sm btn-default" type="button" onclick="LoadingInfo(1)">搜索</button>
+				</span>
+			</div>
+		</div>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="20"><input type="checkbox"></th>
+					<th>会员昵称</th>
+					<th class="center">类别</th>
+					<th class="center">数量</th>
+					<th class="center">描述</th>
+					<th class="center">时间</th>
+					
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+			<input type="hidden" id="member_id" value="{$member_id}"/>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+
+
+{/block} {block name="script"}
+<script type="text/javascript">
+
+$(function(){
+	LoadingInfo(1);
+})
+	function LoadingInfo(pageIndex) {
+	var search_text = $("#search_text").val();
+	var member_id = $("#member_id").val();
+	var start_date = $("#startDate").val();
+	var end_date = $("#endDate").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/member/pointdetail",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text, "member_id" : member_id, "start_date" : start_date, "end_date" : end_date
+			},
+			success : function(data) {
+// 				alert(JSON.stringify(data));
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><div class="cell"><label ><input name="sub" type="checkbox" value="'+ data["data"][i]["id"]+'" ></label></div></td>';
+						html += '<td>' + data["data"][i]["nick_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["type_name"];
+						html += '<td class="center">' + data["data"][i]["number"] + '</td>';	
+						html += '<td class="center">' + data["data"][i]["text"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["create_time"] + '</td>';
+						html += '</tr>';
+						html += '<input type="hidden" id="member_id" value="{$member_id}"/>'
+					}
+				} else {
+					html += '<tr align="center"><th colspan="9">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+ 					var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+				
+			}
+		});
+	}
+	//全选
+	function CheckAll(event){
+		var checked = event.checked;
+		$(".style0list tbody input[type = 'checkbox']").prop("checked",checked);
+	}
+	$("#search_text").keypress(function(e){
+		if(e.keyCode == 13){
+			LoadingInfo(1);
+		}
+	});
+</script>
+{/block}

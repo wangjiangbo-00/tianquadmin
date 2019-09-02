@@ -1,0 +1,107 @@
+{extend name="platform/base" /} {block name="resources"/}
+{/block} {block name="right_tab"} {/block} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-7"></div>
+	<div class="col-sm-2">
+		<div class="input-group">
+			<input id="userName" class="input-sm form-control" type="text"
+				value="" placeholder="请输入收货人姓名">
+		</div>
+	</div>
+	<div class="col-sm-2">
+		<div class="input-group">
+			<input id="userTel" class="input-sm form-control" type="text"
+				value="" placeholder="请输入手机号">
+		</div>
+	</div>
+	<div class="col-sm-1">
+		<div class="input-group">
+			<span class="input-group-btn">
+				<button class="btn btn-sm btn-default" type="button"
+					onclick="LoadingInfo(1)">搜索</button>
+			</span>
+		</div>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th><label style="margin-left: 5px;"> <input
+							type="checkbox"></label></th>
+					<th>股东姓名</th>
+					<th>分红开始时间</th>
+					<th>分红结束时间</th>
+					<th>分红总金额</th>
+					<th>店铺总分值</th>
+					<th>股东分值</th>
+					<th>分红佣金比率</th>
+					<th>分红金额</th>
+					<th>创建时间</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} {block name="script"}
+<script type="text/javascript">	
+//查询
+	$(function(){
+	LoadingInfo(1);
+});
+	//加载数据
+	function LoadingInfo(pageIndex) {
+		var user_name = $("#userName").val();
+		var user_phone = $("#userTel").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Commission/commissionPartnerGlobalList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex,
+				"records_id":{$records_id},
+				"user_name":user_name,
+				"user_phone":user_phone
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr align="center">';						
+						html += '<td>' + data["data"][i]["real_name"] + '</td>';
+						html += '<td>' + data["data"][i]["start_time"] + '</td>';
+						html += '<td>' + data["data"][i]["end_time"] + '</td>';
+						html += '<td>' + data["data"][i]["yingye_money"] + '</td>';
+						html += '<td>' + data["data"][i]["shop_value"] + '</td>';
+						html += '<td>' + data["data"][i]["partner_value"] + '</td>';
+						html += '<td>' + data["data"][i]["partner_rate"] + '%</td>';
+						html += '<td>' + data["data"][i]["fenhong_money"] + '</td>';
+						html += '<td>' + data["data"][i]["create_time"] + '</td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="9">暂无符合条件的数据记录</th></tr>';
+				}
+				
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}	
+</script>
+{/block}

@@ -1,0 +1,54 @@
+{extend name="platform/base" /}
+{block name="main"}
+<div class="set-style">
+	<dl>
+		<dt>账号:</dt>
+		<dd><input name="" id="ali_partnerid" type="text" value="{$config.ali_partnerid}"/></dd>
+	</dl>
+	<dl>
+		<dt>合作者身份ID:</dt>
+		<dd><input name="" id="ali_seller" type="text" value="{$config.ali_seller}"/></dd>
+	</dl>
+		<dl>
+		<dt>安全校验网:</dt>
+		<dd><input name="" id="ali_key" type="text" value="{$config.ali_key}"/></dd>
+	</dl>
+	<dl>
+		<dt>是否选择:</dt>
+		<dd>
+			<p>
+				<div class="switch switch-small">
+					<input id="is_menu" type="checkbox" checked="checked"/>
+					<span class="help-inline" id="is_menuPrompt" style="display: none;"></span>
+				</div>
+			</p>
+		</dd>
+	</dl>
+	<button class="edit_button" onclick="setConfigAjax();">提交</button>
+</div>
+{include file="platform/openDialog" /}
+<script>
+	function setConfigAjax(){
+		var ali_partnerid = $("#ali_partnerid").val();
+		var ali_seller = $("#ali_seller").val();
+		var ali_key = $("#ali_key").val();
+		$.ajax({
+			type:"post",
+			url:"",
+			data:{
+				'partnerid':ali_partnerid,
+				'seller':ali_seller,
+				'ali_key':ali_key
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],'');
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+</script>
+{/block}

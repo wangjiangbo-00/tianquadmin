@@ -1,0 +1,255 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+
+</style>
+
+{/block}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 网站设置 </header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">网站标题</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="title" value="{$website.title}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">官方网址</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="web_url" value="{$website.web_url}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">联系地址</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="web_address" value="{$website.web_address}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">网站二维码</label>
+				<div class="col-md-4">
+					<img src="__ROOT__/{$qrcode_path}" title=""><!-- <p><img src="{$website.web_qrcode}" title=""></p> -->
+				</div>
+				
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">网站描述</label>
+                <div class="col-sm-4">
+                    <div id="editor" class="form-control" style="overflow:scroll;height:150px;max-height:150px">{$website.web_desc}</div>
+                </div>
+            </div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+                  <label class="col-lg-2 control-label">网站Logo</label>
+                  <div class="col-md-4">
+					<p><img id="imgLogo" src="__UPLOAD__/{$website['logo']}" class="imglogo"/></p>
+                         <a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                              <span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+                              <input hidefocus="true" size="1" class="input-file" name="file_upload" id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;" onchange="imgUpload(this);"> 
+							  <input type="hidden" id="Logo" value="{$website['logo']}" />
+							  </span>
+						<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+					    </a>
+				</div>
+           </div>
+           <div class="line line-dashed line-lg pull-in"></div>
+              <div class="form-group">
+                  <label class="col-lg-2 control-label">公众号二维码</label>
+                       <div class="col-md-4">
+						<p><img id="imgLogo1" src="__UPLOAD__/{$website['web_qrcode']}" class="imglogo"/></p>
+                           <a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+                            <span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+                            <input hidefocus="true" size="1" class="input-file" name="file_upload" id="uploadImg1" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;" onchange="imgUpload1(this);"> 
+							<input type="hidden" id="Logo1" value="{$website['web_qrcode']}" />
+							</span>
+							<a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+						</a>
+					</div>
+              </div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">网站关键字</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="key_words" value="{$website.key_words}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">电话</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="web_phone" value="{$website.web_phone}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">邮箱</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="web_email" value="{$website.web_email}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">qq</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="web_qq" value="{$website.web_qq}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">微信</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="web_weixin" value="{$website.web_weixin}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">网站备案号</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="web_icp" value="{$website.web_icp}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">网站风格</label>
+				<div class="col-sm-4">
+					<select id="style_id" name="account" class="form-control m-b">
+						{volist name="style_list" id="v"}
+							<option value="{$v['style_id']}" {if condition="$website['style_id'] eq $v['style_id']"} selected{/if}>{$v['style_name']}</option>
+						{/volist}
+					</select>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">PC端商城运营状态</label>
+				 <div class="total">
+					  <label for="navigationtype1" style="padding:8px;" class="in"><input type="radio" value="1" name="navigationtype" id="navigationtype1" {if condition="$website.web_status eq 1"}checked{/if}/>开启</label>
+				      <label for="navigationtype2" style="paddind:8px;" class="out"><input type="radio" value="2" name="navigationtype" id="navigationtype2" {if condition="$website.web_status eq 2"}checked{/if}/>关闭</label>
+		 	     </div>
+		 	     <p class="col-sm-4" style="margin-left: 16.66%;margin-top: 10px;color: #BBB;">暂时将站点关闭，其他人无法访问，但不影响管理员访问</p>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">WAP端商城运营状态</label>
+				 <div class="total">
+					  <label for="waptype1" class="go"><input type="radio" value="1" name="waptype" id="waptype1" {if condition="$website.wap_status eq 1"}checked{/if}/>开启</label>
+			      	  <label for="waptype2" class="come"><input type="radio" value="2" name="waptype" id="waptype2" {if condition="$website.wap_status eq 2"}checked{/if}/>关闭</label>
+		 	     </div>
+		 	     <p class="col-sm-4" style="width:100%;margin-left: 16.66%;margin-top: 10px;color: #BBB;">暂时将站点关闭，其他人无法访问，但不影响管理员访问</p>
+				 <div style="margin-left:16.66%;">
+					<textarea name="store_zy" rows="2" id="close_reason" class="textarea w400" style="width:350px;height:100px;">{$website.close_reason}</textarea>
+				    <p class="hint" style="color:#BBB;margin-top:10px;">请填写站点关闭原因，将在前台显示</p>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">商城第三方统计代码</label>
+				 <div style="margin-left:16.66%;">
+					<textarea name="store_zy" rows="2" id="third_count" class="textarea w400" style="width:350px;height:100px;">{$website.third_count}</textarea>
+				    <p class="hint" style="color:#BBB;margin-top:10px;">页面底部可以显示第三方统计</p>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="setConfigAjax()" class="btn btn-primary">保存</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script src="ADMIN_JS/ajax_file_upload.js" type="text/javascript"></script>
+<script src="__STATIC__/js/file_upload.js" type="text/javascript"></script>
+<script>
+/**
+ *图片上传
+ */
+/* function imgUpload(event) {
+	var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+	fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+} */
+function imgUpload(event) {
+	var fileid = $(event).attr("id");
+	var data = { 'file_path' : UPLOADCOMMON };
+	uploadFile(fileid,data,function(res){
+		if(res.code){
+			$("#imgLogo").attr("src","__UPLOAD__/"+res.data);
+			$("#Logo").val(res.data);
+			showTip(res.message,"success");
+		}else{
+			showTip(res.message,"error");
+		}
+	});
+}
+function imgUpload1(event) {
+	var fileid = $(event).attr("id");
+	var data = { 'file_path' : UPLOADCOMMON };
+	uploadFile(fileid,data,function(res){
+		if(res.code){
+			$("#imgLogo1").attr("src","__UPLOAD__/"+res.data);
+			$("#Logo1").val(res.data);
+			showTip(res.message,"success");
+		}else{
+			showTip(res.message,"error");
+		}
+	});
+}
+	function setConfigAjax(){
+		var title = $("#title").val();
+		var web_url = $("#web_url").val();
+		var web_address = $("#web_address").val();
+		var web_desc = $("#editor").html();
+		var Logo = $("#Logo").val();
+		var web_qrcode = $("#Logo1").val();
+		var key_words = $("#key_words").val();
+		var web_phone = $("#web_phone").val();
+		var web_email = $("#web_email").val();
+		var web_qq = $("#web_qq").val();
+		var web_weixin = $("#web_weixin").val();
+		var web_icp = $("#web_icp").val();
+		var web_style = $("#style_id").val();
+		var web_status = $("input[name='navigationtype']:checked").val();
+		var wap_status = $("input[name='waptype']:checked").val();
+		var third_count = $("#third_count").val();
+		var close_reason = $("#close_reason").val();
+		 $.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Config/webConfig",
+			data:{
+				'title':title,
+				'web_url':web_url,
+				'web_address':web_address,
+				'web_desc':web_desc,
+				'logo':Logo,
+				'web_qrcode':web_qrcode,
+				'key_words':key_words,
+				'web_phone':web_phone,
+				'web_email':web_email,
+				'web_qq':web_qq,
+				'web_weixin':web_weixin,
+				'web_icp':web_icp,
+				'web_style':web_style,
+				'web_status' : web_status,
+				'wap_status' : wap_status,
+				'third_count' : third_count,
+				'close_reason' : close_reason
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/Config/webConfig");
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		}); 
+	}
+</script>
+{/block}

@@ -1,0 +1,87 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加用户 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="user_form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">姓名</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="admin_name" name="admin_name" value="" required>
+				</div>
+				<label class="col-md-8 error" for="admin_name" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+                                            <label class="col-sm-2 control-label">密码</label>
+                                            <div class="col-sm-2">
+                                                <input type="password" name="user_password" id="user_password" class="form-control" required>
+                                            </div>
+				<label class="col-md-8 error" for="user_password" ></label>
+                                        </div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">所属用户组</label>
+				<div class="col-sm-2">
+					<select id="group_id" name="group_id" class="form-control m-b" required>
+						<option value="">请选择用户组</option>
+						{foreach name="auth_group" item="v1"}
+							<option value="{$v1['group_id']}">&nbsp;&nbsp;{$v1['group_name']}</option>
+						{/foreach}
+					</select>
+				</div>
+				<label class="col-md-8 error" for="group_id" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+                                            <label class="col-sm-2 control-label">描述</label>
+                                            <div class="col-sm-4">
+                                                <div id="editor" class="form-control" style="overflow:scroll;height:150px;max-height:150px"></div>
+                                            </div>
+                                        </div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button type="submit" class="btn btn-primary">保存</button>
+<!-- 					<a href="javascript:void(0);" onclick="addUserAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+$().ready(function() {
+	$("#user_form").validate({
+		submitHandler:function(){
+			addUserAjax();
+		}
+	});
+});
+	/**
+	 *添加用户
+	 **/
+	function addUserAjax() {
+		var admin_name = $("#admin_name").val();
+		var group_id = $("#group_id").val();
+		var user_password = $("#user_password").val();
+		var desc = $("#editor").html();
+// 		verify(admin_name, user_password, desc);
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Auth/addUser",
+			data : {
+				'admin_name' : admin_name,
+				'group_id' : group_id,
+				'user_password' : user_password,
+				'desc' : desc
+			},
+			async : true,
+			success : function(data) {
+				if (data['code'] > 0) {
+					location.href = 'PLATFORM_MAIN/Auth/userList';
+				}
+			}
+		});
+	}
+</script>
+{/block}

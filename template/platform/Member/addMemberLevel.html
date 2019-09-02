@@ -1,0 +1,161 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<!-- <script src="ADMIN_JS/My97DatePicker/WdatePicker.js" type="text/javascript"></script> -->
+<style type="text/css">
+.hint{color: #BBB;}
+.error{display:none;color:red}
+.total{overflow: hidden;}
+.required{color:red;margin-right:10px;}
+.total>div { text-align: left;font-size: 12px;width:100%;height: 43px;line-height: 34px;overflow:hidden;color:#666;font-weight: normal;}
+.total>div input { margin: 0 5px 0 0;} 
+.total label {float:left;text-align: left;font-size: 12px; line-height: 30px;width:10%;overflow:hidden;color:#666;font-weight: normal;}
+.total label input {margin: 0 5px 0 0;}  
+textarea{width:300px;height:100px;border-color:#d9d9d9;}
+</style>
+{/block}
+{block name="main"}
+
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加等级</header>
+	<div class="panel-body">
+		<form class="form-horizontal">
+		     <div class="form-group">
+				<label class="col-sm-2 control-label"><span class="required">*</span>等级名称</label>
+				<div class="col-md-4" style="width:28%;">
+					<input type="text" class="form-control" id="level_name" value="" >
+				</div>
+				<p class="error">请输入等级名称</p>
+				<p class="col-sm-4" style="margin-left: 200px;margin-top: 10px;color: #BBB;width:100%;">设置会员等级名称</p>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            <div class="form-group">
+				<label class="col-sm-2 control-label" style="margin-right: 15px;"><span class="required">*</span>升级条件</label>
+				
+				<div  class="total">
+					<div>
+					      <div style="float:left"><input type="checkbox" value="1" name=""/>累计积分满&nbsp;&nbsp;&nbsp;</div>
+						 
+						  <div class="col-md-2">
+							  <input type="number" min="0"  class="form-control"  id="min_integral" placeholder="0" onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+						  </div>分&nbsp;&nbsp;&nbsp;
+						  <span class="hint">设置会员等级所需要的累计积分且必须大于等于0</span>
+					</div>
+			        <div >
+			              <div style="float:left"><input type="checkbox" value="2" name=""/>消费额度满&nbsp;&nbsp;&nbsp;</div>
+			             
+			              <div class="col-md-2">
+							  <input type="number" min="0"  class="form-control"  id="quota" placeholder="0" onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')">
+						  </div>元&nbsp;&nbsp;&nbsp;
+			           
+			              <span class="hint">设置会员等级所需要的消费额度且必须大于等于0,单位：元</span>
+			     
+			        </div>
+			        <label for="navigationtype1"><input type="radio" value="1" name="navigationtype" id="navigationtype1" checked/>或</label>
+			        <label for="navigationtype2"><input type="radio" value="2" name="navigationtype" id="navigationtype2" />且</label>
+		        	<label class="hint" style="margin-left: 78px;width:27%;font-size:12px ;color:#BBB;">设置会员升级条件的关系</label>
+		    <p class="error">至少勾选一个升级条件</p>
+			    </div>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            
+            <div class="form-group">
+				<label class="col-sm-2 control-label"><span class="required">*</span>折扣率</label>
+				<div class="col-md-2" style="width:10%;">
+					<input type="text" class="form-control" id="goods_discount" value="" >
+				</div>
+				<p class="col-sm-4" style="margin-left: 200px;margin-top: 10px;color: #BBB;width:100%;">折扣率单位为百分比，如输入90，表示该会员等级的用户可以以商品原价的90%购买</p>
+			<p class="error">折扣率必须为0-100的正整数</p>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            
+            <div class="form-group">
+				<label class="col-sm-2 control-label" style="margin-right: 15px;">等级描述</label>
+				<textarea id="desc"></textarea>
+				<p class="col-sm-4" style="margin-left: 200px;margin-top: 10px;color: #BBB;width:100%;">会员等级描述信息</p>
+			</div>
+            <div class="line line-dashed line-lg pull-in"></div>
+            
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="addGift()" class="btn btn-primary">提交</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+
+
+<script>	
+     var flag = false;//防止重复提交
+	//保存
+	function addGift(){
+		var level_name = $("#level_name").val();
+		var min_integral = $("#min_integral").val();
+		var quota = $("#quota").val();
+		var goods_discount = $("#goods_discount").val();
+		var desc = $("#desc").val();
+		var reg = /^(?:0|[1-9][0-9]?|100)$/;
+		var relation = $("input[name='navigationtype']:checked").val();
+		var upgrade = new Array();
+		$(".total input[type='checkbox']:checked").each(function() {
+			if (!isNaN($(this).val())) {
+				upgrade.push($(this).val());
+			}
+		});
+		if(upgrade=='1,2'){
+			upgrade=3;
+		}
+		if (level_name == '') {
+			$("#level_name").parent().siblings('.error').show().css("display","inline-block");
+			$("#level_name").focus();
+			return false;
+		} else {
+			$(".error").hide();
+		}
+
+		if (upgrade == '') {
+			$(".total .error").show();
+			return false;
+		} else {
+			$(".error").hide();
+		}
+
+		if(!reg.test(goods_discount)){
+			$("#goods_discount").parent().siblings('.error').show().css("display","inline-block");
+			$("#goods_discount").focus();
+			return false;
+		}else {
+			$(".error").hide();
+		}
+	
+		if(flag){
+			return false;
+		}
+		flag = true;
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/member/addmemberlevel",
+			data : {
+				'level_name' : level_name,
+				'min_integral' : min_integral,
+				'quota' : quota,
+				'upgrade' : upgrade.toString(),
+				'goods_discount' : goods_discount,
+				'desc' : desc,
+				'relation' : relation
+			},
+			async : true,
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				if (data["code"] > 0) {
+					showMessage('success', data["message"]);
+					 location.href="PLATFORM_MAIN/member/memberlevellist";
+				}else{
+					showMessage('error', data["message"]);
+				}	
+				flag = false;
+			}
+		});
+	}
+</script>
+{/block}

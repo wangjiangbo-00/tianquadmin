@@ -1,0 +1,191 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 修改商品分类 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="goods_category_form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">商品分类名称</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="category_name" value="{$data.category_name}" required>
+				</div>
+				<label class="col-md-8 error" for="category_name" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">上級分类</label>
+				<div class="col-sm-2">
+					<select id="pid" name="account" class="form-control m-b">
+						<option value="0">顶级分类</option> 
+						{foreach name="category_list" item="v1"}
+							<option value="{$v1['category_id']}" {if condition="$data.pid eq $v1['category_id']"}selected{/if}>{$v1['category_name']}</option>
+						{foreach name="v1['child_list']" item="v2"}
+							<option value="{$v2['category_id']}" {if condition="$data.pid eq $v2['category_id']"}selected{/if}>&nbsp;&nbsp;&nbsp;&nbsp;{$v2['category_name']}</option>
+						{/foreach} {/foreach}
+					</select>
+				</div>
+			</div>			
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">商品分类简称</label>
+				<div class="col-sm-2">
+					<input type="text" class="form-control" id="short_name" name="short_name" required value="{$data.short_name}">
+				</div>
+				<label class="col-md-8 error" for="short_name"></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">商品类型</label>
+				<div class="col-sm-2">
+					<select name="attr" id="attr_id" style="width:100%;height:30px;border-color:#d9d9d9;color:#555555;">
+						<option value="">选择类型</option>
+						{volist name="goodsAttributeList" id="vo"}
+						<option value="{$vo.class_id}" {if condition="$data['attr_id'] eq $vo['class_id']"}selected{/if}>{$vo.class_name}</option>
+						{/volist}
+					</select>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+                  <label class="col-sm-2 control-label">是否可见</label>
+                  <div class="col-sm-4">
+                      <label class="switch">
+                          <input id="is_visible" type="checkbox" {if condition="$data.is_visible eq 1"}checked="checked"{/if}>
+                          <span></span> </label>
+                  </div>
+            </div>
+            <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">关键字</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="keywords" value="{$data.keywords}">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">排序</label>
+				<div class="col-md-1">
+					<input type="text" class="form-control" id="sort" value="{$data.sort}" number="true" min="0">
+				</div>
+				<label class="col-md-9 error" for="sort" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">分类图片</label>
+				<div class="col-md-10">
+					<p>
+					    {if condition="$data.category_pic eq ''"} 
+					    	<img id="imgLogo" src=""> 
+						{else/}
+		 				    <img id="imgLogo" src="{$data.category_pic}" class="imglogo"/>
+						{/if} 
+					</p>
+                                               	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+	                                   		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+							                                   		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+												id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+												onchange="imgUpload(this);"> 
+												<input type="hidden" id="Logo" value="{$data.category_pic}" />
+											 </span>
+											 <a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+									     </a>
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+                                            <label class="col-sm-2 control-label">描述</label>
+                                            <div class="col-sm-4">
+                                                <div id="editor" class="form-control" style="overflow:scroll;height:150px;max-height:150px">{$data.description}</div>
+                                            </div>
+                                        </div>
+			<!-- 书签 -->
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<input id="category_id" type="hidden" value="{$data.category_id}">
+					<button type="submit" class="btn btn-primary">保存</button>
+<!-- 					<a href="javascript:void(0);" onclick="updateGoodsCategoryAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+$().ready(function() {
+	 $("#goods_category_form").validate({
+	        submitHandler:function(){
+	        	updateGoodsCategoryAjax();
+	        }    
+	 });
+});
+	/**
+	*修改模块
+	*/
+	function updateGoodsCategoryAjax() {
+		var category_id = $("#category_id").val();
+		var category_name = $("#category_name").val();
+		var short_name = $("#short_name").val();
+		var pid = $("#pid").val();
+		var keywords = $("#keywords").val();
+		var sort = $("#sort").val();
+		var description = $("#editor").html();
+		if($("#is_visible").prop("checked")){
+			var is_visible = 1;
+		}else{
+			var is_visible = 0;
+		}
+		var category_pic = $("#Logo").val();
+		var attr_id = $("#attr_id").val();
+		if(attr_id.length>0){
+			var attr_name = $("#attr_id").find("option:selected").text();
+		}else{
+			var attr_name = '';
+		}
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/goods/updategoodscategory",
+			data : {
+				'category_id' : category_id,
+				'category_name' : category_name,
+				'pid' : pid,
+				'keywords' : keywords,
+				'sort' : sort,
+				'description' : description,
+				'is_visible' : is_visible,
+				'category_pic' : category_pic,
+				"short_name" : short_name,
+				"attr_id" : attr_id,
+				"attr_name" : attr_name
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],'PLATFORM_MAIN/goods/goodscategorylist');
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+	/**
+	 *图片上传
+	 */
+/* 	function imgUpload(event) {
+		var fileid = $(event).attr("id");   var str = $(event).next().attr("id");
+		fileCommonUpload("UPLOAD_URL", fileid,"__UPLOAD__",str);
+	} */
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src",res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

@@ -1,0 +1,138 @@
+{extend name="platform/base" /} 
+{block name="resources"/}
+<style>
+	.img{
+		float:left;
+		padding-left: 30px;
+    	padding-top: 19px;
+	}
+</style>
+{/block}
+{block name="main"}
+<section class="panel panel-default">
+              <header class="panel-heading"> 账户记录</header>
+              <div class="row text-sm wrapper">
+                <div class="col-sm-7 m-b-xs">
+                  
+                </div>
+                <div class="col-sm-2">
+                  	<div class="input-group">
+						<input type="text" id="startDate" class="input-sm form-control"placeholder="请选择开始日期" onclick="WdatePicker()" />		
+				  	</div>
+				  </div>
+				  <div class="col-sm-2">
+				  	<div class="input-group">
+						<input type="text" id="endDate" placeholder="请选择结束日期" class="input-sm form-control"onclick="WdatePicker()" />
+				  	</div>
+				  </div>
+				   <div class="col-sm-1">
+						<div class="input-group">
+							<span class="input-group-btn">
+								<button class="btn btn-sm btn-default" type="button"
+									onclick="LoadingInfo(1)">搜索</button>
+							</span> 
+						</div>
+				  </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped b-t b-light text-sm">
+                  <thead>
+                    <tr>
+                      <th width="20"><input type="checkbox"></th>
+                      <th class="center">店铺 </th>
+                      <th class="center">金额</th>
+                      <th class="center">发生方式</th>
+                      <th class="center">是否参与计算</th>
+                      <th class="center">创建时间</th>
+                      <th class="center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="list">
+                  </tbody>
+                </table>
+              </div>
+               {include file="platform/page" /}
+               <footer class="panel-footer bg-white no-padder">
+                    <div class="row text-center no-gutter">
+                      <div class="col-xs-3 b-r b-light"><img src="PLATFORM_IMG/platform1.png" class="img"> <span class="h4 font-bold m-t block" id="order_total">0</span> <small class="text-muted m-b block">平台的总营业额</small> </div>
+                      <div class="col-xs-3 b-r b-light"><img src="PLATFORM_IMG/platform2.png" class="img"> <span class="h4 font-bold m-t block" id="bond">0</span> <small class="text-muted m-b block">平台资金总余额</small> </div>
+                      <div class="col-xs-3 b-r b-light"><img src="PLATFORM_IMG/platform3.png" class="img"> <span class="h4 font-bold m-t block" id="turnover">0</span> <small class="text-muted m-b block">平台利润总额</small> </div>
+                      <div class="col-xs-3"><img src="PLATFORM_IMG/platform4.png" class="img"> <span class="h4 font-bold m-t block" id="cash_withdrawal_amount">10</span> <small class="text-muted m-b block">保证金总额</small> </div>
+                    </div>
+                  </footer>
+                   <footer class="panel-footer bg-white no-padder">
+                    <div class="row text-center no-gutter">
+                      <div class="col-xs-4 b-r b-light"><img src="PLATFORM_IMG/platform5.png" class="img"> <span class="h4 font-bold m-t block" id="total">0</span> <small class="text-muted m-b block">商城订单总额</small> </div>
+                      <div class="col-xs-4 b-r b-light"><img src="PLATFORM_IMG/platform6.png" class="img"> <span class="h4 font-bold m-t block" id="platform_balance">0</span> <small class="text-muted m-b block">商城提现总额</small> </div>
+                      <div class="col-xs-4 b-r b-light"><img src="PLATFORM_IMG/platform7.png" class="img"> <span class="h4 font-bold m-t block" id="shop_balance">0</span> <small class="text-muted m-b block">店铺总余额</small> </div>
+                    </div>
+                  </footer>
+            </section>
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script> 
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+function LoadingInfo(page_index) {
+	var start_date = $("#startDate").val();
+	var end_date = $("#endDate").val();
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/account/platformaccountrecordscountlist",
+		async : true,
+		data : {
+			"page_index" : page_index,
+			"start_date":start_date,
+			"end_date":end_date,
+		},
+		success : function(data) {
+			$("#order_total").text(data.count["order_total"]);
+			$("#bond").text(data.count["bond"]);
+			$("#turnover").text(data.count["turnover"]);
+			$("#cash_withdrawal_amount").text(data.count["cash_withdrawal_amount"]);
+			$("#total").text(data.count["total"]);
+			$("#platform_balance").text(data.count["platform_balance"]);
+			$("#shop_balance").text(data.count["shop_balance"]);
+			
+			$("#page_count").val(data.list["page_count"]);
+			$("#pageNumber a").remove();
+			var html = '';
+			if (data.list["data"].length > 0) {
+				for (var i = 0; i < data.list["data"].length; i++) {
+					html += '<tr>';
+					html += '<td><input type="checkbox" name="sub" value="'+ data.list['data'][i]['id']+'"></td>';
+					html += '<td class="center">' + data.list["data"][i]["shop_name"] + '</td>';
+					html += '<td class="center">' + data.list["data"][i]["money"] + '</td>';
+					if(data.list["data"][i]["account_type"] == 1){
+						html += '<td class="center">订单</td>';
+					}else{
+						html += '<td class="center">提现</td>';
+					}
+					if(data.list["data"][i]["is_calculate"] == 1){
+						html += '<td class="center">参与</td>';
+					}else{
+						html += '<td class="center">不参与</td>';
+					}
+					html += '<td class="center">' + data.list["data"][i]["create_time"] + '</td>';															
+					
+					html += '<td></td>';
+					
+					html += '</tr>';
+				}
+			} else {
+				html += '<tr><th colspan="7">暂无符合条件的数据记录</th></tr>';
+			}
+			$("#list").html(html);
+				var totalpage = $("#page_count").val();
+		if (totalpage == 1) {
+			changeClass("all");
+		}
+		var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+		$("#pageNumber").append($html);
+		}
+	});
+}	
+
+</script>
+{/block}

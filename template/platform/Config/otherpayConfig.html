@@ -1,0 +1,95 @@
+{extend name="platform/base" /} {block name="main"}
+<section class="panel panel-default">
+<!-- 	<header class="panel-heading text-right bg-light"> -->
+<!-- 		<ul class="nav nav-tabs pull-left"> -->
+<!-- 			<li class="active"><a href="#wpay" data-toggle="tab">其他支付方式</a></li> -->
+<!--  			<li class=""><a href="#alipay" data-toggle="tab">支付宝支付</a></li> --> 
+<!-- 		</ul> -->
+<!-- 		<span class="hidden-sm">其他支付方式设置</span> -->
+<!-- 	</header> -->
+	<div class="panel-body">
+		<div class="tab-content">
+			<div class="tab-pane fade active in" id="wpay">
+				<section class="panel panel-default">
+					<header class="panel-heading font-bold"> 其他支付方式 </header>
+					<div class="panel-body">
+						<form class="form-horizontal" id="opay_form"  method="post">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">是否启用余额支付</label>
+								<div class="col-md-4">
+									<label class="switch">
+										<input type="checkbox" id="ypay_is_use" {if condition="$other_config.oauth_value.is_balance_pay eq 1"}checked{/if}>
+										<span></span>
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">是否启用购物币支付</label>
+								<div class="col-md-4">
+									<label class="switch">
+										<input type="checkbox" id="gpay_is_use" {if condition="$other_config.oauth_value.is_coin_pay eq 1"}checked{/if}>
+										<span></span>
+									</label>
+								</div>
+							</div>
+							<div class="line line-dashed line-lg pull-in"></div>
+							<div class="form-group">
+								<div class="col-sm-4 col-sm-offset-2">
+									<button type="submit" class="btn btn-primary">保存</button>
+<!-- 									<a href="javascript:void(0);" onclick="setWpayConfigAjax()" -->
+<!-- 										class="btn btn-primary">保存</a> -->
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+			</div>
+			
+		</div>
+	</div>
+</section>
+<script>
+$().ready(function() {
+	 $("#opay_form").validate({
+	        submitHandler:function(){
+	            setopayConfigAjax();
+	        }    
+	 });
+});
+
+/**
+ * 其他支付方式 设置
+ */
+	function setopayConfigAjax() {
+		if($("#ypay_is_use").prop("checked")){
+			var yis_use = 1;
+		}else{
+			var yis_use = 0;
+		}
+		if($("#gpay_is_use").prop("checked")){
+			var gis_use = 1;
+		}else{
+			var gis_use = 0;
+		}
+		
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Config/setOpayConfig",
+			data : {
+				
+				'yis_use' : yis_use,
+				'gis_use' : gis_use
+			},
+			async : true,
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"], 'PLATFORM_MAIN/Config/otherpayConfig');
+				} else {
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+
+</script>
+{/block}

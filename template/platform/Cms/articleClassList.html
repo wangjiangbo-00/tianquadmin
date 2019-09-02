@@ -1,0 +1,124 @@
+{extend name="platform/base" /}
+{block name="main"}
+<header class="header clearfix">
+	<div class="row m-t-sm">
+			<a href="PLATFORM_MAIN/Cms/addArticleClass"
+				class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加分类</a>
+	</div>
+</header>
+<section class="panel panel-default">
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+				<th width="20"></th>
+				<th width="80">排序</th>
+				<th>分类名称</th>
+				<th  class="center" width="100">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		{foreach name="list" item="v"}
+			<tr class="pid_0">
+				<td>{if condition="$v['child_list'] neq array()"}<a
+					href="javascript:;" onclick="tab_switch({$v['class_id']})"
+					class="tab_jia_{$v['class_id']}" style="display: block;"> <i
+						class="fa fa-plus"></i></a> <a href="javascript:;"
+					onclick="tab_switch({$v['class_id']})"
+					class="tab_jian_{$v['class_id']}" style="display: none;"><i
+						class="fa fa-minus"></i></a> {/if}
+				</td>
+				<td><input type="text" class="form-control"
+					fieldid="{$v['class_id']}" fieldname="sort" value="{$v['sort']}"
+					size="1"></td>
+				<td>
+					<div class="col-md-12">
+					{$v['name']}
+					</div>
+				</td>
+				<td class="center"><a
+					href="PLATFORM_MAIN/Cms/updateArticleClass?class_id={$v['class_id']}">修改</a>&nbsp;
+					<a href="javascript:void(0);"
+					onclick="deleteArticleClass({$v['class_id']})">删除</a></td>
+			</tr>
+			{foreach name="v['child_list']" item='v2'}
+				<tr class="pid_{$v['class_id']}" style="display: none;">
+				<td></td>
+				<td><input type="text" class="form-control"
+					fieldid="{$v2['class_id']}" fieldname="sort" value="{$v2['sort']}"
+					size="1"></td>
+				<td>
+					<div class="col-md-1"></div>
+					<div class="col-md-11">
+					{$v2['name']}
+					</div>
+				</td>
+				<td class="center"><a
+					href="PLATFORM_MAIN/Cms/updateArticleClass?class_id={$v2['class_id']}">修改</a>
+					<a href="javascript:void(0);"
+					onclick="deleteArticleClass({$v2['class_id']})">删除</a></td>
+			</tr>
+			{/foreach}
+		{/foreach}
+		</tbody>
+	</table>
+</section>
+<script type="text/javascript">
+	function tab_switch(class_id){
+		if($(".pid_"+class_id).css('display') != 'none'){
+			$(".tab_jian_"+class_id).hide();
+			$(".tab_jia_"+class_id).show();
+			$(".pid_"+class_id).hide(300);
+		}else{
+			$(".tab_jian_"+class_id).show();
+			$(".tab_jia_"+class_id).hide();
+			$(".pid_"+class_id).show(500);
+		}
+	}
+	//删除分类
+	function deleteArticleClass(class_id){
+		$( "#dialog" ).dialog({				
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+        				type : "post",
+        				url : "PLATFORM_MAIN/Cms/deleteArticleClass",
+        				async : true,
+        				data : {
+        					"class_id" : class_id
+        				},
+        				success : function(data) {
+        					if (data["code"] > 0) {
+        						showMessage('success', data["message"], 'PLATFORM_MAIN/Cms/articleClassList');
+        					}else{
+        						showMessage('error', data["message"]);
+        					}
+        				}
+        				})
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+            },
+            contentText:"是否删除分类？",
+        });
+	}
+	$("table input").change(function(){
+		var fieldid = $(this).attr('fieldid');
+		var fieldvalue = $(this).val();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Cms/modifyField",
+			data:{'fieldid':fieldid,'sort':fieldvalue},
+			async:true,
+			success: function (data) {
+				if(data['code'] <= 0){
+					alert(data['message']);
+				}
+			}
+		});
+	});
+</script>
+{/block}
+
+

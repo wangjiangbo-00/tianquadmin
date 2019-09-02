@@ -1,0 +1,172 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.fa {
+    display: grid;
+   
+}
+</style>
+{/block}
+ {block name="main"}
+<div class="row padder-v">
+    <div class="col-sm-4">
+        <a href="PLATFORM_MAIN/Shop/addshopbanner"
+           class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加横幅</a>
+    </div>
+</div>
+
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+
+
+					<th>横幅名称</th>
+					<th>横幅图片</th>
+					<th>关联类型</th>
+					<th>关联名字</th>
+					<th>有效状态</th>
+					<th>展示状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} 
+{block name="script"}
+<script type="text/javascript">
+
+$(function(){
+	LoadingInfo(1);
+});
+function LoadingInfo(pageIndex) {
+    var search_text = $("#search_text").val();
+    $.ajax({
+        type : "post",
+        url : "PLATFORM_MAIN/shop/getShopBannerList",
+        async : true,
+        data : {
+            "pageIndex" : pageIndex, "search_text" : search_text
+        },
+        success : function(data) {
+            $("#page_count").val(data["page_count"]);
+            $("#pageNumber a").remove();
+            var html = '';
+            if (data["data"].length > 0) {
+                for (var i = 0; i < data["data"].length; i++) {
+
+
+
+                    switch(data['data'][i]['is_valid']){
+                        case 0:
+                            var valid_name = '无效';
+                            break;
+                        case 1:
+                            var valid_name = '生效';
+                            break;
+
+                    }
+
+                    switch(data['data'][i]['is_show']){
+                        case 0:
+                            var visible_name = '不展示';
+                            break;
+                        case 1:
+                            var visible_name = '展示';
+                            break;
+
+                    }
+
+                    switch(data['data'][i]['type']){
+                        case 1:
+                            var type_name = '商品链接';
+                            break;
+                        case 2:
+                            var type_name = '店铺链接';
+                            break;
+                        case 3:
+                            var type_name = '平台折扣';
+                            break;
+                        case 4:
+                            var type_name = '平台抽奖';
+                            break;
+                        case 5:
+                            var type_name = '平台团购';
+                            break;
+
+
+                    }
+
+
+
+                    html += '<tr >';
+                    html += '<td>' + data["data"][i]["name"] + '</td>';;
+                    html += '<td>' + data["data"][i]["poster"] + '</td>';;
+                    html += '<td>'+ type_name +'</td>';
+                    html += '<td>'+ data["data"][i]["refdetails"] +'</td>';
+                    html += '<td>'+ valid_name +'</td>';
+                    html += '<td>'+ visible_name +'</td>';
+                    html += '<td>';
+
+                    html += '<a href="PLATFORM_MAIN/Shop/updateshopbanner?id=' + data["data"][i]["id"] + '">编辑</a>&nbsp;';
+                    html += '<a href="javascript:void(0);"onclick="del('+data["data"][i]["id"]+')">删除</a>&nbsp;';
+                    html += '<a href="javascript:void(0);"onclick="info('+data["data"][i]["id"]+')">详情</a>&nbsp;';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+            } else {
+                html += '<tr align="center"><th colspan="4">暂无符合条件的数据记录</th></tr>';
+            }
+            $("#list").html(html);
+            var totalpage = $("#page_count").val();
+            if (totalpage == 1) {
+                changeClass("all");
+            }
+            var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+            $("#pageNumber").append($html);
+        }
+    });
+}
+
+function del(id){
+    $.ajax({
+        type:"post",
+        url : "ADMIN_MAIN/promotion/deleteactivity",
+        data : {
+            "id" : id
+        },
+        success : function(data) {
+            if (data["code"] > 0) {
+                showMessage('success', data["message"],'ADMIN_MAIN/promotion/getFestivalActivityList');
+            }else{
+                showMessage('error', data["message"]);
+            }
+        }
+    })
+}
+
+function info(id){
+    $.ajax({
+        type:"post",
+        url : "ADMIN_MAIN/promotion/getactivitydetail",
+        data : {
+            "id" : id
+        },
+        success : function(data) {
+            if (data["code"] > 0) {
+                showMessage('success', data["message"],'ADMIN_MAIN/promotion/getFestivalActivityList');
+            }else{
+                showMessage('error', data["message"]);
+            }
+        }
+    })
+}
+
+</script>
+{/block}

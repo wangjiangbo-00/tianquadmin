@@ -1,0 +1,198 @@
+{extend name="platform/base" /}
+{block name="resources"}
+<script type="text/javascript" charset="utf-8" src="ADMIN_JS/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" 	src="ADMIN_JS/ueditor/ueditor.all.common.js"></script>
+<style type="text/css">
+.required{
+	color:red;margin-right:10px;
+}
+.error{display:none;color:red;}
+</style>
+{/block} {block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 添加专题</header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="form" name="form" action="javascript:;">
+			<div class="form-group">
+				<label class="col-sm-2 control-label"><span class="required">*</span>专题标题</label>
+				<div class="col-md-6">
+					<input type="text" class="form-control" id="title" value="{$info.title}">
+				</div>
+				<span class="error">请输入专题标题</span>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+	       <!-- 上传图片 -->
+			<div class="form-group">
+                                   <label class="col-sm-2 control-label">专题封面</label>
+                                   <div class="col-sm-8">
+	                                   	<p>
+								            {if condition="$info.image eq ''"} 
+										    	<img id="imgLogo" src=""> 
+											{else/}
+							 				    <img id="imgLogo" src="__ROOT__/{$info.image}"> 
+											{/if} 
+	                                  
+	                                   	</p>
+	                                   	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+	                                   		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+							                                   		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+												id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+												onchange="imgUpload(this);"> 
+												<input type="hidden" id="Logo" value="{$info.image}" />
+											 </span>
+											 <a class="btn btn-default"><i class="fa fa-cloud-upload text"></i><span class="text">上传图片</span></a>
+									     </a>
+			            	
+						            	 <p style="margin-top:10px">
+											 <span style="color: orange;">建议使用宽1200像素-高300像素内的GIF或PNG透明图片；点击下方"提交"按钮后生效。</span>
+										 </p> 
+                                   </div>
+                                   
+                             
+            </div>
+
+          
+		    <div class="line line-dashed line-lg pull-in"></div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">专题内容</label>
+						<div class="col-sm-8">
+						<script id="editor" type="text/plain" style="height: 200px;">{$info.content}</script>
+						</div>
+					</div>
+
+
+
+	        <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button class="btn btn-primary" onclick="save(1)" style="float:left;margin-right:15px;">存为草稿</button>
+					<button class="btn btn-primary" onclick="save(2)" style="float:left;">发布专题</button>
+				</div>
+			</div>
+          
+	   </form>
+	</div>
+</section>
+
+
+<script src="PLATFORM_JS/ajaxFileUpload.js" type="text/javascript"></script>
+<script src="__STATIC__/js/file_upload.js" type="text/javascript"></script>
+<script>
+var flag = false;//防止重复提交
+var ue = UE.getEditor('editor',{
+	toolbars : [
+	            [ 'source', // 源代码
+		'bold', // 加粗
+		'italic', // 斜体
+		'underline', // 下划线
+		'strikethrough', // 删除线
+		'forecolor', // 字体颜色
+		'backcolor', // 背景色
+		'fontfamily', // 字体
+		'fontsize', // 字号
+		'paragraph', // 段落格式
+		'justifyleft', // 居左对齐
+		'justifycenter', // 居中对齐
+		'justifyright', // 居右对齐
+		'superscript', // 上标
+		'blockquote', // 引用
+		'selectall', // 全选
+		'preview', // 预览
+		'removeformat', // 清除格式
+		'inserttable', // 插入表格
+		'unlink', // 取消链接
+		'insertrow', // 前插入行
+		'insertcol', // 前插入列
+		'mergeright', // 右合并单元格
+		'mergedown', // 下合并单元格
+		'deleterow', // 删除行
+		'deletecol', // 删除列
+		'splittorows', // 拆分成行
+		'splittocols', // 拆分成列
+		'splittocells', // 完全拆分单元格
+		'deletecaption', // 删除表格标题
+		'inserttitle', // 插入标题
+		'mergecells', // 合并多个单元格
+		'deletetable', // 删除表格
+		'cleardoc', // 清空文档
+		 'simpleupload', // 单图上传
+		'insertimage', // 多图上传
+		'link', // 超链接
+		'emotion', // 表情
+		'insertorderedlist', // 有序列表
+		'insertunorderedlist', // 无序列表
+		'fullscreen', // 全屏
+		'directionalityltr', // 从左向右输入
+		'directionalityrtl', // 从右向左输入
+		'imagenone', // 默认
+		'imageleft', // 左浮动
+		'imageright', // 右浮动
+		// 'attachment', // 附件
+		'imagecenter', // 居中
+		'lineheight', // 行间距
+		'customstyle', // 自定义标题
+		]]
+});
+$(function(){
+	UE.getEditor('editor').addListener( 'ready', function() {
+		if($("#content").val()){
+			UE.getEditor('editor').setContent($("#content").val());
+		}
+	} );
+})
+	function save(type){
+		if(type==1){
+			var status=0;
+		}else{
+			var status=1;
+		}
+		var topic_id={$info.topic_id};
+		var title = $("#title").val();
+		var image = $("#Logo").val();
+		var content = UE.getEditor('editor').getContent();
+		
+
+		if(title.length == 0){
+			$(".error").css("display","inline-block");
+			$("#title").focus();
+			return false;
+		}
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/cms/updatetopic",
+			data:{
+				'topic_id':topic_id,
+				'title':title,
+				'image':image,
+				'content':content,
+				'status':status
+				},
+			success:function(data){
+				if (data["code"] > 0) {
+					showMessage('success', data["message"]);
+			        location.href="PLATFORM_MAIN/cms/topiclist";
+				}else{
+					showMessage('error', data["message"]);
+				}
+				flag = false;
+			}
+		});
+	}
+	/**
+	 *图片上传
+	 */
+	function imgUpload(event) {
+		var fileid = $(event).attr("id");
+		var data = { 'file_path' : UPLOADCOMMON };
+		uploadFile(fileid,data,function(res){
+			if(res.code){
+				$("#imgLogo").attr("src","__UPLOAD__/"+res.data);
+				$("#Logo").val(res.data);
+				showTip(res.message,"success");
+			}else{
+				showTip(res.message,"error");
+			}
+		});
+	}
+</script>
+{/block}

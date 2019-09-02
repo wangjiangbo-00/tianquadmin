@@ -1,0 +1,81 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 修改用户 </header>
+	<div class="panel-body">
+		<form class="form-horizontal"  id="user_form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">姓名</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="admin_name" name="admin_name" value="{$ua_info['admin_name']}" required>
+				</div>
+				<label class="col-md-8 error" for="admin_name" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">所属用户组</label>
+				<div class="col-sm-2">
+					<select id="group_id" name="group_id" class="form-control m-b" required>
+						<option value="">请选择用户组</option>
+						{foreach name="auth_group" item="v1"}
+							<option value="{$v1['group_id']}" {if condition="$v1['group_id'] eq $ua_info['group_id_array']"}selected{/if}>&nbsp;&nbsp;{$v1['group_name']}</option>
+						{/foreach}
+					</select>
+				</div>
+				<label class="col-md-8 error" for="group_id" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+                                            <label class="col-sm-2 control-label">描述</label>
+                                            <div class="col-sm-4">
+                                                <div id="editor" class="form-control" style="overflow:scroll;height:150px;max-height:150px">{$ua_info['desc']}</div>
+                                            </div>
+                                        </div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<input type="hidden" id="uid" value="{$ua_info['uid']}">
+					<button type="submit" class="btn btn-primary">保存</button>
+<!-- 					<a href="javascript:void(0);" onclick="editUserAjax()" class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>	
+$().ready(function() {
+	$("#user_form").validate({
+		submitHandler:function(){
+			editUserAjax();
+		}
+	});
+});
+	/**
+	*用户修改
+	*/	
+	function editUserAjax() {
+			var uid = $("#uid").val();
+			var admin_name = $("#admin_name").val();
+			var group_id = $("#group_id").val();
+			var desc = $("#editor").html();
+			$.ajax({
+				type : "post",
+				url : "PLATFORM_MAIN/Auth/editUser",
+				data : {
+					'uid' : uid,
+					'admin_name' : admin_name,
+					'group_id' : group_id,
+					'desc' : desc
+				},
+				async : true,
+				success : function(data) {
+					if (data['code'] > 0) {
+						showMessage('success', data['message'], 'PLATFORM_MAIN/Auth/userList');
+					}else{
+						showMessage('error', data['message']);
+					}
+				}
+			});
+		}
+	</script>
+{/block}

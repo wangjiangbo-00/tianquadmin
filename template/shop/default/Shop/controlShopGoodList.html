@@ -1,0 +1,137 @@
+<div class="main fr">
+	<div class="" id="filter" style="">
+		<!--排序-->
+		<form method="GET" name="listform" action="SHOP_MAIN/shop/shopgoodlist">
+			<div class="fore1">
+				<dl class="order">
+					{volist name="screen_list_two" id="vo" key="k" }
+						{if condition="$k eq 1"}
+							{if condition="$order_type  eq '' "}
+								<dd class="first curr">
+							{else /}
+								<dd class="first">
+							{/if}
+								<a href="SHOP_MAIN/{$path_info}?{$condition_url}"> 综合 </a>
+							</dd>
+						{else /}
+							{if condition="$order_type eq $vo.order_type"}
+								<dd class="curr">
+								{if condition="$sort eq 'desc'"}
+									<a href="SHOP_MAIN/{$path_info}?{$condition_url}&order_type={$vo.order_type}&sort=asc"> {$vo.order_name}
+									<b class="icon-order-DESCending"></b></a>
+								{else /}
+									<a href="SHOP_MAIN/{$path_info}?{$condition_url}&order_type={$vo.order_type}&sort=desc"> {$vo.order_name}
+									<b class="icon-order-ASCending"></b></a>
+								{/if} 
+							{else /}
+								<dd class="">
+								<a href="SHOP_MAIN/{$path_info}?{$condition_url}&order_type={$vo.order_type}&sort=desc"> {$vo.order_name} <b class="icon-order-DESCending"></b> </a>
+							{/if}
+						{/if}
+						</dd>
+						
+					{/volist}
+
+				</dl>
+				<div class="pagin">&nbsp;&nbsp;&nbsp;</div>
+				<div class="total">
+					共 <span class="color">{$good_list|count}</span> 个商品
+				</div>
+			</div>
+			<div class="fore2">
+				<div class="filter-btn">
+
+					{if condition="$is_shipping_fee eq 1"}
+					<a href="SHOP_MAIN/{$path_info}?{$condition_url|str_replace='&is_shipping_fee=1','',###}&order_type={$order_type}&sort={$sort}" class="filter-tag curr">
+					{else /}
+					<a href="SHOP_MAIN/{$path_info}?{$condition_url}&order_type={$order_type}&sort={$sort}&is_shipping_fee=1" class="filter-tag">
+					{/if}
+					
+						<input class="none" name="fff" onclick="" type="checkbox">
+						<i class="icon"></i> <span class="text">包邮</span>
+					</a>
+					{if condition="$is_stock eq 1"}
+					<a href="SHOP_MAIN/{$path_info}?{$condition_url|str_replace='&is_stock=1','',###}&order_type={$order_type}&sort={$sort}" class="filter-tag curr">
+					{else /}
+					<a href="SHOP_MAIN/{$path_info}?{$condition_url}&order_type={$order_type}&sort={$sort}&is_stock=1" class="filter-tag">
+					{/if}
+						<input class="none" name="fff" onclick="" type="checkbox">
+						<i class="icon"></i> <span class="text">仅显示有货</span>
+					</a>
+ 
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<!--主体商品内容展示-->
+	<form name="compareForm" action="compare.php" method="post" onsubmit="">
+		<ul class="list-grid clearfix">
+			<!-- 一行显示四个如果是四的倍数就样式价格last 及 item last-->
+			{volist name='good_list' id="vo" key="k"}
+			{if condition="$k%4 == 0"}
+			<li class="item last">
+			{else /}
+				<li class="item">
+			{/if}
+				<div class="item-con">
+					<!--售罄-->
+					<div class="item-pic">
+						<a href="SHOP_MAIN/goods/goodsInfo?goodsid={$vo.goods_id}"
+							title="{$vo.goods_name}" target="_blank"> <img
+							src="__UPLOAD__/{$vo['pic_cover_mid']}" alt="">
+						</a>
+					</div>
+					<div class="item-info">
+						<div class="item-price">
+							<em class="sale-price color">{$vo.price}</em> <em
+								class="sale-count">已售{$vo.sales}</em>
+						</div>
+						<div class="item-name">
+							<!-- 注意商品名称长度，需考虑包邮、赠品标签 -->
+							<a href="SHOP_MAIN/goods/goodsInfo?goodsid={$vo.goods_id}"
+								target="_blank" title="{$vo.goods_name}">{$vo.goods_name}</a>
+							<!-- 包邮、赠品标签  _star -->
+							{if condition="$vo.shipping_fee eq 0"}
+								 <i class="free-shipping">包邮</i>
+							{/if}
+							<!-- 包邮、赠品标签  _end -->
+						</div>
+						<div class="item-con-info">
+							<div class="fl">
+								<div class="item-operate">
+									 <a href="javascript:;" class="operate-btn collet-btn" onclick="collectionGoods({$vo.goods_id},'goods','{$vo.goods_name}',this,false)">
+									 	<i {if condition="$vo.is_favorite>0"}style="background-position:-107px -11px;"{/if} data-log-id="{$vo.is_favorite}"></i>
+										<span> {if condition="$vo.is_favorite>0"}已收藏
+					 							{else/}收藏{/if}
+					 					</span>
+					 				</a>
+									<a href="javascript:;" class="operate-btn comment-btn"> <i></i> {$vo.evaluates}
+									</a>
+								</div>
+							</div>
+							<div class="fr">
+								<div class="item-add-cart">
+									<!--售罄时，为加入购物车按钮添加sell-out-btn样式-->
+									<a href="javascript:ShowGoodsAttribute({$vo.goods_id},'{$vo.goods_name}',{$vo.pic_id},this);" class="add-cart" title="加入购物车"></a>
+									{foreach name="vo['sku_list']" item="pro_skus"}
+									<input type="hidden" name="goods_sku{$vo.goods_id}" value="{$pro_skus.attr_value_items};" stock="{$pro_skus.stock}" {if condition = "$vo.promotion_info neq ''"} price="{$pro_skus.promote_price}" {else/} price="{$pro_skus.price}"{/if} skuid="{$pro_skus.sku_id}" skuname="{$pro_skus.sku_name}">
+									{/foreach}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</li>
+			 {/volist}
+
+		</ul>
+		<!--当没有数据时，显示如下div-->
+
+		{include file='shop/default/Goods/controlPopUpGoodsSkuAttribute'/}
+		<!--分页-->
+		<input type="hidden" name="shop_id" id="shop_id" value="{$shop_id}" />
+		</script>
+	</form>
+
+</div>

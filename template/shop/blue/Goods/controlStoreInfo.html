@@ -1,0 +1,108 @@
+<!--
+	创建人：王永杰
+	创建时间：2017年2月7日 12:16:45
+	功能描述： 店铺信息
+-->
+<!-- 店铺信息 _star    提出来的    【店铺信息】 -->
+<div class="store-info">
+	<dl class="store-logo">
+		<a href="SHOP_MAIN/shop/shopindex?shop_id={$shop_info.shop_id}" target="_blank"> 
+			<img src=" __UPLOAD__/{$shop_info.shop_avatar}" width="" height="">
+		</a>
+	</dl>
+	<dl class="store-name third-store">
+		<a href="SHOP_MAIN/shop/shopindex?shop_id={$shop_info.shop_id}" target="_blank" class="name" title="{$shop_info.shop_company_name}">{$shop_info.shop_name}</a>
+		<input type="hidden" value="{$shop_info.shop_id}" id="store_shop_id"/>
+	</dl>
+	<dl class="store-score">
+		<dd>
+			<!-- 通过分数判断width的宽度-->
+			<div class="score-sum color">{$shop_score} <span>综合</span>
+			</div>
+			<ul class="score-part">
+				<li>
+					<span class="score-desc">描述相符</span>
+					<span class="score-detail color">{$shop_info.shop_desccredit}</span>
+				</li>
+				<li>
+					<span class="score-desc">服务态度</span>
+					<span class="score-detail color">{$shop_info.shop_servicecredit}</span>
+				</li>
+				<li>
+					<span class="score-desc">发货速度</span>
+					<span class="score-detail color">{$shop_info.shop_deliverycredit}</span>
+				</li>
+			</ul>
+		</dd>
+	</dl>
+	<dl class="store-other">
+		<dt>所在地：</dt>
+		<dd>{$shop_info.live_store_address}</dd>
+	</dl>
+	<!-- 客服 -->
+	<dl class="store-other">
+		<dt class="tool">QQ客服：</dt>
+		<dd class="tool">
+			<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin={$shop_info.shop_qq}&site=qq&menu=yes" class="service-btn service-online">
+				<img src="__TEMP__/{$style}/public/images/openim.png" width="20" height="20" border="0" alt="在线客服">
+				<span>在线客服</span>
+			</a>
+		</dd>
+	</dl>
+	<div class="enter-store">
+		<div class="enter-store-item">
+			<a class="bg-color goto-shop"href="SHOP_MAIN/shop/shopindex?shop_id={$shop_id}" target="_blank"><i></i> 进入店铺</a>
+			<a class="bg-color shop-add collect-shop" href="javascript:;"><i></i> 
+				<span>
+				{if condition="$is_member_fav_shop==0||$is_member_fav_shop==-1"}
+					收藏本店
+				{else/}
+					取消收藏
+				{/if}
+				</span>
+			</a>
+		</div>
+	</div>
+</div>
+<script>
+var is_member_fav_shop = {$is_member_fav_shop};//获取商品收藏状态
+// 添加收藏
+$(".collect-shop").click(function(event) {
+	var target = $(this);
+	var uid ="{$uid}";
+	if(uid!=null && uid!="")
+	{
+		if(is_member_fav_shop==0)
+		{	
+			//没有收藏，我要收藏
+			$.ajax({
+				url: "SHOP_MAIN/components/collectiongoodsorshop",
+				type: "post",
+				data: { "fav_id":{$shop_info.shop_id},"fav_type":"shop","log_msg":""},
+				success: function (data) {
+					if(data.code>0)
+					{
+						$(target).find("span").html("取消收藏");
+						is_member_fav_shop = 1;
+					}
+				}
+			});
+		}else{
+			$.ajax({
+				url: "SHOP_MAIN/components/cancelcollgoodsorshop",
+				type: "post",
+				data: { "fav_id":{$shop_info.shop_id},"fav_type":"shop"},
+				success: function (data) {
+					if(data.code>0)
+					{
+						$(target).find("span").html("收藏本店");
+						is_member_fav_shop = 0;
+					}
+				}
+			});
+		}
+	}else{
+		location.href = "SHOP_MAIN/login/index";
+	}
+});
+</script>

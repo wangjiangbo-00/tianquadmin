@@ -1,0 +1,76 @@
+<!--功能：店铺头部菜单-->
+<!--创建人：李志伟-->
+<!--时间：2017年2月7日16:51:22-->
+
+<div class="layout">
+	
+	<div class="shop-header-banner">
+		{if condition="$shop_banner eq ''"}
+		{else /}
+			<img src="__UPLOAD__/{$shop_banner}" style="width:100%;">
+		{/if}
+	</div>
+	
+	<div class="shop-menu">
+		<ul>
+			{if condition="$goods_group_id eq ''"}	
+			<li class="select"><a href="SHOP_MAIN/shop/shopindex?shop_id={$shop_id}" target="">首页</a></li>
+			{else /}
+			<li><a href="SHOP_MAIN/shop/shopindex?shop_id={$shop_id}" target="">首页</a></li>
+			{/if}
+			
+			
+			{if condition="$goods_group_id eq '0'"}
+				<li class="all-category select">
+			{else /}
+				<li class="all-category">
+			{/if}
+				<a href="SHOP_MAIN/shop/shopgoodlist?shop_id={$shop_id}&goods_group_id=0" target="">
+					全部分类
+					<span class="arrow"></span>
+				</a>
+				<div class="all-category-coupon" style="display: none;">
+
+					<!-- 获取店铺内商品分类 -->
+					
+					
+							<div style="width:100%;overflow:hidden;text-align: -webkit-left;margin-left: 50px;margin-left:50px;"><a href="SHOP_MAIN/shop/shopgoodlist?shop_id={$shop_id}&goods_group_id=0" target="_blank">全部 &gt;</a></div>
+						
+				
+
+					{foreach $goods_group_list as $vo} 
+						<dl>
+							<dt>
+								<a href="SHOP_MAIN/shop/shopgoodlist?shop_id={$shop_id}&goods_group_id={$vo.group_id}" target="_blank">{$vo.group_name}</a>
+							</dt>
+							<dd>
+								<ul>
+								{foreach name="vo.child_list" item="v1" key="k1"}
+			
+									<li>
+										<a href="SHOP_MAIN/shop/shopgoodlist?shop_id={$shop_id}&goods_group_id={$v1.group_id}" target="_blank">{$v1.group_name}</a>
+									</li>
+								{/foreach}
+								</ul>
+							</dd>
+						</dl>
+					{/foreach}
+				
+
+				</div>
+			</li>
+			<!-- 获取店铺导航 -->
+				{volist name="goods_group_list" id="vo" key="k" }
+					{if condition="$k lt 13"}
+					 {if condition="$goods_group_id eq $vo.group_id"}
+					 	<li class="select"> <a href="SHOP_MAIN/shop/shopgoodlist?shop_id={$shop_id}&goods_group_id={$vo.group_id}" target="_parent">{$vo.group_name}</a></li>
+					 {else /}
+					 	<li> <a href="SHOP_MAIN/shop/shopgoodlist?shop_id={$shop_id}&goods_group_id={$vo.group_id}" target="_parent">{$vo.group_name}</a></li>
+					 {/if}
+					{/if}
+				{/volist}
+			
+			
+		</ul>
+	</div>
+</div>

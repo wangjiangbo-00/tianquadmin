@@ -1,0 +1,180 @@
+{extend name="admin/base" /} {block name="resources"/}
+<style>.style0list tbody td{border:0;vertical-align: middle;}</style>
+{/block} {block name="right_tab"}
+<li><a class="nscs-table-handle_green"
+	href="ADMIN_MAIN/Account/addShopAccountBank"><i class="fa fa-plus-circle"></i>&nbsp;添加提现账户</a></li>
+{/block} {block name="main"}
+<div class="mod-table">
+	<div class="mod-table-head">
+		<table class="mytable">
+		<tr><th width="10%"><input type="text" id = 'search_text' placeholder="请输入用户名" /><input type="button" onclick="searchData()" value="搜索" /></th></tr>
+		</table>
+		<div class="style0list">
+			<table>
+				<colgroup>
+					<col style="width: 5%;">
+					<col style="width: 8%;">
+					<col style="width: 8%;">
+					<col style="width: 8%;">
+					<col style="width: 15%;">
+					<col style="width: 10%;">
+					<col style="width: 10%;">
+					<col style="width: 18%;">
+					<col style="width: 24%;">
+				</colgroup>
+				<thead>
+					<tr align="center">
+						<th><label><input type="checkbox"  onclick="CheckAll(this)"></label></th>
+						<th>账号类型</th>
+						<th>银行名称</th>
+						<th>账号姓名</th>
+						<th>银行账号</th>
+						<th>手机号</th>
+						<th>是否默认</th>
+						<th>创建时间</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<colgroup>
+					<col style="width: 5%;">
+					<col style="width: 8%;">
+					<col style="width: 8%;">
+					<col style="width: 8%;">
+					<col style="width: 15%;">
+					<col style="width: 10%;">
+					<col style="width: 10%;">
+					<col style="width: 18%;">
+					<col style="width: 24%;">
+				</colgroup>
+				<tbody></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+{/block}{block name="script"}
+{include file="admin/openDialog" /}
+{include file="admin/pageCommon" /}
+<script type="text/javascript">
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "ADMIN_MAIN/Account/shopBankAccountList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data.length));
+				$("#page_count").val(1);
+				$("#pageNumber a").remove();
+				var html = '';
+				if (data.length > 0) {
+					for (var i = 0; i < data.length; i++) {
+						if(data[i]["bank_type"] == 1){
+							data[i]["bank_type"] = '银行卡';
+						}else if(data[i]["bank_type"] == 2){
+							data[i]["bank_type"] = '支付宝';
+						}
+						if(data[i]["is_default"] == 1){
+							data[i]["default"] = '是';
+						}else if(data[i]["is_default"] == 0){
+							data[i]["default"] = '否';
+						}
+						html += '<tr align="center">';
+						html += '<td><div class="cell"><label><input name="sub" type="checkbox" value="'+ data[i]['id']+'" ></label></div></td>';
+						html += '<td>' + data[i]["bank_type"] + '</td>';
+						html += '<td>' + data[i]["branch_bank_name"] + '</td>';
+						html += '<td>' + data[i]["realname"] + '</td>';
+						html += '<td>' + data[i]["account_number"] + '</td>';
+						html += '<td>' + data[i]["mobile"] + '</td>';
+						if(data[i]["is_default"] == 1){
+							html += '<td><i class="fa fa-check text-success"></i></td>';
+						}else{
+							html += '<td><i class="fa  fa-times"></i></td>';
+						}
+						html += '<td>' + data[i]["create_date"] + '</td>';
+						html += '<td align="left" ><a href="ADMIN_MAIN/Account/updateBankAccount?id=' + data[i]["id"] + '">修改</a>&nbsp;&nbsp; ';
+						html += '<a href="javascript:void(0);" onclick="Delete_bank(' + data[i]["id"] + ')">删除</a>&nbsp;&nbsp;';
+						if(data[i]["is_default"] == 0){
+							html += '<a href="javascript:void(0);" onclick="Set_default(' + data[i]["id"] + ')">设为默认</a></td>';
+						}
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="9">暂无符合条件的数据记录</th></tr>';
+				}
+				$(".style0list tbody").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}	
+	function Delete_bank(id){
+		$.ajax({
+			type : "post",
+			url : "ADMIN_MAIN/account/deleteshopbankaccouht",
+			async : true,
+			data : {
+				"id" : id,
+			},
+			success : function(data) {
+				if(data["code"] > 0 ){
+					showMessage('success', data["message"]);
+					location.href="ADMIN_MAIN/account/shopbankaccountlist";
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+	function Set_default(id){
+		$.ajax({
+			type : "post",
+			url : "ADMIN_MAIN/account/modifyshopbankaccountisdefault",
+			async : true,
+			data : {
+				"id" : id,
+			},
+			success : function(data) {
+				if(data["code"] > 0 ){
+					showMessage('success', data["message"]);
+					location.href="ADMIN_MAIN/account/shopbankaccountlist";
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+	function unlock(uid){
+		$.ajax({
+			type : "post",
+			url : "ADMIN_MAIN/auth/userunlock",
+			async : true,
+			data : {
+				"uid" : uid,
+			},
+			success : function(data) {
+				if(data["code"] > 0 ){
+					showMessage('success', data["message"],'ADMIN_MAIN/auth/userlist');
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+	//全选
+	function CheckAll(event){
+		var checked = event.checked;
+		$(".style0list tbody input[type = 'checkbox']").prop("checked",checked);
+	}
+	function searchData(){
+		LoadingInfo(1);
+	}
+</script>
+{/block}

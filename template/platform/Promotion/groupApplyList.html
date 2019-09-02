@@ -1,0 +1,182 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.fa {
+    display: grid;
+   
+}
+</style>
+{/block}
+ {block name="main"}
+<div class="row padder-v">
+
+</div>
+
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+
+
+					<th>活动名称</th>
+					<th>有效时间</th>
+					<th>店铺名字</th>
+					<th>商品名字</th>
+					<th>团购信息</th>
+					<th>活动状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} 
+{block name="script"}
+<script type="text/javascript">
+
+$(function(){
+	LoadingInfo(1);
+});
+function LoadingInfo(pageIndex) {
+    var search_text = $("#search_text").val();
+    $.ajax({
+        type : "post",
+        url : "PLATFORM_MAIN/Promotion/groupApplyList",
+        async : true,
+        data : {
+            "pageIndex" : pageIndex, "search_text" : search_text
+        },
+        success : function(data) {
+            $("#total_count_num").text(data["total_count"]);
+            $("#page_count_num").text(data["page_count"]);
+            $("#page_count").val(data["page_count"]);
+            $("#pageNumber a").remove();
+            var html = '';
+            if (data["data"].length > 0) {
+                for (var i = 0; i < data["data"].length; i++) {
+                    var status = parseInt(data['data'][i]['status']);
+
+                    switch(status){
+                        case 0:
+                            var status_name = '未发布';
+                            break;
+                        case 1:
+                            var status_name = '申请上架中';
+                            break;
+                        case 2:
+                            var status_name = '申请成功';
+                            break;
+                        case 3:
+                            var status_name = '申请失败';
+                            break;
+                        case 4:
+                            var status_name = '展示中';
+                            break;
+                        case 5:
+                            var status_name = '已开始';
+                            break;
+
+                        case 6:
+                            var status_name = '已开奖';
+                            break;
+
+                        case 7:
+                            var status_name = '已结束';
+                            break;
+                    }
+                    html += '<tr >';
+                    html += '<td>' + data["data"][i]["name"] + '</td>';;
+                    html += '<td>' + data["data"][i]["start_time"] + ' 至 ' + data["data"][i]["expire_time"] + '</td>';
+                    html += '<td>' + data["data"][i]["goodsid"] + '</td>';;
+                    html += '<td>' + data["data"][i]["shop_id"] + '</td>';;
+                    html += '<td>' + data["data"][i]["stage_format"] + '</td>';;
+                    html += '<td>'+ status_name +'</td>';
+                    html += '<td>';
+                    html += '<a href="javascript:void(0);"onclick="agree('+data["data"][i]["group_order_id"]+')">同意</a>&nbsp;';
+                    html += '<a href="javascript:void(0);"onclick="disagree('+data["data"][i]["group_order_id"]+')">拒绝</a>&nbsp;';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+            } else {
+                html += '<tr align="center"><th colspan="7">暂无符合条件的数据记录</th></tr>';
+            }
+            $("#list").html(html);
+            var totalpage = $("#page_count").val();
+            if (totalpage == 1) {
+                changeClass("all");
+            }
+            var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+            $("#pageNumber").append($html);
+        }
+    });
+}
+
+function agree(id){
+    $( "#dialog" ).dialog({
+        buttons: {
+            "确定,#e57373": function() {
+                $(this).dialog('close');
+                $.ajax({
+                    type : "post",
+                    url : "PLATFORM_MAIN/Promotion/agreegroup",
+                    async : true,
+                    data : {
+                        "id" : id
+                    },
+                    success : function(data) {
+                        if(data["code"] > 0 ){
+                            showMessage('success', "操作成功",'PLATFORM_MAIN/Promotion/groupApplyList');
+                        }else{
+                            showMessage('error', "操作失败");
+                        }
+                    }
+                })
+            },
+            "取消": function() {
+                $(this).dialog('close');
+            }
+
+        },
+        contentText:"你确定同意吗？",
+        title:"消息提醒"
+    });
+}
+
+function disagree(id){
+    $( "#dialog" ).dialog({
+        buttons: {
+            "确定,#e57373": function() {
+                $(this).dialog('close');
+                $.ajax({
+                    type : "post",
+                    url : "PLATFORM_MAIN/Promotion/disagreegroup",
+                    async : true,
+                    data : {
+                        "id" : id
+                    },
+                    success : function(data) {
+                        if(data["code"] > 0 ){
+                            showMessage('success', "操作成功",'PLATFORM_MAIN/Promotion/groupApplyList');
+                        }else{
+                            showMessage('error', "操作失败");
+                        }
+                    }
+                })
+            },
+            "取消": function() {
+                $(this).dialog('close');
+            }
+
+        },
+        contentText:"你确定拒绝吗？",
+        title:"消息提醒"
+    });
+}
+
+</script>
+{/block}

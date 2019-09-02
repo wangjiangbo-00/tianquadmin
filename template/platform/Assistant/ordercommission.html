@@ -1,0 +1,116 @@
+{extend name="platform/base" /} {block name="resources"/}
+{/block} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-7"></div>
+	<div class="col-sm-2">
+		<div class="input-group">
+			<input id="nickname" class="input-sm form-control" type="text"
+				value="" placeholder="请输入招商员名称">
+		</div>
+	</div>
+	<div class="col-sm-2">
+		<div class="input-group">
+			<input id="shopName" class="input-sm form-control" type="text"
+				value="" placeholder="请输入店铺名称">
+		</div>
+	</div>
+	<div class="col-sm-1">
+		<div class="input-group">
+			<span class="input-group-btn">
+				<button class="btn btn-sm btn-default" type="button"
+					onclick="LoadingInfo(1)">搜索</button>
+			</span>
+		</div>
+	</div>
+</div>
+
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th><label style="margin-left: 5px;"> <input
+							type="checkbox"></label></th>
+					<th>商品</th>
+					<th>店铺名称</th>
+					<th>佣金比率</th>
+					<th>平台佣金</th>
+					<th>招商员</th>
+					<th>招商员获取佣金</th>
+					<th>时间</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+
+<!-- 修改用户上级（Modal）结束 -->
+{/block} {block name="script"}
+<script type="text/javascript">	
+	//查询
+	$(function(){
+	LoadingInfo(1);
+});
+	function LoadingInfo(pageIndex) {
+		var nick_name = $("#nickname").val();
+		var shop_name = $("#shopName").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Assistant/ordercommission",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex,
+				"nick_name":nick_name,
+				"shop_name":shop_name
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';	
+						html += '<td><div class="cell"><label ><input name="sub" type="checkbox" value="'+ data["data"][i]["id"] +'" ></label></div></td>';
+						if(data["data"][i]["pic_info"]){
+							html += '<td><img src="__ROOT__/'+ data["data"][i]["pic_info"] +'">&nbsp;&nbsp;'+ data["data"][i]["goods_name"] +'</td>';
+						}else{
+							html += '<td><img src="__ROOT__/public/platform/images/default_shop_logo.png">&nbsp;&nbsp;'+ data["data"][i]["goods_name"] +'</td>';
+						}
+						html += '<td>'+ data["data"][i]["shop_name"] +'</td>';
+						html += '<td>'+ data["data"][i]["commission_rate"] +'%</td>';
+						html += '<td>'+ data["data"][i]["platform_money"] +'</td>';
+						html += '<td>'+ data["data"][i]["nick_name"] +'</td>';
+						html += '<td>'+ data["data"][i]["commission_money"] +'</td>';
+						html += '<td>'+ data["data"][i]["create_time"] +'</td>';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr align="center"><th colspan="11">暂无符合条件的数据记录</th></tr>';
+				}
+				
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}
+	
+	//全选
+	function CheckAll(event){
+		var checked = event.checked;
+		$(".style0list tbody input[type = 'checkbox']").prop("checked",checked);
+	}
+	
+
+</script>
+{/block}

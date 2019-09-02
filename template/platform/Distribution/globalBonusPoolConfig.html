@@ -1,0 +1,77 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+<header class="panel-heading font-bold"> 基本设置 </header>
+<form class="form-horizontal" id="level_form" name="form">
+	<div class="form-group" style="margin-top:20px;">
+                                            <label class="col-sm-2 control-label">是否开启全球分红</label>
+                                            <div class="col-sm-4">
+                                                <label class="switch">
+                                                    <input id="is_global_enable" type="checkbox" {eq name="shop_config_info.is_global_enable" value="1"}checked{/eq}>
+                                                    <span></span> </label>
+                                            </div>
+                                        </div>
+	<table class="table table-striped b-t b-light text-sm">
+		<thead>
+			<tr>
+						<th class="center">等级名称</th>
+						<th width="20%">全球分红分值</th>
+						<th width="20%">全球分红权重</th>
+						<th class="center">创建时间</th>
+			</tr>
+		</thead>
+		<tbody id="list">
+			{foreach name="partner_level_list" item="partner_level_info" }
+				    <tr align="center" data-level_id={$partner_level_info.level_id}>
+						<td>{$partner_level_info.level_name}</td>
+						<td><input  class="form-control" type="text" value="{$partner_level_info.global_value}" /></td>
+						<td><input  class="form-control"  type="text" value="{$partner_level_info.global_weight}" /></td>
+						<td>{$partner_level_info.create_time}</td>
+					</tr>					
+				{/foreach}
+		</tbody>
+	</table>
+	<div class="form-group" style="margin-top:15px;">
+				<div class="col-sm-12 col-sm-offset-5">
+					<button type="submit" class="btn btn-primary" onclick="updateGlobalBonusPoolConfig();">保存</button>
+				</div>
+	</div>
+	</form>
+</section>
+<script>		
+function updateGlobalBonusPoolConfig(){
+	if($("#is_global_enable").prop("checked")){
+		var is_open = 1;
+	}else{
+		var is_open = 0;
+	}
+	var trObj = $("#partner_global");
+	var partner_level_string = "";
+	$("#list tr").each(function() {
+		var level_id = $(this).data("level_id");
+		var global_value = $(this).children().eq(1).children("input").val();
+		var global_weight = $(this).children().eq(2).children("input").val();
+		partner_level_string = partner_level_string + ";" + level_id + "," + global_value + "," + global_weight;
+	});
+	partner_level_string = partner_level_string.substring(1, partner_level_string.length );
+	$.ajax({
+		type:"post",
+		url:"PLATFORM_MAIN/Distribution/updateGlobalBonusPoolConfig",
+		data:{
+			'is_open':is_open,
+			'partner_level_string':partner_level_string
+		},
+		async:true,
+		success:function (data) {
+			//alert(data);
+			if (data["code"] > 0) {
+				showMessage('success', data["message"],"PLATFORM_MAIN/Distribution/globalBonusPoolConfig");
+			}else{
+				showMessage('error', data["message"]);
+			}	
+		}
+	});
+}
+
+</script>
+{/block}

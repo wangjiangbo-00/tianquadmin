@@ -1,0 +1,53 @@
+<!--功能：店铺首页广告栏-->
+<!--创建人：李志伟-->
+<!--时间：2017年2月7日16:42:09-->
+<style type="text/css">
+	.shop3-title>hr{
+		height: 1px;
+    	background: #999;
+	}
+	.shop3-title>span.title{
+		margin-top: -26px;
+	    display: block;
+	    background: #fff;
+	    width: 20%;
+	    margin: -32px auto 14px;
+	    font-size: 24px;
+	}
+</style>
+
+
+<!-- 促销版块开始 -->
+	{if condition="count($recommend_block) >0"}
+	<div class="shop-ad-group3">
+	{foreach name="recommend_block" item="recommend_detail" key="k"}
+	<h2 class="shop3-title" ><hr /><span class="title">{$recommend_detail.class_name}</span></h2>
+	
+	<div class="w1210 shop-floor">
+	        <div class="shop-goods-list">
+	            <ul id="shoplist[type]">
+	             	{foreach name="recommend_detail['goods_list']" item="goods_list"}
+	               <li class="first">	
+					 <dl>
+					     <dt class="goods-thumb">
+					       <a target="_blank" href="SHOP_MAIN/goods/goodsinfo?goodsid={$goods_list.goods_info.goods_id}" title="{$goods_list.goods_info.goods_name}" >
+					          <img class="lazy" src="__UPLOAD__/{$goods_list.picture_info.pic_cover_mid}"  alt="{$goods_list.picture_info.goods_name}" >
+					       </a>
+					     </dt>
+					 <dd class="goods-info">
+					      <a target="_blank" href="SHOP_MAIN/goods/goodsinfo?goodsid={$goods_list.picture_info.goods_id}" title="{$goods_list.goods_info.goods_name}" class="goods-name">{$goods_list.goods_info.goods_name}</a>
+					        <p> 
+					          <span class="goods-price color fl">￥{$goods_list.goods_info.promotion_price}</span>
+					          <a target="_blank" href="SHOP_MAIN/goods/goodsinfo?goodsid={$goods_list.goods_info.goods_id}" title="立即抢购" class="shop-add-cart fr">立即抢购</a>
+					         </p>
+					  </dd>
+					  </dl>
+				 </li>
+	            {/foreach}
+	            </ul>
+	        </div>      
+	</div>	
+	{/foreach}	
+	</div>
+	{/if}	
+<!-- 促销版块结束 -->

@@ -1,0 +1,264 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+	<div class="col-sm-7"></div>
+	<div class="col-sm-2">
+		<div class="input-group">
+			<input id="userName" class="input-sm form-control" type="text"
+				value="" placeholder="请输入用户姓名">
+		</div>
+	</div>
+	<div class="col-sm-2">
+		<div class="input-group">
+			<select id="is_audit" class="input-sm form-control input-s-sm inline">
+				<option value="">审核状态</option>
+				<option value="0">审核中</option>
+				<option value="-1">已拒绝</option>
+				<option value="1">已通过</option>
+			</select>
+		</div>
+	</div>
+	<div class="col-sm-1">
+		<div class="input-group">
+			<span class="input-group-btn">
+				<button class="btn btn-sm btn-default" type="button"
+					onclick="LoadingInfo(1)">搜索</button>
+			</span>
+		</div>
+	</div>
+</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th><label style="margin-left: 5px;"> <input
+							type="checkbox"></label></th>
+					<th>股东名称</th>
+					<th>股东等级</th>
+					<th>手机号</th>
+					<th>上级股东名称</th>
+					<th>状态</th>
+					<th>申请时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+
+
+
+
+<!-- 修改股东用户等级（Modal）开始 -->
+<div class="modal fade" id="editPartnerLevel" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel">商品分销设定</h4>
+			</div>
+			<div class="modal-body">
+				<div class="set-style">
+					<input type="hidden" id="uid" value="" />
+					<dl>
+						<dt>用户等级:</dt>
+						<dd>
+							<p>
+								<select id="level_id"
+									class="input-sm form-control input-s-sm inline">
+									{foreach name="partner_level_list" item="info"}
+									<option value="{$info.level_id}">{$info.level_name}</option>
+									{/foreach}
+								</select>
+							</p>
+						</dd>
+					</dl>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-success"
+					onclick="modifyPartnerLevelNum();">修改</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+{/block} {block name="script"}
+<script type="text/javascript">
+//查询
+$(function(){
+	LoadingInfo(1);
+});
+//加载数据
+function LoadingInfo(pageIndex) {
+	var user_name = $("#userName").val();
+	var is_audit = $("#is_audit").val();
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Distribution/partnerList",
+		async : true,
+		data : {
+			"pageIndex" : pageIndex,
+			"user_name":user_name,
+			"is_audit":is_audit
+		},
+		success : function(data) {
+			//alert(JSON.stringify(data));
+			var html = '';
+			$("#total_count_num").text(data["total_count"]);
+			$("#page_count_num").text(data["page_count"]);
+			$("#page_count").val(data["page_count"]);
+			$("#pageNumber a").remove();
+			if (data["data"].length > 0) {
+				for (var i = 0; i < data["data"].length; i++) {
+					var lock_status = "";
+					var lock_operrate = "";
+					var lock_do = 1;
+					if(data["data"][i]["is_lock"] == 1){
+						lock_status = "冻结中";
+						lock_operrate = "解冻";
+						lock_do =  0;
+					}else{
+						lock_status = "正常";
+						lock_operrate = "冻结";
+						lock_do =  1;
+					}
+					html += '<tr>';
+					html += '<td><div class="cell"><label ><input name="sub" type="checkbox" value="'+ data["data"][i]["partner_id"] +'" ></label></div></td>';
+					if(data["data"][i]["promoter_no"]==null){
+						html += '<td>' + data["data"][i]["real_name"] + '<br/></td>';
+					}else{
+						html += '<td>' + data["data"][i]["real_name"] + '<br/>' + data["data"][i]["promoter_no"] + '</td>';
+					}
+					html += '<td>' + data["data"][i]["level_name"] + '</td>';
+					html += '<td>' + data["data"][i]["user_tel"] + '</td>';
+					if(data["data"][i]["parent_realname"] != null){
+						html += '<td>' + data["data"][i]["parent_realname"] + '</td>';	
+					}else{
+						html += '<td> </td>';
+					}
+					if(data["data"][i]["is_audit"] == 0){
+ 						html += '<td>审核中</td>';
+					}else if(data["data"][i]["is_audit"] == 1){
+						html += '<td>已通过</td>';
+					}else{
+						html += '<td>已拒绝</td>';
+					}
+					html += '<td>' + data["data"][i]["register_time"] + '</td>';
+					html += '<td>';
+					if(data["data"][i]["is_audit"] == 0){
+						html += '&nbsp;&nbsp;<a href="javascript:void(0);" onclick="audit('+ data["data"][i]["partner_id"] +',1);">通过</a>&nbsp;&nbsp;<a href="javascript:void(0);" onclick="audit('+ data["data"][i]["partner_id"] +',-1);">拒绝</a>';
+					}else if(data["data"][i]["is_audit"] == 1){
+						html += '<a href="javascript:void(0);" onclick="modifyPartnerLock('+ data["data"][i]["partner_id"] +','+lock_do+')">'+lock_operrate+'</a>';
+						html += '&nbsp;&nbsp;<a  href="javascript:void(0);" onclick="showPartnerLevelBox('+ data["data"][i]["uid"] +','+ data["data"][i]["partner_level"] +')">修改等级</a>';
+					}
+					
+					html += '</td> ';
+					html += '</tr>';
+				}
+			} else {
+				html += '<tr align="center"><th colspan="9">暂无符合条件的数据记录</th></tr>';
+			}
+			
+			$("#list").html(html);
+			var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+		}
+	});
+}	
+	function modifyPartnerLock(partner_id,is_lock){
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Distribution/modifyPartnerLock",
+			async : true,
+			data : {
+				"partner_id" : partner_id,
+				"is_lock":is_lock
+			},
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/Distribution/PartnerList");
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+	//推广员审核通过
+// 	function partnerAudit(partner_id){
+// 		$( "#dialog" ).dialog({
+//             buttons: {
+//                 "确定,#e57373": function() {
+//                 	audit(partner_id,1);
+//                     $(this).dialog('close');
+//                 },
+//                 "取消": function() {
+//                 	//audit(promoter_id,-1);
+//                     $(this).dialog('close');
+//                 }
+//             },
+//             contentText:"确定要通过此用户的股东审核吗？",
+// 		});
+// 	}
+	function audit(partner_id,is_audit){
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Distribution/partnerAudit",
+			async : true,
+			data : {
+				"partner_id" : partner_id,
+				"is_audit":is_audit
+			},
+			success : function(data) {
+				if(data.code == 1){
+					location.reload();
+				}
+			}
+		})
+	}
+	
+	/**
+	*弹出修改等级框
+	*/
+	function showPartnerLevelBox(uid,partner_level){
+		$("#editPartnerLevel").modal("show");
+		$("#uid").val(uid);
+		$("#level_id").val(partner_level);
+	}
+	/**
+	*修改等级
+	*/
+	function modifyPartnerLevelNum(){
+		var uid = $("#uid").val();
+		var level_id = $("#level_id").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Distribution/modifyPartnerLevelNum",
+			async : true,
+			data : {
+				"uid" : uid,
+				"level_id":level_id
+			},
+			success : function(data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/Distribution/PartnerList");
+				}else{
+					showMessage('error', data["message"]);
+				}
+			}
+		});
+	}
+</script>
+{/block}

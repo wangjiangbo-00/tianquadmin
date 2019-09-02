@@ -1,0 +1,339 @@
+{extend name="admin/base" /}
+{block name="resources"}
+<!-- 编辑商品时，用到的JS、CSS资源 -->
+{include file="admin/Goods/controlEditGoodsCommonResources"}
+{/block}
+
+{block name="main"}
+<div class="ncsc-form-goods">
+    <h3 class="js-goods-info">商品信息</h3>
+    <dl>
+        <dt><i class="required">*</i>商品分类：</dt>
+        <dd id="tbcNameCategory" data-flag="category" cid="{$goods_info.category_id}"
+            data-attr-id="{$goods_info.goods_attribute_id}" cname="{$goods_info.category_name}"
+            data-goods-id="{$goodsid}">
+            <div class="controls">
+                <span class="category-text">{$goods_info.category_name}</span>
+                <button class="category-button">选择</button>
+                <span class="help-inline">请选择商品类目</span>
+            </div>
+        </dd>
+    </dl>
+
+    <dl>
+        <dt><i class="required">*</i>商品名称：</dt>
+        <dd>
+            <div class="controls">
+                <input class="productname" type="text" id="txtProductTitle" placeholder="请输入商品名称，不能超过10个字符"
+                       value="{$goods_info.goods_name}"/>
+                <span class="help-inline">请输入商品名称，不能超过10个字符</span>
+            </div>
+        </dd>
+    </dl>
+    <dl>
+        <dt><i class="required">*</i>商品标题：</dt>
+        <dd>
+            <div class="controls">
+                <input class="productname" type="text" id="txtIntroduction" placeholder="请输入商品名称，请输入10-30个字符"
+                       value="{$goods_info.introduction}"/>
+                <span class="help-inline">请输入商品标题，请输入10-30个字符</span>
+            </div>
+        </dd>
+    </dl>
+
+
+    <dl>
+        <dt><i class="required">*</i>商品简介：</dt>
+        <dd>
+            <div class="controls">
+                <input class="productname" type="text" id="txtshortdesp" placeholder="请输入商品简介，请输入10-60个字符"
+                       value="{$goods_info.shortdesp}"/>
+                <span class="help-inline">请输入商品简介，请输入10-60个字符</span>
+            </div>
+        </dd>
+    </dl>
+
+
+    <dl id="commodity-weight" style="...">
+        <dt><i class="required">*</i>商品重量：</dt>
+        <dd>
+            <input type="number" class="goods-stock" id="goods_weight" min="0" value="{$goods_info.goods_weight}"/>公斤
+            <span class="help-inline">商品重量不能为空</span>
+            <p class="hint">当存在运费时,使用该值计算运费</p>
+        </dd>
+    </dl>
+
+
+    <dl>
+        <dt><i class="required">*</i>单买价：</dt>
+        <dd>
+            <div class="controls">
+                <input type="number" id="txtProductSalePrice" min="0" placeholder="销售价必须大于0" value="{$goods_info.price}"
+                       style="width:114px;"/><em class="add-on">元</em>
+                <span class="help-inline">商品现价不能为空且需是数字</span>
+            </div>
+        </dd>
+    </dl>
+
+    <dl>
+        <dt>团购价：</dt>
+        <dd>
+            <div class="controls">
+                <input type="number" id="txtProductGroupPrice" min="0" placeholder="0"
+                       style="width:114px;"/><em class="add-on">元</em>
+                <span class="help-inline">团购价不能为空且需是数字</span>
+            </div>
+        </dd>
+    </dl>
+
+    <dl>
+        <dt>团购人数：</dt>
+        <dd>
+            <div class="controls">
+                <input type="number" id="txtProductGroupNum" min="0" placeholder="2"
+                       style="width:114px;"/><em class="add-on">人</em>
+                <span class="help-inline">团购人数不能为空且需是数字</span>
+            </div>
+        </dd>
+    </dl>
+
+
+    <dl>
+        <dt>生产许可证：</dt>
+        <dd>
+            <input type="text" id="txtProductCodeA" value="{$goods_info.code}"/>
+            <span class="help-inline">加工品请输入有效的产品许可证，以确保审核通过</span>
+        </dd>
+    </dl>
+    <dl>
+        <dt><i class="required">*</i>总库存：</dt>
+        <dd>
+            <input type="number" class="goods-stock" id="txtProductCount" min="0" value="{$goods_info.stock}"/>
+            <span class="help-inline">请输入总库存数量，必须是大于0的整数</span>
+        </dd>
+    </dl>
+
+
+
+
+
+
+
+    <dl>
+        <dt>运费模板：</dt>
+        <dd>
+            <select id="feelistSelect">
+
+                {foreach name="feelist" item="fee"}
+                <option value="{$fee.shipping_fee_id}">{$fee.shipping_fee_name}</option>
+                {/foreach}
+            </select>
+            <span class="help-inline">请选择运费模板</span>
+        </dd>
+    </dl>
+
+
+    <dl>
+        <dt><i class="required">*</i>开启自提：</dt>
+        <dd>
+
+            <div class="controls">
+                {if condition = "$goods_info.openselflift eq 1"}
+                <label class="radio inline normal"><input type="radio" name="openselflift" value="1" checked="checked" /> 开启</label>
+                <label class="radio inline normal"><input type="radio" name="openselflift" value="0" /> 关闭</label>
+                {else /}
+                <label class="radio inline normal"><input type="radio" name="openselflift" value="1" /> 开启</label>
+                <label class="radio inline normal"><input type="radio" name="openselflift" value="0" checked="checked" /> 关闭</label>
+                {/if}
+            </div>
+
+
+        </dd>
+    </dl>
+
+
+    <dl>
+        <dt>优惠金额：</dt>
+        <dd>
+            <div class="controls">
+                <input type="number" id="txtelfliftreturn" min="0" placeholder="3"
+                       style="width:114px;"/><em class="add-on">元</em>
+                <span class="help-inline">优惠金额不能为空且需是数字</span>
+            </div>
+        </dd>
+    </dl>
+
+
+
+    <dl>
+        <dt>商品类型：</dt>
+        <dd>
+            <div class="controls">
+                <select id="goodstype">
+
+
+                    <option value="0" selected="selected">普通商品</option>
+                    <option value="1">礼品/非卖品</option>
+
+
+                </select>
+                <span class="help-inline">请选择商品类型</span>
+            </div>
+        </dd>
+    </dl>
+
+
+    <dl>
+        <dt><i class="required">*</i>商品描述：</dt>
+        <dd>
+            <div class="controls" id="discripContainer">
+                <textarea id="tareaProductDiscrip" name="discripArea"
+                          style="height: 500px; width: 800px; display: none;"></textarea>
+                <div id="editor" type="text/plain" style="width: 800px; height: 500px;">
+
+                </div>
+                <span class="help-inline">请填写商品描述</span>
+            </div>
+        </dd>
+    </dl>
+
+    <!--h3 class="js-goods-type">商品规格</h3>
+    <dl>
+        <dt>商品规格：</dt>
+        <dd>
+            <select id="specType">
+                <option value="0">请选择商品规格</option>
+                {foreach name="goods_class_list" item="attribute"}
+
+                <option value="{$attribute.class_id}">{$attribute.class_name}</option>
+
+                {/foreach}
+            </select>
+            <span class="help-inline">请选择商品规格</span>
+        </dd>
+    </dl>
+
+    <dl class="control-group js-goods-spec-block" style="display:none;">
+        <dt><span class="color-red"></span></dt>
+        <dd>
+            <table class="goods-sku js-goods-sku"></table>
+        </dd>
+    </dl>
+    <dl class="control-group js-spec-table" name="skuTable" style="display: none;">
+        <dt><span class="color-red"></span>商品库存：</dt>
+        <dd>
+            <div class="controls">
+                <div class="js-goods-stock control-group" style="font-size: 14px; margin-top: 10px;">
+                    <div id="stock-region" class="sku-group">
+                        <table class="table-sku-stock">
+                            <thead></thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </dd>
+    </dl -->
+
+
+    <h3 class="js-goods-img">商品图片</h3>
+    <dl>
+        <dt><i class="required">*</i>商品图片：</dt>
+        <dd>
+            <div class="controls" style="background-color:#FFF;border: 1px solid #E9E9E9;">
+                <div class="ncsc-goods-default-pic">
+                    <div class="goodspic-uplaod" style="padding: 15px;">
+                        <div class='img-box' style="min-height:160px;">
+                            {if condition="count($goods_info['img_temp_array']) gt 0" }
+                            {foreach $goods_info["img_temp_array"] as $vo}
+                            <div class="upload-thumb draggable-element">
+                                <img src="{$vo['pic_cover']}"/>
+                                <input type="hidden" class="upload_img_id" value="{$vo['pic_id']}"/>
+                                <div class="black-bg hide">
+                                    <div class="off-box">&times;</div>
+                                </div>
+                            </div>
+                            {/foreach}
+                            {else /}
+                            <div class="upload-thumb" id="default_uploadimg">
+                                <img src="ADMIN_IMG/album/default_goods_image_240.gif"/>
+                            </div>
+                            {/if}
+                        </div>
+                        <div class="clear"></div>
+                        <span class="img-error">最少需要一张图片作为商品主图</span>
+                        <p class="hint">上传商品图片，<font color="red">第一张图片将作为商品主图</font>,支持同时上传多张图片,多张图片之间可随意调整位置；支持jpg、gif、png格式上传或从图片空间中选择，建议使用尺寸800x800像素以上、大小不超过1M的正方形图片，上传后的图片将会自动保存在图片空间的默认分类中。
+                        </p>
+                        <div class="handle">
+                            <div class="ncsc-upload-btn">
+                                <a href="javascript:void(0);">
+									<span>
+										<input style="cursor:pointer;font-size:0;" type="file" id="fileupload"
+                                               hidefocus="true" size="1" class="input-file" name="file_upload"
+                                               multiple="multiple"/>
+									</span>
+                                    <p>图片上传</p>
+                                </a>
+                            </div>
+                            <a class="ncsc-btn mt5" id="img_box" nctype="show_image"
+                               href="javascript:void(0);">从图片空间选择</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </dd>
+    </dl>
+
+
+    <dl>
+        <dt>商品横幅:</dt>
+        <dd>
+            <div class="class-logo"><p><img id="imgbanner"src="{$goods_info.bannerurl}" ></p></div>
+            <div class="ncsc-upload-btn">
+                <a href="javascript:void(0);"><span>
+			          <input hidefocus="true" size="1" class="input-file" name="file_upload" id="uploadImg2" nc_type="change_store_label" type="file" onchange="bannerUpload(this);">
+			        <input type="hidden"id="banner"value="{$goods_info.bannerurl}"/></span><p><!-- <i class="icon-upload-alt"></i> -->上传图片</p>
+                </a>
+            </div>
+
+            <p class="hint"><br><span style="color:orange;">建议使用720*360像素内的GIF或PNG透明图片；点击下方"提交"按钮后生效。</span></p>
+        </dd>
+    </dl>
+
+    {include file="admin/Goods/fileAlbumImg"/}
+
+
+</div>
+
+<div class="btn-submit">
+    <button class="btn btn-info" id="btnSave" type="button" onClick="SubmitProductInfo(0,'ADMIN_MAIN','SHOP_MAIN')">保存
+    </button>
+
+</div>
+
+<script>
+
+
+    function bannerUpload(event) {
+        var fileid = $(event).attr("id");
+        var str = $(event).next().attr("id");
+        var data = { 'file_path' : UPLOADCOMMON }
+
+
+        uploadFile(fileid,data,function(res){
+            if(res.code){
+                $("#img"+str).attr("src",res.data);
+                $("#"+str).val(res.data);
+                showTip(res.message,"success");
+            }else{
+                showTip(res.message,"error");
+            }
+        });
+    }
+
+
+</script>
+{include file="admin/Goods/controlEditGoodsCommonHTML"}
+{include file="admin/Goods/controlEditGoodsCommonScript"}
+{/block}

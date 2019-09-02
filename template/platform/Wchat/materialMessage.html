@@ -1,0 +1,137 @@
+{extend name="platform/base" /} {block name="main"}
+<div class="row padder-v">
+		<div class="col-sm-4">
+			<a href="PLATFORM_MAIN/wchat/addmedia"
+				class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加素材 </a>
+		</div>
+		<div class="col-sm-5">
+				<a
+					class="btn btn-sm btn-default {eq name='type' value='0'}active{/eq}"
+					href="PLATFORM_MAIN/Wchat/materialmessage?type=0">全部</a> <a
+					class="btn btn-sm btn-default {eq name='type' value='1'}active{/eq}"
+					href="PLATFORM_MAIN/Wchat/materialmessage?type=1">文本</a> <a
+					class="btn btn-sm btn-default {eq name='type' value='2'}active{/eq}"
+					href="PLATFORM_MAIN/Wchat/materialmessage?type=2">单图文</a> <a
+					class="btn btn-sm btn-default {eq name='type' value='3'}active{/eq}"
+					href="PLATFORM_MAIN/Wchat/materialmessage?type=3">多图文</a>
+			</div>
+		<div class="col-sm-2">
+				<input type="text" class="input-sm form-control" id="search_text"
+					placeholder="请输入素材名称">
+		</div>
+		<div class="col-sm-1">
+				<button
+					class="btn btn-sm btn-default" onclick="LoadingInfo(1)">搜索</button>
+		</div>
+	</div>
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th>标题</th>
+					<th class="center">创建时间</th>
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+<input type="hidden" id="type" value="{$type}">
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//分页数据
+ function LoadingInfo(pageIndex) {
+	var search_text = $("#search_text").val();
+	var type = $("#type").val();
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/wchat/materialmessage",
+		async : true,
+		data : {
+			"pageIndex" : pageIndex, "search_text" : search_text, "type" : type
+		},
+		success : function(data) {
+			var html = '';
+			$("#total_count_num").text(data["total_count"]);
+			$("#page_count_num").text(data["page_count"]);
+			$("#page_count").val(data["page_count"]);
+			$("#pageNumber a").remove();
+			if (data["data"].length > 0) {
+			for (var i = 0; i < data["data"].length; i++) {
+				if(data['data'][i]['type'] == 1){
+					var type_name = '文本 ';
+				}else if(data['data'][i]['type'] == 2){
+					var type_name = '单图文 ';
+				}else if(data['data'][i]['type'] == 3){
+					var type_name = '多图文 ';
+				}
+				html += '<tr align="center">';
+				/* html += '<td>' + data["data"][i]["uid"] + '</td>'; */
+				html += '<td style="text-align:left;"><ul class="list-group" style="margin-bottom:0px;">';
+				html += '';
+				for(var l=0; l<data['data'][i]['item_list'].length; l++){
+					var k = l+1;
+					html += '<li class="list-group-item"><span class="label bg-primary m-r-sm">'+ type_name + k+' </span> <a href="#">'+data['data'][i]['item_list'][l]['title']+'</a></li>';
+				}
+				html += '';
+				html += '</ul></td>';
+				html += '<td>' + data["data"][i]["create_time"] + '</td>';
+				html += '<td><a href="PLATFORM_MAIN/Wchat/updateMedia?media_id=' + data["data"][i]["media_id"] + '">修改</a>&nbsp;&nbsp; ';
+				html += '<a href="javascript:void(0);" onclick="delMedia(' + data["data"][i]["media_id"] + ')">删除</a></td>';
+				html += '</tr>';
+			}
+		} else {
+			html += '<tr align="center"><th colspan="4">暂无符合条件的数据记录</th></tr>';
+		}
+			$("#list").html(html);
+			var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+		}
+	});
+}	
+$("#search_text").keypress(function(e){
+	if(e.keyCode == 13){
+		LoadingInfo(1);
+	}
+});
+function delMedia(media_id){
+	$( "#dialog" ).dialog({
+        buttons: {
+            "确定": function() {
+                $(this).dialog('close');
+        		$.ajax({
+        			type : "post",
+        			url : "PLATFORM_MAIN/wchat/deleteweixinmedia",
+        			data : {"media_id" : media_id},
+        			success : function(res){
+        				if(res>0){
+        					showMessage('success', "操作成功", "PLATFORM_MAIN/wchat/materialmessage");
+        				}else{
+        					showMessage('error', "操作失败");
+        				}
+        			}
+        		})
+            },
+            "取消,#e57373": function() {
+                $(this).dialog('close');
+                return 0;
+            }
+        },
+        contentText:"确定要删除吗",
+	});
+}
+
+</script>
+{/block}

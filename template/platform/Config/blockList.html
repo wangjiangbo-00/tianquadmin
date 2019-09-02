@@ -1,0 +1,149 @@
+{extend name="platform/base" /} 
+{block name="main"}
+<div class="row padder-v">
+                <div class="col-sm-9">
+                  <a href="PLATFORM_MAIN/Config/addBlock" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加版块 </a> 
+                </div>
+                <div class="col-sm-2">
+                    <input type="text" class="input-sm form-control" id="search_text" placeholder="请输入版块名称">
+                </div>
+                <div class="col-sm-1">
+                    <button class="btn btn-sm btn-default" type="button" onclick="LoadingInfo(1)">搜索</button>
+                </div>
+              </div>
+<section class="panel panel-default">
+              <div class="table-responsive">
+                <table class="table table-striped b-t b-light text-sm">
+                  <thead>
+                    <tr>
+                      <th width="20"><input type="checkbox"></th>
+                      <th class="center">版块名称</th>
+                      <th class="center">色彩风格</th>
+                      <th class="center">更新时间</th>
+                      <th class="center">是否显示</th>
+                      <th class="center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="list">
+                    <tr></tr>
+                  </tbody>
+                </table>
+              </div>
+              {include file="platform/page" /}
+            </section>
+
+{/block}
+{block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+})
+//查询用户列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Config/blockList",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data['data'].length > 0) {
+					for (var i = 0; i < data['data'].length; i++) {
+						var block_id = data['data'][i]['block_id'];
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['block_id']+'"></td>';
+						html += '<td class="center">'+ data['data'][i]['block_name']+'</td>';
+						html += '<td class="center"><span style="display:inline-block;width:20px;height:20px;background:' + data['data'][i]["block_color"] + ';"></span></td>';
+						html += '<td class="center">' + data['data'][i]["modify_time"] + '</td>';
+						if(data['data'][i]["is_display"] == 0){
+							html += '<td class="center"><a href="javascript:void(0);" onclick="setWebBlockIsBlock(this,'+block_id+',1)" class data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}else{
+							html += '<td class="center"><a href="javascript:void(0);" onclick="setWebBlockIsBlock(this,'+block_id+',0)" class="active" data-toggle="class"><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>';
+						}
+						html += '<td class="center"><a href="PLATFORM_MAIN/Config/updateBlock?block_id=' + data['data'][i]["block_id"] + '">编辑</a>&nbsp;&nbsp;<a href="javascript:;" onclick="delBlock(' + block_id + ')">删除</a></td> ';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="6">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+				var totalpage = $("#page_count").val();
+				if (totalpage == 1) {
+					changeClass("all");
+				}
+				var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+				$("#pageNumber").append($html);
+			}
+		});
+	}	
+$("#search_text").keypress(function(e){
+	if(e.keyCode == 13){
+		LoadingInfo(1);
+	}
+});
+//删除 版块
+function delBlock(block_id){
+	$( "#dialog" ).dialog({
+        buttons: {
+            "确定": function() {
+                $(this).dialog('close');
+                $.ajax({
+        			type : "post",
+        			url : "PLATFORM_MAIN/config/delblock",
+        			async : true,
+        			data : {
+        				"block_id" : block_id
+        			},
+        			success : function(data) {
+        				if(data["code"] > 0 ){
+        					showMessage('success', data["message"],'PLATFORM_MAIN/config/blocklist');
+        				}else{
+        					showMessage('error', data["message"]);
+        				}
+        			}
+        		})
+            },
+            "取消,#e57373": function() {
+                $(this).dialog('close');
+            }
+        },
+        contentText:"你确定删除吗？",
+        title:"消息提醒"
+    });
+}
+/**
+ * 显示与不显示
+ */
+function setWebBlockIsBlock(eve,block_id,is_block){
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/config/setwebblockisblock",
+		async : true,
+		data : {
+			"block_id" : block_id,
+			"is_display" : is_block
+		},
+		success : function(data) {
+			
+			if(data["code"] > 0 ){
+				showMessage('success','设置成功');
+				if(is_block==1){
+					$(eve).addClass('active').attr('onclick','setWebBlockIsBlock(this,'+block_id+',0)').html('<i class="fa fa-check text-success text-active"></i>');
+				}else{
+					$(eve).removeClass('active').attr('onclick','setWebBlockIsBlock(this,'+block_id+',1)').html('<i class="fa fa-times text-danger text"></i>');
+				}
+			}else{
+				showMessage('error',data["message"]);
+			}
+		}
+	})
+}
+</script>
+{/block}

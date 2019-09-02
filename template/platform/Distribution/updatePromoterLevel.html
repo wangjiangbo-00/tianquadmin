@@ -1,0 +1,101 @@
+{extend name="platform/base" /}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 修改推广员等级 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="level_form" name="form">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">等级名称</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="level_name" name="level_name" value="{$premoter_level_info.level_name}" required>
+				</div>
+				<label class="col-md-8 error" for="level_name" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">升级条件</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="level_money" name="level_money" value="{$premoter_level_info.level_money}" onkeyup="javascript:CheckInputIntFloat(this);">
+				</div>
+				<label class="col-md-8 error" for="level_money" ></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">本店销售佣金比率（%）</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="level_0" value="{$premoter_level_info.level_0}" onkeyup="javascript:CheckInputIntFloat(this);">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">给上级的佣金比率（%）</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="level_1" value="{$premoter_level_info.level_1}" onkeyup="javascript:CheckInputIntFloat(this);">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">给上上级的佣金比率（%）</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" id="level_2" value="{$premoter_level_info.level_2}" onkeyup="javascript:CheckInputIntFloat(this);">
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button type="submit" class="btn btn-primary">保存</button>
+					<input type="hidden"  id="level_id"value="{$level_id}"/>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script src="__STATIC__/js/limit_input_digit.js"></script>
+<script>	
+$().ready(function() {
+	$("#level_form").validate({
+		submitHandler:function(){
+			updatePromoterLevel();
+		}
+	});
+});
+	function updatePromoterLevel(){
+		var level_name = $("#level_name").val();
+		var level_money = $("#level_money").val();
+		var level_0 = $("#level_0").val();
+		var level_1 = $("#level_1").val();
+		var level_2 = $("#level_2").val();
+		//var level_id = $("#level_id").val();
+		if(level_name == ""){
+			$("#level_name").parent().next().show();
+			return false;
+		}else{
+			$("#level_name").parent().next().hide();
+		}
+		if((parseFloat(level_0) +parseFloat(level_1)+ parseFloat(level_2))>100 ){
+			showMessage('error', "佣金比率不可超过100%！");	
+			return false;
+		}
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Distribution/updatePromoterLevel",
+			data:{
+				'level_name':level_name,
+				'level_money':level_money,
+				'level_0':level_0,
+				'level_1':level_1,
+				'level_2':level_2,
+				'level_id':{$level_id}
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"PLATFORM_MAIN/Distribution/PromoterLevelList");
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+</script>
+{/block}

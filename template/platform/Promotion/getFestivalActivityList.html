@@ -1,0 +1,233 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style>
+.fa {
+    display: grid;
+   
+}
+</style>
+{/block}
+ {block name="main"}
+<div class="row padder-v">
+    <div class="col-sm-4">
+        <a href="PLATFORM_MAIN/Promotion/addactivityfestival"
+           class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加活动</a>
+    </div>
+</div>
+
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+
+
+					<th>活动名称</th>
+					<th>有效时间</th>
+					<th>活动类型</th>
+					<th>活动状态</th>
+					<th>开放状态</th>
+					<th>展示状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+{/block} 
+{block name="script"}
+<script type="text/javascript">
+
+$(function(){
+	LoadingInfo(1);
+});
+function LoadingInfo(pageIndex) {
+    var search_text = $("#search_text").val();
+    $.ajax({
+        type : "post",
+        url : "PLATFORM_MAIN/Promotion/getFestivalActivityList",
+        async : true,
+        data : {
+            "pageIndex" : pageIndex, "search_text" : search_text
+        },
+        success : function(data) {
+            $("#page_count").val(data["page_count"]);
+            $("#pageNumber a").remove();
+            var html = '';
+            if (data["data"].length > 0) {
+                for (var i = 0; i < data["data"].length; i++) {
+                    var status = parseInt(data['data'][i]['status']) ;
+                    switch(status){
+                        case 0:
+                            var status_name = '未发布';
+                            break;
+                        case 1:
+                            var status_name = '申请上架中';
+                            break;
+                        case 2:
+                            var status_name = '上架成功';
+                            break;
+                        case 3:
+                            var status_name = '上架失败';
+                            break;
+                        case 4:
+                            var status_name = '展示中';
+                            break;
+                        case 5:
+                            var status_name = '已开始';
+                            break;
+
+                        case 6:
+                            var status_name = '已开奖';
+                            break;
+
+                        case 7:
+                            var status_name = '已结束';
+                            break;
+                    }
+
+
+                    switch(data['data'][i]['is_open']){
+                        case 0:
+                            var open_name = '未开放';
+                            break;
+                        case 1:
+                            var open_name = '开放';
+                            break;
+
+                    }
+
+                    switch(data['data'][i]['is_visible']){
+                        case 0:
+                            var visible_name = '不展示';
+                            break;
+                        case 1:
+                            var visible_name = '展示';
+                            break;
+
+                    }
+                    var type = parseInt(data['data'][i]['type']) ;
+                    switch(type){
+                        case 2:
+                            var type_name = '永久活动';
+                            break;
+                        case 3:
+                            var type_name = '限时活动';
+                            break;
+
+                    }
+
+
+                    html += '<tr >';
+                    html += '<td>' + data["data"][i]["discount_name"] + '</td>';;
+                    html += '<td>' + data["data"][i]["start_time"] + ' 至 ' + data["data"][i]["end_time"] + '</td>';
+                    html += '<td>'+ type_name +'</td>';
+                    html += '<td>'+ status_name +'</td>';
+                    html += '<td>'+ open_name +'</td>';
+                    html += '<td>'+ visible_name +'</td>';
+                    html += '<td>';
+
+                    if(status == 0)
+					{
+                        html += '<a href="javascript:void(0);"onclick="putOn('+data["data"][i]["id"]+')">上架</a>&nbsp;';
+					}
+					else if(status == 2|| status == 4 || status == 5)
+					{
+                        html += '<a href="javascript:void(0);"onclick="pulloff('+data["data"][i]["id"]+')">下架</a>&nbsp;';
+					}
+
+                    html += '<a href="PLATFORM_MAIN/Promotion/updateActivityFestival?id=' + data["data"][i]["id"] + '">编辑</a>&nbsp;';
+                    html += '<a href="javascript:void(0);"onclick="del('+data["data"][i]["id"]+')">删除</a>&nbsp;';
+                    html += '<a href="javascript:void(0);"onclick="info('+data["data"][i]["id"]+')">详情</a>&nbsp;';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+            } else {
+                html += '<tr align="center"><th colspan="4">暂无符合条件的数据记录</th></tr>';
+            }
+            $("#list").html(html);
+            var totalpage = $("#page_count").val();
+            if (totalpage == 1) {
+                changeClass("all");
+            }
+            var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+            $("#pageNumber").append($html);
+        }
+    });
+}
+
+function pulloff(id){
+    $.ajax({
+        type:"post",
+        url : "ADMIN_MAIN/promotion/closeactivity",
+        data : {
+            "id" : id
+        },
+        success : function(data) {
+            if (data["code"] > 0) {
+                showMessage('success', data["message"],'ADMIN_MAIN/promotion/getFestivalActivityList');
+            }else{
+                showMessage('error', data["message"]);
+            }
+        }
+    })
+}
+
+function puton(id){
+    $.ajax({
+        type:"post",
+        url : "ADMIN_MAIN/promotion/putonactivity",
+        data : {
+            "id" : id
+        },
+        success : function(data) {
+            if (data["code"] > 0) {
+                showMessage('success', data["message"],'ADMIN_MAIN/promotion/getFestivalActivityList');
+            }else{
+                showMessage('error', data["message"]);
+            }
+        }
+    })
+}
+
+
+function del(id){
+    $.ajax({
+        type:"post",
+        url : "ADMIN_MAIN/promotion/deleteactivity",
+        data : {
+            "id" : id
+        },
+        success : function(data) {
+            if (data["code"] > 0) {
+                showMessage('success', data["message"],'ADMIN_MAIN/promotion/getFestivalActivityList');
+            }else{
+                showMessage('error', data["message"]);
+            }
+        }
+    })
+}
+
+function info(id){
+    $.ajax({
+        type:"post",
+        url : "ADMIN_MAIN/promotion/getactivitydetail",
+        data : {
+            "id" : id
+        },
+        success : function(data) {
+            if (data["code"] > 0) {
+                showMessage('success', data["message"],'ADMIN_MAIN/promotion/getFestivalActivityList');
+            }else{
+                showMessage('error', data["message"]);
+            }
+        }
+    })
+}
+
+</script>
+{/block}

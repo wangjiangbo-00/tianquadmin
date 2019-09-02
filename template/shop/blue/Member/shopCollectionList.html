@@ -1,0 +1,89 @@
+{extend name="shop/blue/base" /}
+{block name="resources"}
+<script src="__TEMP__/{$style}/public/js/ns_collections.js" type="text/javascript"></script>
+<!-- 添加css、字体文件文件 -->
+<style>
+</style>
+{/block}
+{block name="main"}
+<div class="margin-w1210">
+	{include file='shop/blue/Member/controlLeftMenu'/}
+	<div class="member-main">
+		<div class="box">
+			<div class="tabmenu">
+				<ul class="tab">
+					<li class="first active">我的店铺收藏</li>
+				</ul>
+			</div>
+			<div class="mar_top">
+				<table class="ncm-default-table">
+					<tbody>
+						<tr>
+							<td colspan="2" class="pic-model">
+								<ul class="js-collection-list">
+								{if condition="$page_count eq 0"}
+								<div class="emptyFrame clearfix" style="cursor: pointer;"> <i class="user_bg"></i><span>这里空空的，赶快收藏自己喜爱的店铺吧！</span> </div>
+								{/if}
+								
+								{volist name="list" id="vo" key="k"}
+								<li class="favorite-pic-list">
+								<!--  onclick="location.href='SHOP_MAIN/shop/shopindex?shop_id={$vo.shop_id}';" style="cursor: pointer;" -->
+									<div class="favorite-goods-thumb" >
+									
+										<a href="SHOP_MAIN/shop/shopindex?shop_id={$vo.shop_id}" target="_blank" title="{$vo.shop_name}">
+										{if condition="$vo.shop_avatar neq ''"}
+											<img src="__UPLOAD__/{$vo.shop_avatar}" alt="{$vo.shop_name}" width="200" height="200" />
+										{else/}	
+										    <img src="__UPLOAD__/template/shop/default/public/images/default/default_shop_avatar.png" alt="{$vo.shop_name}" width="200" height="200" />
+										{/if}
+										</a>
+										
+									</div>
+									<div class="favorite-goods-info">
+										<dl>
+											<dt>
+												<a href="SHOP_MAIN/shop/shopindex?shop_id={$vo.shop_id}" target="_blank" title="{$vo.shop_name}">{$vo.shop_name}</a>
+											</dt>
+											<dd class="price" style="width:50%;float:left;padding-left:5px;color:#0689e1;font-weight: bold;">{$vo.shop_name}</dd>
+											<dd class="hover_tan" style="width:47%;float:left;" onclick="javascript:cancelCollection({$vo.shop_id},'shop',this);">
+												<label><i class="guanzhu1 js-guanzhu{$k}"></i>
+													<a href="javascript:;" class="ncm-btn-mini">取消收藏</a></label> 
+													<!-- <i class="del"></i><a href="javascript:;"class="ncm-btn-mini ncm-btn-mini1">删除</a> -->
+											</dd>
+										</dl>
+									</div>
+								</li>
+								{/volist}
+								
+								</ul>
+							</td> 
+						</tr>
+					</tbody>
+				</table>
+				{include file='shop/blue/controlCommonPage'/}
+			</div>
+		</div>
+	</div>
+</div>
+{/block}
+{block name="RightSideBar"}{/block}
+{block name="javascript"}
+<script>
+//取消收藏 is_reload: true 刷新
+function cancelCollection(fav_id, fav_type, obj) {
+	$.ajax({
+		url : shop_main + "/components/cancelcollgoodsorshop",
+		type : "post",
+		data : {
+			"fav_id" : fav_id,
+			"fav_type" : fav_type
+		},
+		success : function(data) {
+			$.msg("取消收藏成功");
+			$(obj).parent().parent().parent("li").remove();
+			location.reload();
+		}
+	});
+}
+</script>
+{/block}

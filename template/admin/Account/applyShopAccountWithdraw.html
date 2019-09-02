@@ -1,0 +1,133 @@
+{extend name="admin/base" /}
+{block name="resources"/}
+<link rel="stylesheet" type="text/css" href="ADMIN_CSS/defau.css">
+<style>
+.bank-style{
+	overflow:hidden;
+	margin-left:0px;
+}
+.bank-style  li{
+	float:left;
+	border:1px dashed #e2e2e2;
+	width:200px;
+	height:80px;
+	margin-right:10px;
+	margin-bottom:10px;
+	padding:10px;
+	position:relative;
+}
+.border-check{
+	border-color:#de533c !important;
+}
+.bank-style  li p{
+	line-height:20px;
+	font-size:13px;
+	border-bottom:1px solid #e2e2e2;
+}
+</style>
+{/block}
+{block name="main"}
+<div class="set-style">
+
+	<dl>
+		<dt>提现金额:</dt>
+		<dd>
+			<p><input name="" id="cash" type="text" value="" onkeyup="javascript:CheckInputIntFloat(this);"/></p>	
+			<p class="hint"><span style="color:orange;">可提现金额为{$shop_account_info.shop_balance}。</span></p>
+			<p class="error">请输入提现金额</p>
+		</dd>
+	</dl>
+	<dl>
+		<dt>银行账户:</dt>
+		<dd>
+			<p>
+				<ul class="bank-style">
+				<!-- 	<li>
+						<p>银行名称</p>
+						<p>银行账号</p>
+						<p>账户姓名</p>
+						<p>手机号</p>
+					</li> -->
+				{foreach name="bank_lsit" item="bank_info"}
+					{if condition=" $bank_info.is_default eq 1"}
+						<li class="border-check" data-check=1 data-id={$bank_info.id} onclick="check_this(this);">
+							<p>{$bank_info["branch_bank_name"]}</p>
+							<p>{$bank_info["account_number"]}</p>
+							<p>{$bank_info["realname"]}</p>
+							<p>{$bank_info["mobile"]}</p>
+							<img src="ADMIN_IMG/qrcode/check_qrcode1.png" class="qrcode_img"style="position:absolute;bottom:-1px;height:30px;right:-1px;"/>
+						</li>					
+					{else /} 
+						<li data-check=0 data-id={$bank_info.id} onclick="check_this(this);">
+							<p>{$bank_info["branch_bank_name"]}</p>
+							<p>{$bank_info["account_number"]}</p>
+							<p>{$bank_info["realname"]}</p>
+							<p>{$bank_info["mobile"]}</p>
+							<img src="ADMIN_IMG/qrcode/check_qrcode1.png" class="qrcode_img"style="position:absolute;bottom:-1px;height:30px;right:-1px;display:none;"/>
+						</li>
+					{/if}
+						
+				{/foreach} 
+						<!-- <li onclick="window.location.href='ADMIN_MAIN/account/shopBankAccountList'">
+							<img src="ADMIN_IMG/plus.png" style="display:block;width:80px;margin:0 auto;" />
+						</li>	 -->				
+				</ul>			
+			</p>	
+			<p class="hint"><span style="color:#00c0ff;cursor:pointer;"onclick="window.location.href='ADMIN_MAIN/account/shopbankaccountlist'">管理银行账户</span></p>
+		</dd>
+	</dl>	
+	<button class="edit_button" onclick="applyShopAccountWithdraw();">提交</button>
+</div>
+{include file="admin/pageCommon" /}
+<script src="__STATIC__/js/limit_input_digit.js"></script>
+<script>		
+	function applyShopAccountWithdraw(){
+		var cash = $("#cash").val();
+		//var commission_rate = $("#commission_rate").val();
+		//var global_value = $("#global_value").val();
+		//var global_weight = $("#global_weight").val();
+		if(cash == ""){
+			$("#cash").parent().next().next().show();
+			return false;
+		}else{
+			$("#cash").parent().next().next().hide();
+		} 
+		var bank_account_id = 0;
+		$(".bank-style li").each(function(){
+			if($(this).data("check") == 1){
+				bank_account_id = $(this).data("id");
+			}
+		})	
+		$.ajax({
+			type:"post",
+			url:"ADMIN_MAIN/account/applyshopaccountwithdraw",
+			data:{
+				'cash':cash,
+				"bank_account_id":bank_account_id
+				//'global_value':global_value,
+				//'global_weight':global_weight
+			},
+			async:true,
+			success:function (data) {
+				//alert(JSON.stringify(data));
+				if (data["code"] > 0) {
+					showMessage('success', data["message"],"ADMIN_MAIN/account/shopaccountwithdrawlist");
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+	/**
+	*选中自身
+	*/
+	function check_this(event){
+		$(".bank-style li").find("img").hide();
+		$(event).find("img").show();
+		$(".bank-style li").data("check",0);
+		$(event).data("check",1);
+		$(".bank-style li").removeClass("border-check");
+		$(event).addClass("border-check");
+	}
+</script>
+{/block}

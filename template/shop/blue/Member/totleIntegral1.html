@@ -1,0 +1,144 @@
+{extend name="shop/blue/base" /}
+{block name="resources"}
+<link type="text/css" rel="stylesheet" href="__TEMP__/{$style}/public/css/shop_street.css">
+<style type="text/css">
+.integral_totle{width:100%;height:150px;}
+.integral_title{display:block;font-size:30px;text-align:center;color:red;margin-top:20px;border-bottom:1px solid #ccc;height:40px;}
+.totle_list_left{width:240px;height:70px;border:1px solid #ccc;padding:40px;margin-left:40px;margin-top:20px;float:left;}
+.totle_list_right{width:240px;height:70px;padding:40px;margin-right:40px;margin-top:20px;float:right;}
+.control_integral{height:400px;}
+.member-main .tabmenu .tab li.active {
+    margin-left: 10px;
+}
+.platform {
+    margin-left: 10px;
+}
+.control_integral {
+    padding: 10px;
+}
+/*以下为平台显示样式*/
+.platform{position:absolute;width:150px;height:160px;border:1px solid #ccc;}
+.platform .shop_name{text-align:center;width:100%;height:50px;line-height:30px;overflow:hidden;}
+.platform .shop_point{text-align:center;width:130px;height:50px;border-bottom:1px solid #ccc;line-height:50px; font-size:23px;margin:0 10px 0 10px;color:#000;}
+.platform .shop_img{height:68px;}
+.platform .shop_img img{max-height:80px !important;max-width: 120px !important; margin-left:15px; margin-top:10px;}
+.platform_list{position:absolute;width:150px;height:160px;background-color:rgba(0,0,0,0.5); display:none;border:1px solid #ccc;}
+.platform_list .integral_back{width:90px;height:40px; background-color:#ff4f4f;position:relative;top:60px;left:30px; border:0;display:block; color:white;line-height: 40px;text-align: center;border-radius:5px;}
+/*以下为店铺显示样式*/
+.integral_list{float:left;width:150px;height:160px;border:1px solid #ccc;margin-left:13px;margin-top:15px;}
+.integral_list:nth-child(6n+1){margin-left:0;}
+.integral_list .shop_info{position:absolute;z-index:1;}
+.integral_list .shop_img{height:68px;}
+.integral_list .shop_img img{max-height:80px !important;max-width: 120px !important; margin-left:15px; margin-top:10px;}
+.integral_list .shop_name{text-align:center;width:150px;height:30px;line-height:30px;overflow:hidden;}
+.integral_list .shop_point{text-align:center;width:130px;height:50px;border-bottom:1px solid #ccc;line-height:50px; font-size:23px;margin:0 10px 0 10px; color:#000;}
+.integral_list .shop_block{position:absolute; z-index:2; width:150px; height:160px; background-color:rgba(0,0,0,0.5); display:none;}
+.integral_list .shop_block a{width:90px;height:40px; background-color:#ff4f4f;position:relative;top:60px;left:30px; border:0;display:block; color:white;line-height: 40px;text-align: center;border-radius:5px;}
+</style>
+{/block}
+{block name="main"}
+<script>
+	$(document).ready(function(){
+		//平台积分进入效果
+		$(".platform,.platform_list").mouseenter(function(){
+			$(this).hide();
+			$(".platform_list").show();
+		}).mouseover(function(){
+			$(this).hide();
+			$(".platform_list").show();
+		}).mouseleave(function(){
+			$(this).show();
+			$(".platform_list").hide();
+		});
+		//店铺积分进入效果
+		$(".integral_list").on("mouseenter",function(){
+			$(this).children(".shop_block").show();
+		})
+		$(".integral_list").on("mouseleave",function(){
+			$(this).children(".shop_block").hide();
+		});
+		//图片显示效果
+		$('.shop_img img').each(function(){
+			width=$(this).css("width");
+			if(parseFloat(width) > 120){
+				$(this).css("width","120px");
+			}
+		})
+	});
+</script>
+<div class="margin-w1210">
+{include file='shop/blue/Member/controlLeftMenu'/}
+<div class="member-main">
+   	<div class="box">
+   		  <div class="tabmenu">
+            <ul class="tab pngFix">
+              <li class="active"  > <a href="#">平台积分</a> </li>
+            </ul>
+          </div>
+          <div class="integral_totle">
+          {if condition="$market_isset eq true"}
+          	{foreach $integral.data as $integral_list}
+          	  {if condition="$integral_list.shop_id eq 0"}
+          	<div class="platform">
+          				<div class="shop_point">
+	         	 				<span>{$integral_list.point}</span>
+	         	 		</div>
+	         	 		<div class="shop_img">
+							<img  src="__TEMP__/{$style}/public/images/default/default_shop_avatar.png" />
+	         	 		</div>         	 			
+         	 			<div class="shop_name">
+         	 				<span title="{$platform_shopname}">{$platform_shopname}</span>
+         	 			</div>         	 			
+	        </div>	
+	        <div class="platform_list">
+	        	<span class="integral_back"><a href="SHOP_MAIN/member/integrallist?shop_id={$integral_list.shop_id}" style="color:#fff">积分明细</a></span> 
+	       	</div>      
+           {/if}
+           	{/foreach}
+          {else /}
+          		没有数据
+          {/if}
+          </div>
+          <div class="tabmenu" style="margin-bottom:0px; margin-top:15px;">
+            <ul class="tab pngFix">
+              <li class="active"  > <a href="#">店铺积分</a> </li>
+            </ul>
+          </div>
+           <div class="integral_shop">
+         	<div class="control_integral">
+         	{if condition = "$shop_isset eq true"}
+          		{foreach $integral.data as $integral_list}
+         		{if condition="$integral_list.shop_id neq 0"}
+	         	<div class="integral_list">
+	         			
+	         	 		<div class="shop_info">
+	         	 			<div class="shop_point">
+	         	 				<span>{$integral_list.point}</span>
+	         	 			</div>        	 			
+	         	 			<div class="shop_img">
+	         	 			{if condition="$integral_list.extra.shop_logo neq '' and $integral_list.extra.shop_logo neq '0'"}
+							<img src="__UPLOAD__/{$integral_list.extra.shop_logo}"/>
+						    {else /}
+							<img  src="__TEMP__/{$style}/public/images/default/default_shop_avatar.png"  />
+						    {/if}
+	         	 			</div>
+	         	 			<div class="shop_name">
+	         	 				<span title="{$integral_list.extra.shop_name}">{$integral_list.extra.shop_name}</span>	         	 				
+	         	 			</div>		
+	         	 		</div>
+	         	 		<div class="shop_block">
+	         	 			<span class="integral_back"><a href="SHOP_MAIN/member/integrallist?shop_id={$integral_list.shop_id}" >积分明细</a></span> 
+	         	 		</div>	         	 		
+	         	</div>	             	 		
+	         	{/if}
+	         	{/foreach}
+	         {else /}
+	       		  没有数据
+	         {/if}
+         	</div>
+         </div>
+   	</div>
+</div>
+</div>
+{/block}
+{/extend}

@@ -1,0 +1,89 @@
+{extend name="platform/base" /} {block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 微信开放平台设置 </header>
+	<div class="panel-body">
+		<form class="form-horizontal" id="alipay_form">
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">APP_ID</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="appId" required
+						value="{$data.oauth_value.appId}">
+				</div>
+				<label class="col-md-6 error" for="ali_partnerid" class="error"></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">APP_SECRET</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="appsecret" required
+						value="{$data.oauth_value.appsecret}">
+				</div>
+				<label class="col-md-6 error" for="ali_seller" class="error"></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">ENCODING_AES_KEY</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="encodingAesKey" required
+						value="{$data.oauth_value.encodingAesKey}">
+				</div>
+				<label class="col-md-6 error" for="ali_key" class="error"></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">TOKEN</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" id="tk" required
+						value="{$data.oauth_value.tk}">
+				</div>
+				<label class="col-md-6 error" for="ali_key" class="error"></label>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button type="submit" class="btn btn-primary">保存</button>
+<!-- 									<a href="javascript:void(0);" onclick="setAliPayConfigAjax()" -->
+<!-- 										class="btn btn-primary">保存</a> -->
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+<script>
+$(document).ready(function(){
+	$('.btn').click(function(){
+		$(this).attr('disabled',true);
+		setWeixinOpenPlatformConfigAjax();
+	})
+})
+/**
+ * 微信开放平台设置
+ */
+	function setWeixinOpenPlatformConfigAjax(){
+		var appId = $("#appId").val();
+		var appsecret = $("#appsecret").val();
+		var encodingAesKey = $("#encodingAesKey").val();
+		var tk = $("#tk").val();
+		$.ajax({
+			type:"post",
+			url:"PLATFORM_MAIN/Wchat/weixinOpenPlatformConfig",
+			data:{
+				'appId':appId,
+				'appsecret':appsecret,
+				'encodingAesKey':encodingAesKey,
+				'tk':tk
+			},
+			async:true,
+			success:function (data) {
+				if (data["code"] > 0) {
+					$('.btn').attr('disabled',false);
+					showMessage('success', data["message"],'PLATFORM_MAIN/Wchat/weixinOpenPlatformConfig');
+				}else{
+					showMessage('error', data["message"]);
+				}	
+			}
+		});
+	}
+</script>
+{/block}

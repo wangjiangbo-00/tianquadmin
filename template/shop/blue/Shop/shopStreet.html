@@ -1,0 +1,161 @@
+{extend name="shop/blue/base" /}
+{block name="resources"}
+<!-- 添加css、字体文件文件 -->
+<link type="text/css" rel="stylesheet" href="__TEMP__/{$style}/public/css/shop_street.css">
+
+
+{/block}
+{block name="main"}
+
+
+<!--店铺分类选择-->
+<div class="w1210">
+	<div class="classify-screen">
+		
+		<div class="classify-box clearfix">
+			<h5 class="classify-name">店铺分类：</h5>
+			<div class="classify-screen-con">
+				<div class="classify-choose">
+					{if condition="$shop_group_id eq '' "}
+						<a target="_self" href="SHOP_MAIN/shop/shopstreet" class="selected">
+						<span>全部</span>
+					</a>
+					{else /}
+						<a target="_self" href="SHOP_MAIN/shop/shopstreet" >
+							<span>全部</span>
+						</a>
+					{/if}
+					
+					{foreach $shop_group_list as $vo}
+						{if condition="$vo.shop_group_id eq $shop_group_id"}
+							<a target="_self" href="SHOP_MAIN/shop/shopstreet?shop_group_id={$vo.shop_group_id}" title="{$vo.group_name}" class="selected">
+								<span>{$vo.group_name}</span>
+							</a>
+						{else /}
+							  <a target="_self" href="SHOP_MAIN/shop/shopstreet?shop_group_id={$vo.shop_group_id}" title="{$vo.group_name}">
+								<span>{$vo.group_name}</span>
+							</a>
+						{/if}
+					  
+					{/foreach}
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--店铺显示-->
+<div class="w1210">
+	<div id="filter">
+		<form method="get" name="listform" id="listform" action="SHOP_MAIN/shop/shopstreet">
+			<div class="fore1">
+				<dl class="order">
+					<!-- 默认 -->
+					{if condition="$order_type eq ''"}
+						<dd class="first  curr ">
+					{else /}
+						<dd class="first">
+					{/if}
+					<a href="SHOP_MAIN/shop/shopstreet?shop_group_id={$shop_group_id}&shop_name={$shop_name}&order_type="> 默认 </a>
+						</dd>
+						
+					<!-- 销售 -->
+					{if condition="$order_type eq 1"}
+						<dd class="curr">
+					{else /}
+						<dd class="">
+					{/if}
+					
+					{if condition="$sort eq 'desc'"}
+						<a href="SHOP_MAIN/shop/shopstreet?shop_group_id={$shop_group_id}&shop_name={$shop_name}&order_type=1&sort=asc">销量<b class="icon-order-DESCending"></b></a>
+					{else /}
+						<a href="SHOP_MAIN/shop/shopstreet?shop_group_id={$shop_group_id}&shop_name={$shop_name}&order_type=1&sort=desc">销量
+							{if condition="$order_type eq 1"}
+								<b class="icon-order-ASCending"></b>
+							{else /}
+								<b class="icon-order-DESCending"></b>
+							{/if}
+						</a>
+					{/if}
+					</dd>
+					<!-- 信誉 -->
+					{if condition="$order_type eq 2"}
+						<dd class="curr">
+					{else /}
+						<dd class="">
+					{/if}
+						
+						{if condition="$sort eq 'desc'"}
+						<a href="SHOP_MAIN/shop/shopstreet?shop_group_id={$shop_group_id}&shop_name={$shop_name}&order_type=2&sort=asc">信誉<b class="icon-order-DESCending"></b></a>
+						{else /}
+						<a href="SHOP_MAIN/shop/shopstreet?shop_group_id={$shop_group_id}&shop_name={$shop_name}&order_type=2&sort=desc">信誉
+								{if condition="$order_type eq 2"}
+									<b class="icon-order-ASCending"></b>
+								{else /}
+									<b class="icon-order-DESCending"></b>
+								{/if}
+						</a>
+						{/if}
+					</dd>
+				</dl>
+				<dl class="shop-name">
+					<dt>店铺名称：</dt>
+					<dd>
+						<input type="text" placeholder="" name="shop_name" value="{$shop_name}">
+						<input type="submit" class="btn" value="搜索">
+					</dd>
+				</dl>
+			</div>
+		</form>
+	</div>
+	
+	<!-- 列表 -->
+	<div class="main" id="table_list">
+		{if condition="$total_count eq 0"}
+			<div class="tip-box">
+				<i class="tip-icon"></i>
+				<div class="tip-text">抱歉！没有您想要的结果……</div>
+			</div>
+		{else /}
+			<ul class="shop-list">
+			{foreach name="shop_list" item="vo"}
+				<li><a href="SHOP_MAIN/shop/shopindex?shop_id={$vo.shop_id}" target="_blank" title="{$vo.shop_name}">
+				{if condition="$vo.shop_avatar eq '' or $vo.shop_avatar eq null "}
+					<div class="p-img"><img alt="" src="__TEMP__/{$style}/public/images/default/default_shop_avatar.png"></div>
+				{else /}
+					<div class="p-img"><img alt="" src="__UPLOAD__/{$vo.shop_avatar}"></div>
+				{/if}
+					
+					<div class="shop-info">
+					<div class="shop-name-wrap clearfix">
+				{if condition="$vo.shop_logo eq '' or $vo.shop_logo eq null "}
+					<div class="shop-logo fl"><img alt="" src="__TEMP__/{$style}/public/images/default/default_shop_logo.png"></div>
+				{else /}
+					<div class="shop-logo fl"><img alt="" src="__UPLOAD__/{$vo.shop_logo}"></div>
+				{/if}
+					
+					<div class="shop-name fl">{$vo.shop_name}</div>
+					</div>
+					<div class="line"></div>
+					<div class="shop-desc clearfix"><p>{$vo.shop_description}</p></div>
+					</div>
+					</a></li>
+			{/foreach}
+		</ul>
+		{/if}
+		
+	{include file='shop/blue/controlCommonPage' /}
+	
+	<input type="hidden" name="shop_name" id="shop_name" value="{$shop_name}" />
+	<input type="hidden" name="shop_group_id" id="shop_group_id" value="{$shop_group_id}" />
+	<input type="hidden" name="order" id="order" value="{$order_type}" />
+	<input type="hidden" name="sort_statu" id="sort_statu" value="{$sort}" />
+	
+	</div>
+</div>
+{/block}
+
+{block name="javascript"}
+
+{/block}

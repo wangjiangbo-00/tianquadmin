@@ -1,0 +1,128 @@
+{extend name="platform/base" /} 
+{block name="resources"/}
+<style>
+input{
+	width:203px;
+}
+
+</style>
+{/block}
+{block name="main"}
+<section class="panel panel-default">
+              <header class="panel-heading"> 账户记录</header>
+              <div class="row text-sm wrapper">
+	              <div class="col-sm-5 m-b-xs" style="width:34%;">
+					<!-- 			<a href="PLATFORM_MAIN/Auth/addUser" class="btn btn-sm btn-primary"><i -->
+					<!-- 				class="fa fa-plus"></i> 添加用户 </a> -->
+				  </div>
+				  <div class="col-sm-2">
+					  <select class="input-sm form-control" id="account_type">
+	                    	<option value="0">请选择发生方式</option>
+	                    	<option value="1">订单</option>
+	                    	<option value="2">提现</option>
+	            	  </select>
+	              </div>
+                  <div class="col-sm-2" style="width:auto;">
+                  	<div class="input-group">
+						<input type="text" id="startDate" class="input-sm form-control"placeholder="请选择开始日期" onclick="WdatePicker()" style="width:203px;" />		
+				  	</div>
+				  </div>
+				  <div class="col-sm-2" style="width:auto;">
+				  	<div class="input-group">
+						<input type="text" id="endDate" placeholder="请选择结束日期" class="input-sm form-control"onclick="WdatePicker()" style="width:203px;"/>
+				  	</div>
+				  </div>
+				  <div class="col-sm-1">
+						<div class="input-group">
+							<span class="input-group-btn">
+								<button class="btn btn-sm btn-default" type="button"
+									onclick="LoadingInfo(1)">搜索</button>
+							</span> 
+						</div>
+				  </div>
+
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped b-t b-light text-sm">
+                  <thead>
+                    <tr>
+                      <th width="20"><input type="checkbox"></th>
+                      <th class="center">店铺 </th>
+                      <th class="center">金额</th>
+                      <th class="center">发生方式</th>
+<!--                       <th class="center">是否参与计算</th> -->
+                      <th class="center">创建时间</th>
+                    </tr>
+                  </thead>
+                  <tbody id="list">
+                  </tbody>
+                </table>
+              </div>
+                {include file="platform/page" /}
+            </section>
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script>           
+<script type="text/javascript">
+
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+function LoadingInfo(page_index) {
+
+	var start_date = $("#startDate").val();
+	var end_date = $("#endDate").val();
+	var account_type = $("#account_type").val();
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/account/shopaccountrecordslist",
+		async : true,
+		data : {
+			"page_index" : page_index,
+			"start_date":start_date,
+			"end_date":end_date,
+			"account_type":account_type,
+			"shop_id":{$shop_id}
+		},
+		success : function(data) {
+			$("#total_count_num").text(data["total_count"]);
+			$("#page_count_num").text(data["page_count"]);
+			$("#page_count").val(data["page_count"]);
+			$("#pageNumber a").remove();
+			var html = '';
+			if (data["data"].length > 0) {
+				for (var i = 0; i < data["data"].length; i++) {
+					html += '<tr>';
+					html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['id']+'"></td>';
+					html += '<td class="center">' + data["data"][i]["shop_name"] + '</td>';
+					html += '<td class="center">' + data["data"][i]["money"] + '</td>';
+					if(data["data"][i]["account_type"] == 1){
+						html += '<td class="center">订单</td>';
+					}else{
+						html += '<td class="center">提现</td>';
+					}
+// 					if(data["data"][i]["is_calculate"] == 1){
+// 						html += '<td class="center"><i class="fa fa-check text-success"></i></td>';
+// 					}else{
+// 						html += '<td class="center"><i class="fa fa-times text-danger"></i></td>';
+// 					}
+					html += '<td class="center">' + data["data"][i]["create_time"] + '</td>';															
+					
+					
+					html += '</tr>';
+				}
+			} else {
+				html += '<tr><th colspan="5">暂无符合条件的数据记录</th></tr>';
+			}
+			$("#list").html(html);
+				var totalpage = $("#page_count").val();
+		if (totalpage == 1) {
+			changeClass("all");
+		}
+		var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+		$("#pageNumber").append($html);
+		}
+	});
+}	
+
+</script>
+{/block}

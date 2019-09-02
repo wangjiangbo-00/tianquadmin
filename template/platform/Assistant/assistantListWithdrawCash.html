@@ -1,0 +1,165 @@
+{extend name="platform/base" /} {block name="main"}
+
+<section class="panel panel-default">
+	<div class="table-responsive">
+		<table class="table table-striped b-t b-light text-sm">
+			<thead>
+				<tr>
+					<th width="10"><input type="checkbox"></th>
+					<th class="center">姓名</th>
+					<th class="center">银行</th>
+					<th class="center">提现账号</th>
+					<th class="center">提现金额</th>
+					<th class="center">当前状态</th>
+					<th class="center">提现日期</th>
+					<th class="center">操作</th>
+				</tr>
+			</thead>
+			<tbody id="list">
+				<tr></tr>
+			</tbody>
+		</table>
+	</div>
+	{include file="platform/page" /}
+</section>
+
+{/block} {block name="script"}
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询提现列表
+	function LoadingInfo(pageIndex) {
+		var search_text = $("#search_text").val();
+		$.ajax({
+			type : "post",
+			url : "PLATFORM_MAIN/Assistant/assistantListWithdrawCash",
+			async : true,
+			data : {
+				"pageIndex" : pageIndex, "search_text" : search_text
+			},
+			success : function(data) {
+				//alert(JSON.stringify(data));
+				var html = '';
+				$("#total_count_num").text(data["total_count"]);
+				$("#page_count_num").text(data["page_count"]);
+				$("#page_count").val(data["page_count"]);
+				$("#pageNumber a").remove();
+				if (data["data"].length > 0) {
+					for (var i = 0; i < data["data"].length; i++) {
+						html += '<tr>';
+						html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['id']+'"></td>';
+						html += '<td class="center">' + data["data"][i]["realname"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["bank_name"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["account_number"] + '</td>';
+						html += '<td class="center">' + data["data"][i]["cash"] + '</td>';
+// 						html += '<td class="center">' + data["data"][i]["status"] + '</td>';
+						if(data["data"][i]["status"] == 0){
+							$status = '待处理';
+						}else if(data["data"][i]["status"] == 1){
+							$status = '已同意';
+						}else{
+							$status = '已拒绝';
+						}
+						
+						html+='<td class="center">' + $status + '</td>';
+						html += '<td class="center">' + data["data"][i]["ask_for_date"] + '</td>';
+						html += '<td class="center">';
+						if(data["data"][i]["status"]==0){
+							html += '<a href="javascript:void(0);" onclick="BusinessAssistantpass('+data['data'][i]['id']+');">通过</a>&nbsp;&nbsp';
+							html += '<a href="javascript:void(0);" onclick="BusinessAssistantrefuse('+data['data'][i]['id']+');">拒绝</a>&nbsp;&nbsp';
+						}
+						//else{
+						//	html += '<a href="javascript:void(0);" style="color: rgba(153, 153, 153, 0.76);">通过</a>&nbsp;&nbsp';
+						//	html += '<a href="javascript:void(0);" style="color: rgba(153, 153, 153, 0.76);">拒绝</a>&nbsp;&nbsp';
+						//}
+						
+						html += '</td> ';
+						html += '</tr>';
+					}
+				} else {
+					html += '<tr><th colspan="9">暂无符合条件的数据记录</th></tr>';
+				}
+				$("#list").html(html);
+					var totalpage = $("#page_count").val();
+			if (totalpage == 1) {
+				changeClass("all");
+			}
+			var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+			$("#pageNumber").append($html);
+			}
+		});
+	}	
+
+//通过审核
+	function BusinessAssistantpass(id){
+		
+		$( "#dialog" ).dialog({
+            buttons: {
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+            			type : "post",
+            			url : "PLATFORM_MAIN/Assistant/BusinessAssistantpass",
+            			async : true,
+            			data : {
+            				"status" :1,
+            				"id" : id
+            				
+            			},
+            			success : function(data) {
+            				//alert(JSON.stringify(data));
+            				if(data["code"] > 0 ){
+            					showMessage('success', data["message"],'PLATFORM_MAIN/Assistant/assistantListWithdrawCash');
+            				}else{
+            					showMessage('error', data["message"]);
+            				}
+            			}
+            		})
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+            },
+            contentText:"你确定设置该提现通过吗？",
+            title:"消息提醒"
+        });
+	} 
+	//拒绝审核
+	function BusinessAssistantrefuse(id){
+		$( "#dialog" ).dialog({
+            buttons: {
+            	
+                "确定,#e57373": function() {
+                    $(this).dialog('close');
+                    $.ajax({
+                    	
+            			type : "post",
+            			url : "PLATFORM_MAIN/Assistant/BusinessAssistantpass",
+            			async : true,
+            			data : {
+            				"status" :-1,
+            				"id" : id
+            			},
+            			
+            			success : function(data) {
+            				if(data["code"] > 0 ){
+            					showMessage('success', data["message"],'PLATFORM_MAIN/Assistant/assistantListWithdrawCash');
+            				}else{
+            					showMessage('error', data["message"]);
+            				}
+            			}
+            		})
+                },
+                "取消": function() {
+                    $(this).dialog('close');
+                }
+            },
+            contentText:"你确定拒绝该笔提现吗？",
+            title:"消息提醒"
+        });
+	} 
+
+
+</script>
+{/block}

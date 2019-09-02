@@ -1,0 +1,160 @@
+{extend name="admin/base" /}
+{block name="main"}
+<div class="set-style">
+
+	<dl>
+		<dt>店铺名称:</dt>
+		<dd>
+			<p>{$shop_info['base_info']['shop_name']}</p>
+		</dd>
+	</dl>
+
+
+	<dl>
+		<dt>店铺状态:</dt>
+		<dd>
+			<p>{$shop_info['base_info']['shop_state_str']}</p>
+		</dd>
+	</dl>
+
+	<dl>
+		<dt>商家电话:</dt>
+		<dd id="sellerContact">
+			<p><input name="UserCode" id="shop_phone" type="text" value="{$shop_info['base_info']['shopcontact']}"> </p>
+			<p class="error">请输入正确的手机格式</p>
+		</dd>
+	</dl>
+
+	<dl>
+		<dt>店铺logo:</dt>
+		<dd>
+			<div class="class-logo"><p><img id="imgLogo"src="{$shop_info['base_info']['shop_logo']}" ></p></div>
+			<div class="ncsc-upload-btn"> 
+			    <a href="javascript:void(0);"><span>
+			          <input hidefocus="true" size="1" class="input-file" name="file_upload" id="uploadImg" nc_type="change_store_label" type="file" onchange="imgUpload(this);">
+			        <input type="hidden"id="Logo"value="{$shop_info['base_info']['shop_logo']}"/></span><p><!-- <i class="icon-upload-alt"></i> -->上传图片</p>
+			    </a> 
+			</div>
+			<p class="hint"><br><span style="color:orange;">建议使用宽60*60像素内的GIF或PNG透明图片；点击下方"提交"按钮后生效。</span></p>
+		</dd>
+	</dl>
+	<dl>
+		<dt>横幅:</dt>
+		<dd>
+			<div class="class-logo"><p style="width: 600px;"><img id="imgLogo1"src="{$shop_info['base_info']['shop_banner']}" ></p></div>
+			<div class="ncsc-upload-btn"> 
+			    <a href="javascript:void(0);"><span>
+			          <input hidefocus="true" size="1" class="input-file" name="file_upload" id="uploadImg1" nc_type="change_store_label" type="file" onchange="imgUpload(this);">
+			        <input type="hidden"id="Logo1"value="{$shop_info['base_info']['shop_banner']}"/></span><p><!-- <i class="icon-upload-alt"></i> -->上传图片</p>
+			    </a> 
+			</div>
+			<p class="hint"><br><span style="color:orange;">建议使用宽700*350像素内的GIF或PNG透明图片；点击下方"提交"按钮后生效。</span></p>
+		</dd>
+	</dl>
+	<dl>
+		<dt>城市头像:</dt>
+		<dd>
+			<div class="class-logo"><p><img id="imgLogo2"src="{$shop_info['base_info']['shop_avatar']}" ></p></div>
+			<div class="ncsc-upload-btn"> 
+			    <a href="javascript:void(0);"><span>
+			          <input hidefocus="true" size="1" class="input-file" name="file_upload" id="uploadImg2" nc_type="change_store_label" type="file" onchange="imgUpload(this);">
+			        <input type="hidden"id="Logo2"value="{$shop_info['base_info']['shop_avatar']}"/></span><p><!-- <i class="icon-upload-alt"></i> -->上传图片</p>
+			    </a> 
+			</div>
+			<p class="hint"><br><span style="color:orange;">建议使用350*350像素内的GIF或PNG透明图片；点击下方"提交"按钮后生效。</span></p>
+		</dd>
+	</dl>
+
+
+	<dl>
+		<dt>城市特色描述:</dt>
+		<dd>
+			<p><textarea id="shop_description">{$shop_info['base_info']['shop_description']}</textarea> </p>
+			<p class="error">请输入特色描述</p>
+		</dd>
+	</dl>
+	<button class="edit_button" onclick="setShopConfigAjax();">提交</button>
+</div>
+<script src="ADMIN_JS/ajax_file_upload.js" type="text/javascript"></script>
+<script src="__STATIC__/js/file_upload.js" type="text/javascript"></script>
+<script>
+function setShopConfigAjax(){
+	var shop_logo = $("#Logo").val();
+	var shop_banner = $("#Logo1").val();
+	var shop_avatar = $("#Logo2").val();
+	var shop_qq = "";
+	var shop_ww = "";
+    var shop_phone = $("#shop_phone").val();
+	var shop_keywords = "";
+	var shop_description = $("#shop_description").val();
+
+	if(shop_phone == "" || shop_phone == undefined || shop_phone.length<11)
+	{
+        $("#sellerContact .error").show();
+        return;
+	}
+	else
+	{
+        $("#sellerContact .error").hide();
+	}
+	$.ajax({
+		type:"post",
+		url:"ADMIN_MAIN/shop/shopconfig",
+		data:{
+			'shop_logo':shop_logo,
+			'shop_banner':shop_banner,
+			'shop_avatar':shop_avatar,
+			'shop_qq':shop_qq,
+			'shop_ww':shop_ww,
+			'shop_phone':shop_phone,
+			'shop_keywords':shop_keywords,
+			'shop_description':shop_description
+		},
+		async:true,
+		success:function (data) {
+			if (data["code"] > 0) {
+				showMessage('success', data["message"],'ADMIN_MAIN/shop/shopconfig');
+			}else{
+				showMessage('error', data["message"]);
+			}	
+		}
+	});
+}
+/**
+ *图片上传
+ */
+function imgUpload(event) {
+	var fileid = $(event).attr("id");
+	var str = $(event).next().attr("id");
+    var data = { 'file_path' : UPLOADCOMMON }
+    if(fileid == "uploadImg1")
+	{
+        data.width = 700;
+        data.height = 350;
+	}
+	else if(fileid == "uploadImg2")
+	{
+        data.width = 350;
+        data.height = 350;
+	}
+    else if(fileid == "uploadImg")
+    {
+        data.width = 60;
+        data.height = 60;
+    }
+
+
+
+	uploadFile(fileid,data,function(res){
+		if(res.code){
+			$("#img"+str).attr("src",res.data);
+			$("#"+str).val(res.data);
+			showTip(res.message,"success");
+		}else{
+			showTip(res.message,"error");
+		}
+	});
+}
+</script>
+
+{/block}

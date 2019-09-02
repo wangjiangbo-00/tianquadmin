@@ -1,0 +1,367 @@
+{extend name="admin/base" /} 
+{block name="resources"/}
+<style>
+.modal-infp-style{
+width:90%;
+	margin:10px auto;
+}
+.modal-infp-style table{
+	width:100%;
+}
+.modal-infp-style table tr td{
+	border: 1px solid #e6e6e6;
+    padding: 10px;
+}
+
+	#lotterypic{
+		width: 60px;
+		height: 60px;
+	}
+</style>
+{/block}
+{block name="right_tab"} 
+<li><a class="nscs-table-handle_green" href="ADMIN_MAIN/promotion/addgift"><i class="fa fa-plus-circle"></i>&nbsp;添加赠品</a></li>
+{/block}
+{block name="main"}
+<div class="mod-table">
+	<div class="mod-table-head">
+		<table class="mytable">
+			<tr>
+
+			</tr>
+		</table>
+		<div class="con style0list">
+			<table>
+				<thead>
+					<tr align="center">
+						<th>活动名称</th>
+						<th>有效时间</th>
+						<th>活动状态</th>
+						<th>参与人数</th>
+						<th>中奖人数</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript">
+
+	var giftlist = [];
+function LoadingInfo(page_index) {
+	var search_text = $("#search_text").val();
+	$.ajax({
+		type : "post",
+		url : "ADMIN_MAIN/promotion/giftlist",
+		data : {
+			"page_index" : page_index,
+			"page_size" : $("#showNumber").val(),
+			"search_text" : search_text
+		},
+		success : function(data) {
+			var html = '';
+			if (data["data"].length > 0) {
+                giftlist = data["data"];
+				for (var i = 0; i < data["data"].length; i++) {
+
+				    var status = parseInt(data['data'][i]['status']);
+
+                    switch(status){
+                        case 0:
+                            var status_name = '未发布';
+                            break;
+                        case 1:
+                            var status_name = '申请上架中';
+                            break;
+                        case 2:
+                            var status_name = '申请成功';
+                            break;
+                        case 3:
+                            var status_name = '申请失败';
+                            break;
+                        case 4:
+                            var status_name = '展示中';
+                            break;
+                        case 5:
+                            var status_name = '已开始';
+                            break;
+
+                        case 6:
+                            var status_name = '已开奖';
+                            break;
+
+                        case 7:
+                            var status_name = '已结束';
+                            break;
+                    }
+					html += '<tr align="center">';
+					html += '<td>' + data["data"][i]["gift_name"] + '</td>';;
+					html += '<td>' + data["data"][i]["start_time"] + ' 至 ' + data["data"][i]["end_time"] + '</td>';
+					html += '<td>'+ status_name +'</td>';
+					html += '<td>' + data["data"][i]["participate"] + '</td>';;
+					html += '<td>' + data["data"][i]["count"] + '</td>';;
+
+                    html += '<td>';
+                    if(status == 0){
+                        html += '<a href="ADMIN_MAIN/promotion/updategift?gift_id=' + data["data"][i]["gift_id"] + '">编辑</a>&nbsp;';
+                        html += '<a href="javascript:void(0);"onclick="del('+data["data"][i]["gift_id"]+')">删除</a>&nbsp;';
+                        html += '<a href="javascript:void(0);"onclick="submit('+data["data"][i]["gift_id"]+')">提交申请</a>&nbsp;';
+                    }else if(status == 1){
+                        html += '<a href="javascript:void(0);"onclick="recall('+data["data"][i]["gift_id"]+')">撤回申请</a>&nbsp;';
+
+                    }else if(status == 2){
+                        html += '<a href="javascript:void(0);"onclick="del('+data["data"][i]["gift_id"]+')">删除</a>&nbsp;';
+                        html += '<a href="javascript:void(0);"onclick="pulloff('+data["data"][i]["gift_id"]+')">下架</a>&nbsp;';
+                    }else if(status== 3){
+                        html += '<a href="ADMIN_MAIN/promotion/updategift?gift_id=' + data["data"][i]["gift_id"] + '">编辑</a>&nbsp;';
+                        html += '<a href="javascript:void(0);"onclick="del('+data["data"][i]["discount_id"]+')">删除</a>&nbsp;';
+                    }
+
+                    else if(status == 4 || status == 5 ){
+
+                    }
+                    else if(status == 6 || status == 7)
+					{
+
+					    var endtime = data["data"][i]["create_time"];
+                        var endtimedate = new Date(endtime);
+
+                        var spantime = (new Date().getTime() - 0) / 1000;
+
+
+                        if(spantime > 3600 * 24 * 90){
+                            //创建30天的抽奖可以删除
+
+                            //html += '<a href="javascript:void(0);"onclick="del('+data["data"][i]["gift_id"]+')">删除</a>&nbsp;';
+						}
+
+
+
+					}
+                    html += '<a href="javascript:void(0);"onclick="giftInfo('+i+')">详情</a>&nbsp; ';
+
+                    html += '</td>';
+                    html += '</tr>';
+				}
+			} else {
+				html += '<tr align="center"><th colspan="9">暂无符合条件的数据记录</th></tr>';
+			}
+			$(".style0list tbody").html(html);
+			initPageData(data["page_count"],data['data'].length,data['total_count']);
+			$("#pageNumber").html(pagenumShow(jumpNumber,$("#page_count").val(),{$pageshow}));
+		}
+	});
+}
+
+function searchData(){
+	LoadingInfo(1);
+}
+
+function giftInfo(index){
+
+
+	var lottery = giftlist[index];
+
+	if(lottery)
+	{
+        $("#giftInfo").modal("show");
+        $("#gift_name").text(lottery["gift_name"]);
+        $("#time").text(lottery['start_time']+' 至 '+lottery['end_time']);
+        var mode = parseInt(lottery["mode"]);
+        var modestr = "";
+        if(mode == 1)
+		{
+            modestr = "定时开奖";
+		}
+		else if(mode == 2)
+        {
+            modestr = "手气抽奖";
+        }
+        else if(mode == 3)
+        {
+            modestr = "助力抽奖";
+        }
+        else if(mode == 4)
+        {
+            modestr = "满人抽奖";
+        }
+        else if(mode == 5)
+        {
+            modestr = "手动抽奖";
+        }
+
+
+        $("#mode").text(modestr);
+        $("#max_num").text(lottery["max_num"]+"件");
+        $("#instruction").text(lottery["goods_name"]);
+        $("#parms").text(lottery["parms"]);
+
+
+        $("#lotterypic").attr("src",lottery["goods_picture"]);
+
+	}
+	else
+	{
+        showMessage('error', "未找到抽奖信息");
+	}
+
+}
+
+function del(gift_id){
+    $( "#dialog" ).dialog({
+        buttons: {
+            "确定,#e57373": function() {
+                $(this).dialog('close');
+                $.ajax({
+                    type : "post",
+                    url : "ADMIN_MAIN/Promotion/deletegift",
+                    async : true,
+                    data : {
+                        "giftid" : gift_id
+                    },
+                    success : function(data) {
+                        if(data["code"] > 0 ){
+                            showMessage('success', "操作成功",'ADMIN_MAIN/Promotion/giftlist');
+                        }else{
+                            showMessage('error', "操作失败");
+                        }
+                    }
+                })
+            },
+            "取消": function() {
+                $(this).dialog('close');
+            }
+
+        },
+        contentText:"你确定删除抽奖吗？",
+        title:"消息提醒"
+    });
+}
+
+function pulloff(gift_id){
+    $( "#dialog" ).dialog({
+        buttons: {
+            "确定,#e57373": function() {
+                $(this).dialog('close');
+                $.ajax({
+                    type : "post",
+                    url : "ADMIN_MAIN/Promotion/closegift",
+                    async : true,
+                    data : {
+                        "giftid" : gift_id
+                    },
+                    success : function(data) {
+                        if(data["code"] > 0 ){
+                            showMessage('success', "操作成功",'ADMIN_MAIN/Promotion/giftlist');
+                        }else{
+                            showMessage('error', "操作失败");
+                        }
+                    }
+                })
+            },
+            "取消": function() {
+                $(this).dialog('close');
+            }
+
+        },
+        contentText:"你确定下架当前抽奖吗？",
+        title:"消息提醒"
+    });
+}
+
+function submit(id){
+    $.ajax({
+        type:"post",
+        url : "ADMIN_MAIN/promotion/submitgift",
+        data : {
+            "giftid" : id.toString()
+        },
+        dataType : "json",
+        success : function(data) {
+            if (data["code"] > 0) {
+                showMessage('success', data["message"],'ADMIN_MAIN/promotion/giftlist');
+            }else if(data["code"] == -1){
+                showMessage('error', '正在进行中的活动不可删除！');
+            }else{
+                showMessage('error', data['message']);
+            }
+        }
+    })
+}
+
+//撤销折扣信息
+function recall(id){
+    $.ajax({
+        type:"post",
+        url : "ADMIN_MAIN/promotion/recallgift",
+        data : {
+            "giftid" : id.toString()
+        },
+        dataType : "json",
+        success : function(data) {
+            if (data["code"] > 0) {
+                showMessage('success', data["message"],'ADMIN_MAIN/promotion/giftlist');
+            }else if(data["code"] == -1){
+                showMessage('error', '正在进行中的活动不可删除！');
+            }else{
+                showMessage('error', data['message']);
+            }
+        }
+    })
+}
+</script>
+<!-- 模态框（Modal） -->
+<div class="modal fade hide" id="giftInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">赠品详情</h4>
+            </div>
+            <div class="modal-body">
+            	<div class="modal-infp-style">
+            		<table>
+            			<tr>
+            				<td>抽奖名称</td>
+            				<td id="gift_name"></td>
+            			</tr>
+            			<tr>
+            				<td>有效期</td>
+            				<td id="time"></td>
+            			</tr>
+            			<tr>
+            				<td>开奖方式</td>
+            				<td id="mode"></td>
+            			</tr>
+						<tr>
+							<td>开奖参数</td>
+							<td id="parms"></td>
+						</tr>
+            			<tr>
+            				<td>奖品个数</td>
+            				<td id="max_num"></td>
+            			</tr>
+
+						<tr>
+							<td>奖品说明</td>
+							<td id="instruction"></td>
+						</tr>
+
+						<tr>
+							<td>奖品图片</td>
+							<td ><img src="" id="lotterypic" /></td>
+						</tr>
+
+            		</table>
+            		
+            	</div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button></div>
+        </div>
+    </div>
+</div>
+{/block}

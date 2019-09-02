@@ -1,0 +1,19 @@
+{extend name="shop/default/base" /}
+
+{block name="main_resources"}
+<link type="text/css" rel="stylesheet" href="__TEMP__/{$style}/public/css/shop_index.css">
+<script type="text/javascript"src="__TEMP__/{$style}/public/js/shop_index.js"></script>
+<script type="text/javascript"src="__TEMP__/{$style}/public/js/base.js"></script>
+{/block}
+
+<!-- 头部，菜单栏、搜索、导航栏 -->
+{block name="head"}
+	{include file='shop/default/Shop/controlHeadSerach'/}
+	
+{/block}
+
+<!--头部商品分类 start-->
+{block name="headGoodType"}
+	{include file='shop/default/Shop/controlHeadMenu'/}
+{/block}
+<!--头部商品分类 end-->

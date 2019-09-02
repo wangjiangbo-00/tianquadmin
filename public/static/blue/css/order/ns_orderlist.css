@@ -1,0 +1,129 @@
+@CHARSET "UTF-8";
+
+
+.btnstyle {
+	color: #ffffff !important;
+	background: green;
+	display: block;
+	margin: 0 auto;
+	margin-bottom: 5px;
+}
+
+.modal {
+	width: 1070px;
+	top: 50px;
+}
+
+.modal-backdrop {
+	background-color: #000000;
+}
+
+.btn_offline_pay {
+	background: #FF8400;
+}
+
+.product-img {
+	float: left;
+	width: 60px;
+	height: 60px;
+}
+
+.product-img img {
+	width: 100%;
+}
+
+.product-infor {
+	float: left;
+	margin-left: 20px;
+	width: 60%;
+}
+
+.title-tr td input[type="checkbox"] {
+	margin: 0 0 0 7px;
+}
+
+.title-tr td span {
+	margin-left: 10px;
+}
+
+.fa-a {
+	padding: 5px 10px;
+}
+
+.fa-a i {
+	vertical-align: middle;
+	font-size: 16px;
+	color: #333333;
+}
+
+.fa-flag {
+	cursor: pointer;
+}
+
+.order-nav {
+	overflow: hidden;
+	background: #ffffff;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+.order-nav ul {
+	overflow: hidden;
+}
+
+.order-nav li {
+	float: left;
+	padding: 15px 20px;
+	text-align: center;
+	cursor: pointer;
+}
+
+.order-nav li:hover, .order-nav li.selected {
+	border-bottom: 2px solid #0072D2;
+	color: #0072D2;
+}
+
+.order-tool {
+	margin: 5px 20px;
+}
+
+.order-tool input {
+	margin: 0;
+}
+
+.order-tool label {
+	display: inline-block;
+	margin: 0;
+}
+
+/*表格*/
+.style0list table {
+	
+}
+
+.style0list a {
+	color: #0072D2;
+}
+
+.style0list a:hover {
+	color: #1C8FEF;
+}
+
+.style0list thead th {
+	padding: 10px;
+	border-bottom: 1px solid #e5e5e5;
+	font-weight: normal;
+	background: #F3F1F1;
+}
+
+.style0list tbody .title-tr td {
+	background: #F2F9FF;
+	padding: 10px;
+	font-size: 12px;
+}
+
+.style0list tbody td {
+	border-right: 1px solid #e5e5e5;
+	vertical-align: middle;
+	background: #ffffff;
+	padding: 10px 20px;
+}

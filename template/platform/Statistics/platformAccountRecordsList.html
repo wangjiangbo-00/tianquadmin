@@ -1,0 +1,84 @@
+{extend name="platform/base" /} 
+{block name="main"}
+<section class="panel panel-default">
+              <header class="panel-heading"> 账户记录</header>
+              <div class="row text-sm wrapper">
+                <div class="col-sm-10 m-b-xs">
+                  
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped b-t b-light text-sm">
+                  <thead>
+                    <tr>
+                      <th width="20"><input type="checkbox"></th>
+                      <th class="center">店铺 </th>
+                      <th class="center">金额</th>
+                      <th class="center">发生方式</th>
+<!--                       <th class="center">是否参与计算</th> -->
+                      <th class="center">创建时间</th>
+                      <th class="center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="list">
+                  </tbody>
+                </table>
+              </div>
+               {include file="platform/page" /}
+            </section>
+<script type="text/javascript">
+$(function(){
+	LoadingInfo(1);
+});
+//查询用户列表
+function LoadingInfo(page_index) {
+	var search_text = $("#search_text").val();
+	$.ajax({
+		type : "post",
+		url : "PLATFORM_MAIN/Statistics/platformAccountRecordsList",
+		async : true,
+		data : {
+			"page_index" : page_index
+		},
+		success : function(data) {
+			$("#page_count").val(data["page_count"]);
+			$("#pageNumber a").remove();
+			var html = '';
+			if (data["data"].length > 0) {
+				for (var i = 0; i < data["data"].length; i++) {
+					html += '<tr>';
+					html += '<td><input type="checkbox" name="sub" value="'+ data['data'][i]['id']+'"></td>';
+					html += '<td class="center">' + data["data"][i]["shop_name"] + '</td>';
+					html += '<td class="center">' + data["data"][i]["money"] + '</td>';
+					if(data["data"][i]["account_type"] == 1){
+						html += '<td class="center">商城消费</td>';
+					}else{
+						html += '<td class="center">提现</td>';
+					}
+// 					if(data["data"][i]["is_calculate"] == 1){
+// 						html += '<td class="center">参与</td>';
+// 					}else{
+// 						html += '<td class="center">不参与</td>';
+// 					}
+					html += '<td class="center">' + data["data"][i]["create_time"] + '</td>';															
+					
+					html += '<td></td>';
+					
+					html += '</tr>';
+				}
+			} else {
+				html += '<tr><th colspan="7">暂无符合条件的数据记录</th></tr>';
+			}
+			$("#list").html(html);
+				var totalpage = $("#page_count").val();
+		if (totalpage == 1) {
+			changeClass("all");
+		}
+		var $html = pagenumShow(jumpNumber,totalpage,{$pageshow})
+		$("#pageNumber").append($html);
+		}
+	});
+}	
+
+</script>
+{/block}

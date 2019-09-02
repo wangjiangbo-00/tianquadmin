@@ -1,0 +1,534 @@
+{extend name="platform/base" /}
+{block name="resources"/}
+<style type="text/css">
+
+.form-shop label{float:left;margin-left:70px;width: 120px;text-align:right;margin-right: 50px;}
+
+</style>
+{/block}
+{block name="main"}
+<section class="panel panel-default">
+	<header class="panel-heading font-bold"> 审核店铺</header>
+	<div class="panel-body">
+		<form class="form-horizontal"  name="form" onsubmit="">
+		    <input type="hidden" value="{$result.apply_id}" id="apply_id"/>	
+		   	<input type="hidden" id="provinceid" value="{$result.company_province_id}" />
+			<input type="hidden" id="cityid" value="{$result.company_city_id}" />
+			<input type="hidden" id="districtid" value="{$result.company_district_id}" />
+			<input type="hidden" value="{$result.apply_state}" id="apply_state"/>
+			{if condition="$result.apply_type eq 1"}
+			<div class="form-shop">
+				<label>店铺名称:</label>
+				<div>
+					{$result.company_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>联系地址:</label>
+				<div>{$result.province_name}{$result.city_name}{$result.district_name}
+				     <!-- <select name="province" id="seleAreaNext" onchange="GetProvince();" disabled>
+                       <option value="">请选择省</option>
+                     </select>
+                    <select name="city" id="seleAreaThird" onchange="getSelCity();" disabled>
+                      <option value="">请选择市</option>
+                                          </select>
+                    <select name="district" id="seleAreaFouth" disabled>
+                      <option value="-1">请选择区</option>
+                    </select> -->
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>详细地址:</label>
+				<div>
+					{$result.company_address_detail}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>姓名:</label>
+				<div>
+					{$result.contacts_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>联系人电话:</label>
+				<div>
+					{$result.contacts_phone}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>电子邮箱:</label>
+				<div>
+					{$result.contacts_email}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>身份证号码:</label>
+				<div>
+					{$result.contacts_card_no}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<!-- 图片 -->
+			<div class="form-shop">
+                 <label>手持身份证照片:</label>
+                 <div>
+			                              	<p><img id="imgLogo" src="__UPLOAD__/{$result.contacts_card_electronic_1}"  class="imglogo"/></p>
+			                              	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+			                              		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+			                              		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+			id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+			onchange="imgUpload(this);"> 
+				</span>
+		            	</a>
+                 </div>                 
+            </div>
+		    <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+                 <label>身份证正面:</label>
+                 <div>
+			                              	<p><img id="imgLogo" src="__UPLOAD__/{$result.contacts_card_electronic_2}" class="imglogo"/></p>
+			                              	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+			                              		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+			                              		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+			id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+			onchange="imgUpload(this);"> 
+	
+				</span>
+		            	</a>
+                 </div>                 
+            </div>
+		    <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+                 <label>身份证反面:</label>
+                 <div>
+			                              	<p><img id="imgLogo" src="__UPLOAD__/{$result.contacts_card_electronic_3}"  class="imglogo"/></p>
+			                              	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+			                              		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+			                              		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+			id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+			onchange="imgUpload(this);"> 
+		
+				</span>
+		            	</a>
+                 </div>                 
+            </div>
+		    <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>银行开户名:</label>
+				<div>
+					{$result.bank_account_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>个人银行账号:</label>
+				<div>
+					{$result.bank_account_number}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>开户银行支行名称:</label>
+				<div>
+					{$result.bank_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>支行联行号:</label>
+				<div>
+					{$result.bank_code}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>店铺名称:</label>
+				<div>
+					{$result.shop_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>店铺等级:</label>
+				<div>
+					{$result.shop_type_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>店铺分类:</label>
+				<div>
+					{$result.shop_group_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>推荐招商员:</label>
+				<div>
+					{$result.recommend_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			{else/}
+			 	<div class="form-shop">
+				<label>公司名称:</label>
+				<div>
+					{$result.company_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>联系地址:</label>
+				<div>
+				{$result.province_name}{$result.city_name}{$result.district_name}
+<!-- 				     <select name="province" id="seleAreaNext" onchange="GetProvince();" disabled> -->
+<!--                        <option value="">请选择省</option> -->
+<!--                      </select> -->
+<!--                     <select name="city" id="seleAreaThird" onchange="getSelCity();" disabled> -->
+<!--                       <option value="">请选择市</option> -->
+<!--                                           </select> -->
+<!--                     <select name="district" id="seleAreaFouth" disabled> -->
+<!--                       <option value="-1">请选择区</option> -->
+<!--                     </select> -->
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>详细地址:</label>
+				<div>
+					{$result.company_address_detail}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>公司类型:</label>
+				<div>
+					{$result.company_type}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>公司电话:</label>
+				<div>
+					{$result.company_phone}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>公司规模:</label>
+				<div>
+					员工总数{$result.company_employee_count}人，注册资金{$result.company_registered_capital}万元
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>联系人姓名:</label>
+				<div>
+					{$result.contacts_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>联系人电话:</label>
+				<div>
+					{$result.contacts_phone}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>电子邮箱:</label>
+				<div>
+					{$result.contacts_email}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>营业执照号:</label>
+				<div>
+					{$result.business_licence_number}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>法定经营范围:</label>
+				<div>
+					{$result.business_sphere}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<!-- 图片 -->
+			<div class="form-shop">
+                 <label>营业执照号电子版:</label>
+                 <div>
+			                              	<p><img id="imgLogo" src="__UPLOAD__/{$result.business_licence_number_electronic}"  class="imglogo"/></p>
+			                              	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+			                              		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+			                              		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+			id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+			onchange="imgUpload(this);"> 
+				</span>
+		            	</a>
+                 </div>                 
+            </div>
+		    <div class="line line-dashed line-lg pull-in"></div>
+		    <div class="form-shop">
+				<label>组织机构代码:</label>
+				<div>
+					{$result.organization_code}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+                 <label>组织机构代码证电子版:</label>
+                 <div>
+			                              	<p><img id="imgLogo" src="__UPLOAD__/{$result.organization_code_electronic}"  class="imglogo"/></p>
+			                              	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+			                              		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+			                              		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+			id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+			onchange="imgUpload(this);"> 
+				</span>
+		            	</a>
+                 </div>                 
+            </div>
+		    <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+                 <label>一般纳税人证明:</label>
+                 <div>
+			                              	<p><img id="imgLogo" src="__UPLOAD__/{$result.general_taxpayer}"  class="imglogo"/></p>
+			                              	<a href="javascript:void(0);" style="display:block;position:relative;z-index:1;">
+			                              		<span style="width: 97px;height: 34px;position: absolute;left: 0;top: 0;z-index: 2;cursor: pointer;"> 
+			                              		<input hidefocus="true" size="1" class="input-file" name="file_upload"
+			id="uploadImg" nc_type="change_store_label" type="file" style="width: 97px;height: 34px;padding: 0;margin: 0;border: none 0;opacity: 0;filter: alpha(opacity = 0);cursor: pointer;"
+			onchange="imgUpload(this);"> 
+		
+				</span>
+		            	</a>
+                 </div>                 
+            </div>
+		    <div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>店铺名称:</label>
+				<div>
+					{$result.shop_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>店铺等级:</label>
+				<div>
+					{$result.shop_type_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>店铺分类:</label>
+				<div>
+					{$result.shop_group_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+			<div class="form-shop">
+				<label>推荐招商员:</label>
+				<div>
+					{$result.recommend_name}
+				</div>
+			</div>
+			<div class="line line-dashed line-lg pull-in"></div>
+		{/if}
+			
+			<div class="form-group" id="btn_shop">
+				{if condition="$result['apply_state'] eq 1"}
+				<div class="col-sm-4 col-sm-offset-2">
+					<a href="javascript:void(0);" onclick="save(1)" class="btn btn-primary">通过</a>
+					<a href="javascript:void(0);" onclick="save(2)" class="btn btn-primary">拒绝</a>
+				</div>
+				{/if}
+			</div>
+		</form>
+		
+	</div>
+</section>
+
+{/block} 
+{block name="script"}
+<script src="__STATIC__/js/address.js"></script>
+{include file="platform/openDialog" /}
+  <script type="text/javascript">
+  function save(type){
+	  var apply_id = $("#apply_id").val();
+	  if(type == 1){
+		  type = 'agree';
+	  }else if(type == 2){
+		  type = 'disagree';
+	  }else{
+		  return false;
+	  }
+	      $.ajax({
+	    	  type:"post",
+	    	  url:"PLATFORM_MAIN/Shop/ajax_shopVerify",
+	    	  data:{'apply_id':apply_id,'type':type},
+	    	  async : true,
+	    	  success:function(data){
+	    		  if (data["code"] > 0) {
+						showMessage('success', data["message"], 'PLATFORM_MAIN/Shop/shopApplyList');
+				  }else{
+						showMessage('error', data["message"]);
+					   } 
+	    	  }
+	      })
+	  	 
+  }
+  
+//选择省份弹出市区
+  function GetProvince() {
+  	var id = $("#seleAreaNext").find("option:selected").val();
+  	var selCity = $("#seleAreaThird")[0];
+  	for (var i = selCity.length - 1; i >= 0; i--) {
+  		selCity.options[i] = null;
+  	}
+  	
+  	var opt = new Option("请选择市", "-1");
+  	selCity.options.add(opt);
+  	$.ajax({
+  		type : "post",
+  		url : "PLATFORM_MAIN/member/getcity",
+  		dataType : "json",
+  		data : {
+  			"province_id" : id
+  		},
+  		success : function(data) {
+  			if (data != null && data.length > 0) {
+  				for (var i = 0; i < data.length; i++) {
+  					var opt = new Option(data[i].city_name,data[i].city_id);
+  					selCity.options.add(opt);
+  				}
+  				if(typeof($("#cityid").val())!='undefined'){
+  					$("#seleAreaThird").val($("#cityid").val());
+  					getSelCity();
+  					$("#cityid").val('-1');
+  				}
+  			}
+  		}
+  	});
+  };
+  // 选择市区弹出区域
+  function getSelCity() {
+  	var id = $("#seleAreaThird").find("option:selected").val();
+  	var selArea = $("#seleAreaFouth")[0];
+  	for (var i = selArea.length - 1; i >= 0; i--) {
+  		selArea.options[i] = null;
+  	}
+  	var opt = new Option("请选择区/县", "-1");
+  	selArea.options.add(opt);
+  	$.ajax({
+  		type : "post",
+  		url : "PLATFORM_MAIN/member/getdistrict",
+  		dataType : "json",
+  		data : {
+  			"city_id" : id
+  		},
+  		success : function(data) {
+  			if (data != null && data.length > 0) {
+  				for (var i = 0; i < data.length; i++) {
+  					var opt = new Option(data[i].district_name,data[i].district_id);
+  					selArea.options.add(opt);
+  				}
+  				if(typeof($("#districtid").val())!='undefined'){
+  					$("#seleAreaFouth").val($("#districtid").val());
+  					$("#districtid").val('-1');
+  				}
+  				
+  			}
+  		}
+  	});
+  }
+  
+  /**
+   * 省市区联动
+   */
+   $(function(){
+		var province=$("#provinceid").val();
+		var city=$("#cityid").val();
+		var district=$("#districtid").val();
+		var selProvince=$("#seleAreaNext")[0];
+		for (var i = selProvince.length - 1; i >= 0; i--) {
+			selProvince.options[i] = null;
+		}
+		var opt = new Option("请选择省", "-1");
+		selProvince.options.add(opt);
+			//添加省
+			$.ajax({
+				type : "post",
+				url : "PLATFORM_MAIN/member/getprovince",
+				dataType : "json",
+				success : function(data) {
+					if (data != null && data.length > 0) {
+						for (var i = 0; i < data.length; i++) {
+							var opt = new Option(data[i].province_name, data[i].province_id);
+							selProvince.options.add(opt);
+						}
+						$("#seleAreaNext").val(province);
+					}
+				}
+			});
+		 var address_id=$("#adressid").val();
+		 if(address_id!=0){
+			 //查询这个收货地址的详细地址
+			//加载市
+	 				var selCity = $("#seleAreaThird")[0];
+	 				for (var i = selCity.length - 1; i >= 0; i--) {
+	 					selCity.options[i] = null;
+	 				}
+	 				var opt = new Option("请选择市", "-1");
+	 				selCity.options.add(opt);
+	 				$.ajax({
+	 					type: "post",
+	 					url: "PLATFORM_MAIN/member/getcity",
+	 					dataType: "json",
+	 					data: { "province_id": province },
+	 					success: function (data) {
+	 						if (data != null && data.length > 0) {
+	 							for (var i = 0; i < data.length; i++) {
+	 								var opt = new Option(data[i].city_name, data[i].city_id);
+	 								selCity.options.add(opt);
+	 							}
+	 						   $("#seleAreaThird").val(city);
+	 						}
+	 					}
+	 				});
+	 				//加载区县
+	 			   var selArea = $("#seleAreaFouth")[0];
+	 				for (var i = selArea.length - 1; i >= 0; i--) {
+	 					selArea.options[i] = null;
+	 				}
+	 				var opt = new Option("请选择区/县", "-1");
+	 				selArea.options.add(opt);
+	 				$.ajax({
+	 					type: "post",
+	 					url: "PLATFORM_MAIN/member/getdistrict",
+	 					dataType: "json",
+	 					data: { "city_id": city },
+	 					success: function (data) {
+	 						if (data != null && data.length > 0) {
+	 							for (var i = 0; i < data.length; i++) {
+	 								var opt = new Option(data[i].district_name, data[i].district_id);
+	 								selArea.options.add(opt);
+	 							}
+	 						   $("#seleAreaFouth").val(district);
+	 						}
+	 					}
+	 				});
+		 }
+		});
+		
+
+  </script>
+  
+{/block}
